@@ -1,0 +1,5 @@
+extends: base.yaml
+language: c
+model_id: c-tiny
+vscode_language_ids: ["c"]
+file_globs: ["**/*.c", "**/*.h"]

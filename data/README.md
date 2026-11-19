@@ -21,3 +21,7 @@ Teacher responses must be licensed for model training. Prepare JSONL records
 with `prompt`, `solution`, `tests`, and `license`. Run
 `python -m data.synth.verify input.jsonl vetted.jsonl --benchmark held-out.jsonl --terms-permit-training`
 to check them against the same frozen fixtures and keep only passing triples.
+
+Use `--language` with `typescript`, `rust`, `go`, `java`, `c`, or `cpp`
+for the corresponding grammar. Use row-level `language: "tsx"` for TSX files
+in the TypeScript corpus.

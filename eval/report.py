@@ -13,7 +13,7 @@ import yaml
 
 from eval.inference import serve
 from eval.suites.records import Task, load_tasks
-from verifiers.python.runner import verify
+from verifiers.compiled import LANGUAGES, verifier
 from verifiers.sandbox import Outcome
 
 GATES = Path(__file__).with_name("gates.yaml")
@@ -51,10 +51,12 @@ def score(tasks: list[Task], complete: Callable[[str], str], verifier: Verifier)
 
 
 def gate(suites: dict[str, Any], baseline: dict[str, Any],
-         competitor: dict[str, Any]) -> list[str]:
+         competitor: dict[str, Any], language: str = "python") -> list[str]:
     requirements = yaml.safe_load(GATES.read_text(encoding="utf8"))
     failures = []
     for suite, metrics in requirements.items():
+        if suite == "humaneval" and language != "python":
+            continue
         for metric, thresholds in metrics.items():
             def get(report: dict[str, Any]) -> float | None:
                 value = report.get(suite, {}).get("metrics", {}).get(metric)
@@ -75,7 +77,7 @@ def digest(path: Path) -> str:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--lang", default="python", choices=["python"])
+    parser.add_argument("--lang", default="python", choices=LANGUAGES)
     parser.add_argument("--model", type=Path, required=True)
     parser.add_argument("--suite", action="append", required=True, metavar="NAME=PATH")
     parser.add_argument("--license", help="Verified source SPDX identifier for records without a license")
@@ -98,12 +100,12 @@ def main() -> None:
             stop = ("\ndef ", "\nclass ", "\n#", "\nif ", "\nprint(", "\n```") if name == "humaneval" else ()
             suites[name] = {"dataset_sha256": sha,
                             **score(tasks, lambda prompt: client.complete(prompt, extra_stop=stop),
-                                    lambda code, tests: verify(code, tests, docker=args.docker))}
+                                    verifier(args.lang, args.docker))}
     failures = ["Baseline and competitor reports are required for release"]
     if args.baseline and args.competitor:
         baseline = json.loads(args.baseline.read_text(encoding="utf8"))
         competitor = json.loads(args.competitor.read_text(encoding="utf8"))
-        failures = gate(suites, baseline["suites"], competitor["suites"])
+        failures = gate(suites, baseline["suites"], competitor["suites"], args.lang)
         for reference in (baseline, competitor):
             for name, result in suites.items():
                 if result["dataset_sha256"] != reference["suites"].get(name, {}).get("dataset_sha256"):

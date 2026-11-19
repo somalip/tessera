@@ -71,7 +71,7 @@ def run(config: dict[str, Any]) -> Path:
     stages: dict[str, Any] = {}
     stages["cpt"] = optimize(model, torch, cpt, device, config["cpt_steps"],
                              gradient_accumulation, rate)
-    supervision = Supervision(Path(config["supervised"]), benchmarks, config["docker"])
+    supervision = Supervision(Path(config["supervised"]), benchmarks, config["docker"], config["language"])
 
     def pairs(examples: list[tuple[str, str]]) -> Iterator[Pair]:
         return (training_pair(tokenizer, prompt, solution, sequence_length) for prompt, solution in examples)

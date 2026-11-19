@@ -28,3 +28,9 @@ and a `context` list of objects with `path` and `text`. The two arms use the
 extension's FIM builder with identical prompts and decoding settings apart
 from the BM25 context. Live language service definitions are unavailable in
 this offline comparison.
+
+For TypeScript, Rust, Go, Java, C, and C++, run
+`python -m verifiers.prepare LANGUAGE` to install the pinned sandbox image.
+Use MultiPL-E and the regional held-out suites for compiled languages.
+Compiled execution fixtures must combine the prompt, candidate, suffix, and
+tests into a single file with an entry point. Java uses `Main.java`.

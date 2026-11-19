@@ -16,11 +16,12 @@ class VerifierError(RuntimeError):
 
 
 def run_container(image: str, command: list[str], source: str,
-                  timeout: float = 15, docker: str = "docker") -> Outcome:
+                  timeout: float = 15, docker: str = "docker", *, executable_scratch: bool = False) -> Outcome:
     name = f"tinycoders-{uuid.uuid4().hex}"
+    mode = "exec" if executable_scratch else "noexec"
     args = [
         docker, "run", "--rm", "--pull=never", "--name", name, "--interactive",
-        "--network=none", "--read-only", "--tmpfs", "/tmp:rw,nosuid,nodev,size=128m",
+        "--network=none", "--read-only", "--tmpfs", f"/tmp:rw,{mode},nosuid,nodev,size=128m",
         "--cap-drop=ALL", "--security-opt=no-new-privileges", "--user=65534:65534",
         "--memory=512m", "--memory-swap=512m", "--pids-limit=64", "--cpus=1",
         "--ulimit", "nofile=128:128", "--workdir", "/tmp", image, *command,

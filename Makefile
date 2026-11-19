@@ -4,11 +4,11 @@ PYTHON ?= python3
 check:
 	$(PYTHON) tools/generate_contracts.py --check
 	$(PYTHON) -m ruff check .
-	$(PYTHON) -m mypy --strict --explicit-package-bases tools tests data eval verifiers package train
+	$(PYTHON) -m mypy --strict --explicit-package-bases tools tests data eval verifiers package train ci
 	$(PYTHON) -m unittest discover -s tests
 	npm --prefix vscode-extension run check
 	npm --prefix vscode-extension run build
-	node --test vscode-extension/test/*.test.cjs
+	PYTHON=$(PYTHON) node --test vscode-extension/test/*.test.cjs
 
 .PHONY: test-ext
 test-ext:

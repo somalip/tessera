@@ -7,7 +7,7 @@ from typing import Any
 
 from data.pipelines.filtering import SECRET, Contamination, records, tokens
 from data.sources.licensing import licenses
-from verifiers.python.runner import verify
+from verifiers.compiled import verifier
 
 CHAT_MARKERS = ("<|im_start|>", "<|im_end|>")
 
@@ -63,9 +63,9 @@ def training_pair(tokenizer: Any, prompt: str, solution: str,
 
 
 class Supervision:
-    def __init__(self, path: Path, benchmarks: list[Path], docker: str) -> None:
+    def __init__(self, path: Path, benchmarks: list[Path], docker: str, language: str) -> None:
         self.contamination = Contamination(benchmarks)
-        self.docker = docker
+        self.verify = verifier(language, docker)
         self.rows = list(records(path))
         allowed = licenses()
         for row in self.rows:
@@ -85,11 +85,11 @@ class Supervision:
                           row.get("candidates", [row["solution"]]))
             for candidate in candidates:
                 if (self.safe(row["prompt"], candidate, row["tests"])
-                        and verify(candidate, row["tests"], docker=self.docker).passed):
+                        and self.verify(candidate, row["tests"]).passed):
                     yield row["prompt"], candidate
                     break
 
     def teacher(self) -> Iterator[tuple[str, str]]:
         for row in self.rows:
-            if verify(row["solution"], row["tests"], docker=self.docker).passed:
+            if self.verify(row["solution"], row["tests"]).passed:
                 yield row["prompt"], row["solution"]

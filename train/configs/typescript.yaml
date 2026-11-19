@@ -1,0 +1,5 @@
+extends: base.yaml
+language: typescript
+model_id: typescript-tiny
+vscode_language_ids: ["typescript", "typescriptreact"]
+file_globs: ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"]

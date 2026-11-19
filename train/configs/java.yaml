@@ -1,0 +1,5 @@
+extends: base.yaml
+language: java
+model_id: java-tiny
+vscode_language_ids: ["java"]
+file_globs: ["**/*.java"]

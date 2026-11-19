@@ -1,0 +1,5 @@
+extends: base.yaml
+language: rust
+model_id: rust-tiny
+vscode_language_ids: ["rust"]
+file_globs: ["**/*.rs"]
