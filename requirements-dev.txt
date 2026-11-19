@@ -3,3 +3,6 @@ mypy==1.18.2
 ruff==0.14.0
 PyYAML==6.0.3
 types-PyYAML==6.0.12.20250915
+tokenizers==0.22.1
+tree-sitter==0.25.2
+tree-sitter-python==0.25.0
