@@ -1,0 +1,8 @@
+[tool.mypy]
+strict = true
+explicit_package_bases = true
+
+[[tool.mypy.overrides]]
+module = ["torch", "torch.*", "transformers", "transformers.*"]
+follow_imports = "skip"
+ignore_missing_imports = true

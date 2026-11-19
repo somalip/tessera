@@ -1,0 +1,5 @@
+extends: base.yaml
+language: python
+model_id: python-tiny
+vscode_language_ids: [python]
+file_globs: ['**/*.py', '**/*.pyi']

@@ -115,7 +115,11 @@ def build(source: Path, benchmarks: list[Path], tokenizer_path: Path,
         counters["accepted_overlap"] = 0
         if not counters["accepted"]:
             raise ValueError(f"No eligible source records: {dict(counters)}")
-        (target / "stats.json").write_text(json.dumps(counters, indent=2) + "\n", encoding="utf8")
+        statistics = {**counters,
+                      "tokenizer_sha256": hashlib.sha256(tokenizer_path.read_bytes()).hexdigest(),
+                      "benchmarks": sorted(hashlib.sha256(path.read_bytes()).hexdigest()
+                                           for path in benchmarks)}
+        (target / "stats.json").write_text(json.dumps(statistics, indent=2) + "\n", encoding="utf8")
         target.rename(output)
     return counters
 
