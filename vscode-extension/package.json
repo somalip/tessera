@@ -95,6 +95,11 @@
           "scope": "machine",
           "default": "",
           "description": "PEM-encoded trusted Ed25519 public key for the registry."
+        },
+        "tinycoders.repositoryContext": {
+          "type": "boolean",
+          "default": true,
+          "description": "Include nearby workspace snippets and local language service definitions in inline completions."
         }
       }
     },
@@ -110,6 +115,26 @@
       {
         "command": "tinycoders.switchVersion",
         "title": "TinyCoders: Switch Installed Model Version"
+      },
+      {
+        "command": "tinycoders.explain",
+        "title": "TinyCoders: Explain Code"
+      },
+      {
+        "command": "tinycoders.refactor",
+        "title": "TinyCoders: Refactor Code"
+      },
+      {
+        "command": "tinycoders.writeTests",
+        "title": "TinyCoders: Write Tests"
+      }
+    ],
+    "chatParticipants": [
+      {
+        "id": "tinycoders.local",
+        "name": "tinycoders",
+        "fullName": "TinyCoders",
+        "description": "Chat with the active local TinyCoders model"
       }
     ]
   }

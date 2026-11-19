@@ -95,8 +95,9 @@ def main() -> None:
     suites = {}
     with serve(args.model, args.server) as client:
         for name, (sha, tasks) in data.items():
+            stop = ("\ndef ", "\nclass ", "\n#", "\nif ", "\nprint(", "\n```") if name == "humaneval" else ()
             suites[name] = {"dataset_sha256": sha,
-                            **score(tasks, client.complete,
+                            **score(tasks, lambda prompt: client.complete(prompt, extra_stop=stop),
                                     lambda code, tests: verify(code, tests, docker=args.docker))}
     failures = ["Baseline and competitor reports are required for release"]
     if args.baseline and args.competitor:

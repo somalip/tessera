@@ -20,3 +20,11 @@ Repeat `--suite` for each benchmark in `gates.yaml`. Run the same fixture
 snapshots for the base, competitor, and candidate. Pass `--baseline` and
 `--competitor` with the two reference report paths for the release gate.
 Fixture digests must match across all three reports.
+
+For the FIM context A/B, build the extension, then run
+`python -m eval.context_ab --fixtures repo-fim.jsonl --model candidate.gguf --output artifacts/context-ab.json`.
+Each fixture needs `id`, `path`, `license`, `prompt`, `suffix`, `expected`,
+and a `context` list of objects with `path` and `text`. The two arms use the
+extension's FIM builder with identical prompts and decoding settings apart
+from the BM25 context. Live language service definitions are unavailable in
+this offline comparison.

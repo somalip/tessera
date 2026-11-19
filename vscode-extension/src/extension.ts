@@ -3,9 +3,12 @@ import { freemem } from "node:os";
 import { join } from "node:path";
 import * as vscode from "vscode";
 import { qwenFim } from "./context/builder";
+import { WorkspaceContext } from "./context/workspace";
 import type { Manifest } from "./contracts";
 import type { InferenceHost } from "./host/client";
 import { LlamaServer } from "./host/llamaServer";
+import { registerChat } from "./providers/chat";
+import { registerCodeActions } from "./providers/codeActions";
 import { InlineCompletion } from "./providers/inlineCompletion";
 import { fetchIndex, ModelStore, type InstalledModel } from "./registry/download";
 import { embeddedLanguage, projectLanguage } from "./router/detector";
@@ -16,6 +19,7 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
   const log = vscode.window.createOutputChannel("TinyCoders");
   const status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 25);
   const config = () => vscode.workspace.getConfiguration("tinycoders");
+  const repository = new WorkspaceContext();
   const pins = new Map<string, string>();
   const store = new ModelStore(join(context.globalStorageUri.fsPath, "models"));
   let localModels: InstalledModel[] = [];
@@ -85,7 +89,14 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
   const provider = new InlineCompletion((document, position) => {
     const model = candidate(document, position);
     return model && endpoint(model);
-  }, log);
+  }, log, (document, position) => config().get("repositoryContext", true)
+    ? repository.retrieve(document, position) : Promise.resolve([]));
+
+  const chatModel = (editor: vscode.TextEditor, capability: "chat" | "edit") => {
+    const model = candidate(editor.document, editor.selection.active, capability);
+    return model && endpoint(model);
+  };
+  registerCodeActions(context, (editor, action) => chatModel(editor, action === "explain" ? "chat" : "edit"), log);
 
   const updateStatus = () => {
     const editor = vscode.window.activeTextEditor;
@@ -103,6 +114,7 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
     const editor = vscode.window.activeTextEditor;
     const folder = editor && vscode.workspace.getWorkspaceFolder(editor.document.uri);
     const files = new Set<string>();
+    if (editor && config().get("repositoryContext", true)) void repository.warm(editor.document);
     if (folder) {
       await Promise.all([
         ["tsconfig.json", "tsconfig.json"],
@@ -134,7 +146,10 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
   status.show();
   updateStatus();
   context.subscriptions.push(
-    log, provider, status, { dispose: () => lifecycle.dispose() },
+    log, provider, status, repository, registerChat(() => {
+      const editor = vscode.window.activeTextEditor;
+      return editor && chatModel(editor, "chat");
+    }, log), { dispose: () => lifecycle.dispose() },
     vscode.languages.registerInlineCompletionItemProvider({ pattern: "**" }, provider),
     vscode.workspace.onDidChangeTextDocument(event => provider.cancel(event.document)),
     vscode.workspace.onDidCloseTextDocument(document => provider.cancel(document)),

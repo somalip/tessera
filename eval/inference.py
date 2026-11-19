@@ -36,10 +36,10 @@ class Client:
             result: dict[str, Any] = json.load(response)
             return result
 
-    def complete(self, prompt: str) -> str:
+    def complete(self, prompt: str, max_tokens: int = 256, extra_stop: tuple[str, ...] = ()) -> str:
         result = self.request("/v1/completions", {
-            "prompt": prompt, "temperature": 0, "seed": 0, "max_tokens": 256,
-            "stop": ["<|endoftext|>", "<|fim_prefix|>", "<|fim_suffix|>", "<|fim_middle|>"],
+            "prompt": prompt, "temperature": 0, "seed": 0, "max_tokens": max_tokens,
+            "stop": ["<|endoftext|>", "<|fim_prefix|>", "<|fim_suffix|>", "<|fim_middle|>", *extra_stop],
         })
         return str(result["choices"][0]["text"])
 

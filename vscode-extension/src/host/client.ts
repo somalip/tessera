@@ -11,7 +11,8 @@ export interface InferenceHost {
 type ResponseChunk = { choices: Array<{ text?: string; delta?: { content?: string } }> };
 
 export class LlamaClient implements InferenceHost {
-  constructor(private readonly origin: string, private readonly apiKey: string) {}
+  constructor(private readonly origin: string, private readonly apiKey: string,
+    private readonly contextLength: number) {}
 
   private async post(path: string, body: object, signal: AbortSignal) {
     const response = await fetch(this.origin + path, {
@@ -34,7 +35,7 @@ export class LlamaClient implements InferenceHost {
 
   async *chat(messages: Message[], signal: AbortSignal): AsyncIterable<string> {
     const response = await this.post("/v1/chat/completions", {
-      messages, max_tokens: 512, stream: true,
+      messages, max_tokens: Math.min(512, Math.floor(this.contextLength / 4)), stream: true,
     }, signal);
     if (!response.body) throw new Error("llama-server returned an empty response");
     const reader = response.body.getReader();

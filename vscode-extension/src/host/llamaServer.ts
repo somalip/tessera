@@ -73,7 +73,7 @@ export class LlamaServer {
       }).catch(() => undefined);
       if (response?.ok && child.exitCode === null && child.signalCode === null) {
         this.healthy = true;
-        return new LlamaClient(origin, apiKey);
+        return new LlamaClient(origin, apiKey, this.contextLength);
       }
       await delay(100, undefined, { signal: this.abort.signal });
     }
