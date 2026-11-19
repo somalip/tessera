@@ -10,7 +10,7 @@ import urllib.request
 from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import IO, Any, cast
 
 
 class NoRedirect(urllib.request.HTTPRedirectHandler):
@@ -23,22 +23,27 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
 class Client:
     port: int
     key: str
+    pid: int | None = None
 
-    def request(self, path: str, body: dict[str, Any] | None = None,
-                timeout: float = 120) -> dict[str, Any]:
+    def open(self, path: str, body: dict[str, Any] | None = None,
+             timeout: float = 120) -> IO[bytes]:
         opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect())
         request = urllib.request.Request(
             f"http://127.0.0.1:{self.port}{path}",
             data=None if body is None else json.dumps(body).encode(),
             headers={"Content-Type": "application/json", "Authorization": f"Bearer {self.key}"},
         )
-        with opener.open(request, timeout=timeout) as response:
+        return cast(IO[bytes], opener.open(request, timeout=timeout))
+
+    def request(self, path: str, body: dict[str, Any] | None = None,
+                timeout: float = 120) -> dict[str, Any]:
+        with self.open(path, body, timeout) as response:
             result: dict[str, Any] = json.load(response)
             return result
 
     def complete(self, prompt: str, max_tokens: int = 256, extra_stop: tuple[str, ...] = ()) -> str:
         result = self.request("/v1/completions", {
-            "prompt": prompt, "temperature": 0, "seed": 0, "max_tokens": max_tokens,
+            "prompt": prompt, "temperature": 0, "seed": 0, "max_tokens": max_tokens, "cache_prompt": False,
             "stop": ["<|endoftext|>", "<|fim_prefix|>", "<|fim_suffix|>", "<|fim_middle|>", *extra_stop],
         })
         return str(result["choices"][0]["text"])
@@ -55,7 +60,7 @@ def serve(model: Path, executable: str, context_length: int = 4096) -> Iterator[
     with subprocess.Popen([
         executable, "--host", "127.0.0.1", "--port", str(port), "--model", str(model),
         "--ctx-size", str(context_length), "--parallel", "1", "--n-gpu-layers", "0",
-        "--api-key", client.key,
+        "--api-key", client.key, "--cache-ram", "0", "--device", "none",
     ], stdout=subprocess.DEVNULL, stdin=subprocess.DEVNULL) as process:
         try:
             for _ in range(300):
@@ -69,7 +74,7 @@ def serve(model: Path, executable: str, context_length: int = 4096) -> Iterator[
                     break
             else:
                 raise TimeoutError("llama-server did not become ready")
-            yield client
+            yield Client(client.port, client.key, process.pid)
         finally:
             if process.poll() is None:
                 process.terminate()

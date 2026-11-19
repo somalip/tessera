@@ -34,3 +34,18 @@ For TypeScript, Rust, Go, Java, C, and C++, run
 Use MultiPL-E and the regional held-out suites for compiled languages.
 Compiled execution fixtures must combine the prompt, candidate, suffix, and
 tests into a single file with an entry point. Java uses `Main.java`.
+
+Profile runtime separately with the same candidate bytes on each reference
+machine. Both modes test a 1–2K-token FIM prompt. Warm mode primes the prefix
+cache and varies the code near the cursor.
+
+```sh
+python -m eval.profile_runtime --model candidate.gguf --memory-mib 1024 \
+  --mode cold --output artifacts/profile-cold.json --enforce
+python -m eval.profile_runtime --model candidate.gguf --memory-mib 1024 \
+  --mode warm --output artifacts/profile-warm.json --enforce
+```
+
+Pass a reference result with `--system-report` to include its targets in the
+quality gate. Each profile records model digest, platform, load time,
+time to first content token, median throughput, and sampled peak RSS.

@@ -86,7 +86,11 @@ def main() -> None:
     parser.add_argument("--docker", default="docker")
     parser.add_argument("--baseline", type=Path)
     parser.add_argument("--competitor", type=Path)
+    parser.add_argument("--training-audit", type=Path)
+    parser.add_argument("--system-report", type=Path, action="append", default=[])
     args = parser.parse_args()
+    if bool(args.baseline) != bool(args.competitor):
+        parser.error("Specify both baseline and competitor reports for release evaluation")
     data = {}
     for argument in args.suite:
         name, _, filename = argument.partition("=")
@@ -107,11 +111,31 @@ def main() -> None:
         competitor = json.loads(args.competitor.read_text(encoding="utf8"))
         failures = gate(suites, baseline["suites"], competitor["suites"], args.lang)
         for reference in (baseline, competitor):
+            if reference.get("language") != args.lang:
+                failures.append("A reference was scored on a different language")
             for name, result in suites.items():
                 if result["dataset_sha256"] != reference["suites"].get(name, {}).get("dataset_sha256"):
                     failures.append(f"{name}: reference evaluated on different fixtures")
+        if not args.training_audit:
+            failures.append("A licensed, decontaminated training corpus audit is required")
+        else:
+            audit = json.loads(args.training_audit.read_text(encoding="utf8"))
+            required = {suite["dataset_sha256"] for suite in suites.values()}
+            if audit.get("accepted_overlap") != 0 or not required <= set(audit.get("benchmarks", [])):
+                failures.append("Training audit does not cover every evaluation fixture")
+    model_hash = digest(args.model)
+    hardware = []
+    for path in args.system_report:
+        profile = json.loads(path.read_text(encoding="utf8"))
+        hardware.append(profile)
+        gates = profile.get("gates", {})
+        required_gates = {"size", "prompt_window", "load_time", "first_token", "throughput", "resident_memory"}
+        if profile.get("model_sha256") != model_hash or not all(gates.get(gate) is True for gate in required_gates):
+            failures.append(f"System profile failed for {path.name}")
     report = {
-        "language": args.lang, "model_sha256": digest(args.model),
+        "language": args.lang, "model_sha256": model_hash,
+        "system_profiles": [{key: value for key, value in profile.items() if key != "runs"}
+                            for profile in hardware],
         "model_size_bytes": args.model.stat().st_size,
         "suites": suites, "gate_passed": not failures, "gate_failures": failures,
     }

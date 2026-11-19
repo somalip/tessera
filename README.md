@@ -4,6 +4,30 @@ Hand this file to Codex as the repo's source of truth (copy section 9 into `AGEN
 
 ---
 
+## Local build and usage
+
+Use Python 3.12 and Node.js 22.
+
+```sh
+python3.12 -m venv .venv
+.venv/bin/python -m pip install -r requirements-dev.txt
+npm ci --prefix vscode-extension
+make check PYTHON=.venv/bin/python
+make vsix
+.venv/bin/python -m tools.fetch_runtime --starter
+```
+
+Install `artifacts/tinycoders.vsix` from VS Code and set the two paths printed
+by the runtime installer. Use `make test-ext` to run the mock-server
+integration test. The [runtime guide](runtime-bin/README.md) covers local
+configuration, and the [registry guide](registry/README.md) covers signed models.
+
+See the [data](data/README.md), [training](train/README.md),
+[evaluation](eval/README.md), and [CI](ci/README.md) guides for checkpoint
+development and release criteria.
+
+---
+
 ## 1. Goals and hard constraints
 
 | Constraint | Target |

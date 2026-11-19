@@ -129,7 +129,8 @@ def run(config: dict[str, Any]) -> Path:
                             "gate_passed": False, "smoke": True})
     elif config.get("eval_args"):
         subprocess.run([sys.executable, "-m", "eval.report", "--lang", language,
-                        "--model", str(gguf), "--output", str(report), *config["eval_args"]], check=True)
+                        "--model", str(gguf), "--output", str(report), "--training-audit",
+                        str(Path(config["corpus"]) / "stats.json"), *config["eval_args"]], check=True)
     else:
         return gguf
     package = output / f"{config['model_id']}-{config['version']}.tcm"

@@ -34,5 +34,6 @@ stable. Compare the resulting models using the same evaluation fixtures.
 Set `eval_args` to include every suite, the benchmark license when necessary,
 and the baseline and competitor reports to enable automatic release packaging.
 Alternatively, run `make eval` against the candidate and write its report to
-the build directory before running `make package`. Release packages require a
+the build directory before running `make package`. Pass `--training-audit` with
+the corpus pipeline’s `stats.json` when running evaluation separately. Release packages require a
 passing evaluation report for the exact candidate GGUF.
