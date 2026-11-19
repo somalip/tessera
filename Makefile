@@ -7,6 +7,8 @@ check:
 	$(PYTHON) -m mypy --strict tools tests
 	$(PYTHON) -m unittest discover -s tests
 	npm --prefix vscode-extension run check
+	npm --prefix vscode-extension run build
+	node --test vscode-extension/test/*.test.cjs
 
 .PHONY: test-ext
 test-ext:

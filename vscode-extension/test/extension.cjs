@@ -1,4 +1,5 @@
 const assert = require("node:assert/strict");
+const { writeFile } = require("node:fs/promises");
 const path = require("node:path");
 const vscode = require("vscode");
 
@@ -6,7 +7,9 @@ exports.run = async function () {
   const config = vscode.workspace.getConfiguration("tinycoders");
   const global = vscode.ConfigurationTarget.Global;
   await config.update("serverPath", path.join(__dirname, "mock-server.cjs"), global);
-  await config.update("pythonModelPath", "/unused/model.gguf", global);
+  const model = path.join(process.env.TINYCODERS_TEST_HOME, "mock.gguf");
+  await writeFile(model, "stub");
+  await config.update("pythonModelPath", model, global);
   const document = await vscode.workspace.openTextDocument({
     language: "python", content: "def f():\n    \n",
   });

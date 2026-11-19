@@ -14,17 +14,19 @@
   "devDependencies": {
     "@types/node": "22.15.30",
     "@types/vscode": "1.96.0",
+    "@types/yauzl": "2.10.3",
     "@vscode/test-electron": "2.5.2",
     "eslint": "9.39.1",
     "typescript": "5.9.3",
     "typescript-eslint": "8.48.0"
   },
   "dependencies": {
-    "ajv": "8.17.1"
+    "ajv": "8.17.1",
+    "yauzl": "3.2.0"
   },
   "main": "./dist/extension.js",
   "activationEvents": [
-    "onLanguage:python"
+    "onStartupFinished"
   ],
   "categories": [
     "Machine Learning",
@@ -52,8 +54,43 @@
           "scope": "machine",
           "default": 0,
           "description": "Number of model layers to offload to the GPU."
+        },
+        "tinycoders.typescriptModelPath": {
+          "type": "string",
+          "scope": "machine",
+          "default": "",
+          "description": "Path to a local Qwen2.5-Coder GGUF for TypeScript FIM."
+        },
+        "tinycoders.generalist": {
+          "type": "string",
+          "default": "",
+          "description": "Model ID to use as a last resort."
+        },
+        "tinycoders.memoryMiB": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0,
+          "description": "Estimated model memory budget in MiB. Zero uses 60% of free RAM."
+        },
+        "tinycoders.maxModels": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 2,
+          "description": "Maximum number of resident models."
+        },
+        "tinycoders.idleMinutes": {
+          "type": "number",
+          "minimum": 0.01,
+          "default": 5,
+          "description": "Minutes before an idle model is unloaded."
         }
       }
-    }
+    },
+    "commands": [
+      {
+        "command": "tinycoders.pickModel",
+        "title": "TinyCoders: Pick Model"
+      }
+    ]
   }
 }
