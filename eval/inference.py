@@ -50,7 +50,8 @@ class Client:
 
 
 @contextlib.contextmanager
-def serve(model: Path, executable: str, context_length: int = 4096) -> Iterator[Client]:
+def serve(model: Path, executable: str, context_length: int = 4096, *,
+          adapter: Path | None = None) -> Iterator[Client]:
     if not model.is_file():
         raise FileNotFoundError(model)
     with socket.socket() as sock:
@@ -61,6 +62,7 @@ def serve(model: Path, executable: str, context_length: int = 4096) -> Iterator[
         executable, "--host", "127.0.0.1", "--port", str(port), "--model", str(model),
         "--ctx-size", str(context_length), "--parallel", "1", "--n-gpu-layers", "0",
         "--api-key", client.key, "--cache-ram", "0", "--device", "none",
+        *(["--lora", str(adapter)] if adapter else []),
     ], stdout=subprocess.DEVNULL, stdin=subprocess.DEVNULL) as process:
         try:
             for _ in range(300):

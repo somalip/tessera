@@ -4,18 +4,21 @@ import subprocess
 from pathlib import Path
 
 from verifiers.compiled import COMPILERS, LANGUAGES
-from verifiers.python.runner import IMAGE
+from verifiers.python.runner import IMAGE, QUALITY_IMAGE
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("language", choices=(*LANGUAGES, "all"))
+    parser.add_argument("language", choices=(*LANGUAGES, "python-quality", "all"))
     parser.add_argument("--docker", default="docker")
     args = parser.parse_args()
-    targets = LANGUAGES if args.language == "all" else (args.language,)
+    targets = (*LANGUAGES, "python-quality") if args.language == "all" else (args.language,)
     images = set()
     for language in targets:
-        if language == "typescript":
+        if language == "python-quality":
+            subprocess.run([args.docker, "build", "--tag", QUALITY_IMAGE,
+                            str(Path(__file__).with_name("python") / "quality")], check=True)
+        elif language == "typescript":
             subprocess.run([args.docker, "build", "--tag", COMPILERS[language][0],
                             str(Path(__file__).with_name("typescript"))], check=True)
         else:

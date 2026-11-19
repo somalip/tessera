@@ -35,3 +35,33 @@ the candidate with base and competitor reports from the same fixtures.
 Package creation and registry signing verify the reported candidate weight
 digest and the size ceiling. Publish a registry only after independently
 running the reference hardware profiles for the candidate.
+
+## Capsule task routing
+
+The optional task runtime plans a request into JSON work orders. Cursor
+language is a hint to the planner. The task router selects a model by role,
+difficulty, tier, and language. An exact language match wins against a
+generalist at the same difficulty. A local model entry can name a GGUF and
+a GGUF LoRA. Their total must be below 1 GB.
+
+The Python sidecar hashes saved workspace files and uses tree-sitter to
+reparse changed content. SQLite records symbols, file versions, deleted paths,
+decisions, and recipes as append-only rows. The capsule retrieves requested
+symbols and follows their workspace references. It sends paths, names, and
+signatures. The full rendered chat prompt, including the system preamble,
+must fit the default 1,500-token cap as counted by llama.cpp.
+
+The planner selects check IDs from a user-supplied catalog. Every supplied
+check must appear in a work order and every order needs a language-matched
+execution test. The verifier uses fixed Docker commands and preinstalled
+images. Each check runs without network or a workspace mount. A failed check
+is summarized by its ID and exit or timeout status. A stable fingerprint goes
+into the next attempt. After the configured small-model retries, the router
+tries a larger local model if configured. Remote escalation is opt-in.
+
+After verification passes, delta debugging reruns chat and verification
+while removing groups of signatures. It finds a context where removing any
+one remaining signature breaks verification. The runtime caches signature
+positions by model and task type and verifies each reuse. If the recipe
+fails, it falls back to the full capsule within the cap. Task results show
+verified standalone source for review in VS Code.

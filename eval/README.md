@@ -49,3 +49,40 @@ python -m eval.profile_runtime --model candidate.gguf --memory-mib 1024 \
 Pass a reference result with `--system-report` to include its targets in the
 quality gate. Each profile records model digest, platform, load time,
 time to first content token, median throughput, and sampled peak RSS.
+
+## Capsule verifier comparison
+
+Pass each candidate GGUF to `eval.capsule_report` with an identical licensed,
+frozen execution fixture set. The benchmark fixes work orders so it measures
+the coder route without planner variation. Pass `--escalation-model` to use
+the same larger local GGUF across all arms.
+
+```sh
+python -m eval.capsule_report --lang python --fixtures python-heldout.jsonl \
+  --model base-0.5b.gguf --model python-tuned.gguf --retries 1 \
+  --output artifacts/capsule-python-comparison.json
+```
+
+Reports include first-attempt pass rate, the fraction of tasks that reached
+escalation, average rendered prompt tokens across candidate attempts, and
+final pass rate. Without an escalation model the escalation rate is zero.
+Check benchmark digests against each fine-tune's contamination audit before
+interpreting the scores.
+
+### Initial Python result
+
+The local CC0-1.0 Python held-out suite had eight tasks. The fine-tune's
+training audit records no accepted overlap and includes the fixture digest
+`a21a15d4297f9fe3dcbb78b4a99071fed3bb57f344344ebc72e530a19fb110ba`.
+Each run allowed one small-model retry, with escalation and minimization
+disabled.
+
+| Model | Pass@1 | Final passes | Escalation rate | Mean capsule tokens |
+| --- | ---: | ---: | ---: | ---: |
+| Qwen2.5-Coder-0.5B-Instruct, Q4_K_M | 0/8 | 0/8 | 0% | 138.25 |
+| Qwen2.5-Coder-1.5B-Instruct, Q4_0, untuned | 1/8 | 1/8 | 0% | 137.33 |
+| Qwen2.5-Coder-1.5B-Instruct, Q4_0, Python fine-tune | 1/8 | 1/8 | 0% | 137.33 |
+
+The fine-tune beat the smaller baseline by one task. Both 1.5B models
+passed the same task. This suite gives no evidence of a fine-tuning gain
+at matched model size.

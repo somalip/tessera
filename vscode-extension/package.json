@@ -116,6 +116,64 @@
           "type": "boolean",
           "default": true,
           "description": "Include nearby workspace snippets and local language service definitions in inline completions."
+        },
+        "tinycoders.legacy.enabled": {
+          "type": "boolean",
+          "default": true,
+          "scope": "machine",
+          "description": "Enable the existing inline completions, code actions, and chat."
+        },
+        "tinycoders.capsule.enabled": {
+          "type": "boolean",
+          "default": true,
+          "scope": "machine",
+          "description": "Enable Tessera capsule tasks."
+        },
+        "tinycoders.capsule.runtimePath": {
+          "type": "string",
+          "default": "",
+          "scope": "machine",
+          "description": "Absolute path to the installed Tessera Python source checkout."
+        },
+        "tinycoders.capsule.pythonPath": {
+          "type": "string",
+          "default": "python3",
+          "scope": "machine",
+          "description": "Python executable with the Tessera runtime dependencies."
+        },
+        "tinycoders.capsule.models": {
+          "type": "array",
+          "default": [],
+          "scope": "machine",
+          "description": "Trusted model routing entries with id, path, language, roles, difficulty, and tier."
+        },
+        "tinycoders.capsule.remote": {
+          "type": "boolean",
+          "default": false,
+          "scope": "machine",
+          "description": "Allow an explicitly configured HTTPS capsule escalation model."
+        },
+        "tinycoders.capsule.trainingLicense": {
+          "type": "string",
+          "default": "",
+          "scope": "machine",
+          "description": "SPDX license attestation for local escalation examples used in training."
+        },
+        "tinycoders.capsule.tokenCap": {
+          "type": "integer",
+          "default": 1500,
+          "scope": "machine",
+          "description": "Maximum rendered chat prompt tokens for capsule tasks.",
+          "minimum": 1,
+          "maximum": 3328
+        },
+        "tinycoders.capsule.retries": {
+          "type": "integer",
+          "default": 2,
+          "scope": "machine",
+          "description": "Number of tier-0 retries before trying an escalation model.",
+          "minimum": 0,
+          "maximum": 10
         }
       }
     },
@@ -174,6 +232,11 @@
       {
         "command": "tinycoders.showOutput",
         "title": "TinyCoders: Show Output"
+      },
+      {
+        "command": "tinycoders.runTask",
+        "title": "Tessera: Run task",
+        "enablement": "isWorkspaceTrusted"
       }
     ],
     "chatParticipants": [

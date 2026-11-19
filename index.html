@@ -64,10 +64,14 @@
           <h2>Per language</h2>
           <p>The router picks a model based on the language at your cursor. Python first, then TypeScript and more.</p>
         </div>
-        <div class="row">
-          <h2>Early</h2>
-          <p>Built on Qwen2.5-Coder-0.5B. Whether the Python fine-tune beats the base model is not yet verified.</p>
-        </div>
+        <section class="row" aria-labelledby="python-fine-tune">
+          <h2 id="python-fine-tune">Python fine-tune</h2>
+          <div>
+            <p>Both versions start from Qwen2.5-Coder-1.5B-Instruct. The Python version uses LoRA to update a subset of the weights using eight Python examples that passed sandbox tests. The updates are merged into a 935 MB GGUF that runs locally.</p>
+            <p>In an eight-task Python chat benchmark, the tuned model fixed an integer duration calculation that the untuned model missed. The untuned model passed a JSON record decoding task that the tuned model missed. Both scored 2 of 8 overall.</p>
+            <p>With the capsule router, both 1.5B versions passed the same log summarization task on their first try, scoring 1 of 8 each. The smaller 0.5B baseline scored 0 of 8. The duration repair is one observed strength. These tests found no overall gain over the untuned 1.5B model.</p>
+          </div>
+        </section>
         <section class="row" aria-labelledby="general-models">
           <h2 id="general-models">General-purpose variants</h2>
           <div>

@@ -21,9 +21,23 @@ exports.run = async function () {
   await vscode.window.showTextDocument(document);
   const provider = await vscode.extensions.getExtension("tinycoders.tinycoders").activate();
   const { Dashboard, dashboardId } = require("../dist/views/dashboard");
+  const { taskHtml } = require("../dist/providers/task");
+  const taskPanel = taskHtml([
+    { phase: "plan", model: "local-planner", orders: [{ id: "<task>", role: "repair", language: "python" }] },
+    { phase: "candidate", id: "<task>", model: "local-coder", tokens: 115, passed: false, fingerprint: "test:1" },
+    { phase: "result", order: { id: "<task>" }, passed: true, code: "<script>alert(1)</script>" },
+  ], "Finished");
+  assert.match(taskPanel, /&lt;task&gt; · repair · python/);
+  assert.match(taskPanel, /local-planner/);
+  assert.match(taskPanel, /local-coder/);
+  assert.match(taskPanel, /115/);
+  assert.match(taskPanel, /test:1/);
+  assert.match(taskPanel, /Verified/);
+  assert.doesNotMatch(taskPanel, /<script>/);
   const commands = await vscode.commands.getCommands();
   assert.ok(commands.includes(dashboardId + ".focus"));
   assert.ok(commands.includes("tinycoders.ask"));
+  assert.ok(commands.includes("tinycoders.runTask"));
   assert.ok(commands.includes("tinycoders.triggerCompletion"));
   await vscode.commands.executeCommand("tinycoders.openDashboard");
 
@@ -89,6 +103,14 @@ exports.run = async function () {
       current.dispose();
     }
     if (!real) {
+      const disabled = new vscode.CancellationTokenSource();
+      try {
+        await config.update("legacy.enabled", false, global);
+        assert.deepEqual(await provider.provideInlineCompletionItems(document, cursor, context, disabled.token), []);
+      } finally {
+        await config.update("legacy.enabled", true, global);
+        disabled.dispose();
+      }
       await config.update("autocomplete", false, global);
       const marked = await vscode.workspace.openTextDocument({
         language: "python", content: "def f():\n    # tinycoders: return an answer\n    ",

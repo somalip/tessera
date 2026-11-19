@@ -36,3 +36,60 @@ Refactors and generated tests open in a diff preview for review.
 The extension retains aggregate completion metrics in memory for the current
 session. **TinyCoders: Export Local Metrics** writes them to a file you choose.
 The extension sends inference requests only to its local model process.
+
+## Tessera capsule tasks
+
+Use Python 3.11+ with the repository's `requirements-dev.txt`, a local
+llama.cpp server with `/apply-template` and `/tokenize`, and the preinstalled
+Docker verifier image for your language. From the Tessera source directory,
+run `python -m verifiers.prepare python` once for Python execution checks.
+Run `python -m verifiers.prepare python-quality` for mypy and Ruff checks.
+Verifier runs use preinstalled images with the network disabled.
+
+Set `tinycoders.capsule.runtimePath` to the absolute path of this source checkout.
+The task command is enabled by default through `tinycoders.capsule.enabled`.
+Set `tinycoders.capsule.pythonPath` if the dependencies are in a virtual
+environment. The task command uses `tinycoders.serverPath` and defaults to
+installed chat-capable models. Inline completion, chat, and code actions keep
+their existing routing while `tinycoders.legacy.enabled` is true.
+
+Use **Tessera: Run task** in a trusted local workspace, describe the contract,
+and choose a JSON file of acceptance checks. For example, ask the model to
+implement a typed Python function called `answer()` that returns 42, and supply:
+
+```json
+[
+  {"id":"answer-test","kind":"test","language":"python","source":"assert answer() == 42"},
+  {"id":"answer-types","kind":"typecheck","language":"python","source":""}
+]
+```
+
+Use `test` for trusted test source and `typecheck` or `lint` for a fixed
+toolchain check. Each work order produces a standalone candidate file.
+The panel shows the plan, model, capsule tokens, verifier outcome, and
+verified code you can copy. Workspace signatures come from saved files.
+SQLite and escalation logs live in the extension's local workspace storage.
+
+To choose a generalist and a Python specialist, configure
+`tinycoders.capsule.models` in your user settings:
+
+```json
+[
+  {"id":"qwen-small","path":"/models/qwen-0.5b.gguf","language":"*","tier":0},
+  {"id":"python-specialist","path":"/models/qwen-0.5b.gguf","adapter":"/models/python-lora.gguf",
+   "language":"python","roles":["implement","repair","refactor"],"difficulty":"routine","tier":0,
+   "preamble":"You specialize in typed Python."},
+  {"id":"qwen-larger","path":"/models/qwen-1.5b.gguf","language":"*","tier":1}
+]
+```
+
+Difficulty is `routine` or `complex`. Tier 0 is the initial route and tier 1
+is local escalation. Model and adapter bytes together must total less than
+1 GB. The token cap and small-model retry count are configurable.
+
+Optional tier 2 requires `tinycoders.capsule.remote` and an HTTPS llama.cpp
+endpoint with a declared `size_bytes` below 1 GB. The client uses
+`TESSERA_REMOTE_KEY` from the extension environment when provided. Enabling
+this route permits the endpoint to receive the request and retrieved
+signatures, including during token counting. The endpoint operator supplies
+the model size declaration.

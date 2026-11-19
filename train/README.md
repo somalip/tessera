@@ -37,3 +37,23 @@ Alternatively, run `make eval` against the candidate and write its report to
 the build directory before running `make package`. Pass `--training-audit` with
 the corpus pipeline’s `stats.json` when running evaluation separately. Release packages require a
 passing evaluation report for the exact candidate GGUF.
+
+## LoRA updates from capsule escalations
+
+The task runtime appends each escalation to local `escalations.jsonl` with
+its capsule and verified code. Failed escalations have a null `fixed_code`.
+Set the extension's `tinycoders.capsule.trainingLicense` only for material
+you can license for training. The trainer filters rows for license, privacy,
+and benchmark overlap, then reruns the original acceptance checks in Docker.
+
+```sh
+python -m train.capsule_lora --log escalations.jsonl --language python \
+  --base /models/qwen-snapshot --base-license Apache-2.0 \
+  --benchmark /benchmarks/frozen.jsonl --confirm-training-rights \
+  --output artifacts/python-capsule-lora
+```
+
+Supply every frozen benchmark using repeatable `--benchmark` flags.
+The command writes a PEFT adapter. Convert it with the same llama.cpp
+build's `convert_lora_to_gguf.py`, referencing the base snapshot, and set
+`adapter` on the matching local capsule model entry.

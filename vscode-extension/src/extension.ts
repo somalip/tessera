@@ -11,6 +11,7 @@ import { modelMemoryBytes } from "./host/memory";
 import { registerChat, registerPrompt } from "./providers/chat";
 import { registerCodeActions } from "./providers/codeActions";
 import { InlineCompletion } from "./providers/inlineCompletion";
+import { registerTask } from "./providers/task";
 import { fetchIndex, ModelStore, type InstalledModel } from "./registry/download";
 import { embeddedLanguage, projectLanguage } from "./router/detector";
 import { Lifecycle } from "./router/lifecycle";
@@ -71,7 +72,7 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
     document: vscode.TextDocument, position: vscode.Position,
     capability: Manifest["capabilities"][number] = "fim",
   ) => {
-    if (!vscode.workspace.isTrusted) return;
+    if (!vscode.workspace.isTrusted || !config().get("legacy.enabled", true)) return;
     const folder = vscode.workspace.getWorkspaceFolder(document.uri)?.uri.toString();
     const docsKey = document.uri.toString();
     const language = document.languageId;
@@ -124,7 +125,7 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
     return model && endpoint(model);
   };
   const selectChat = () => {
-    if (!vscode.workspace.isTrusted) return;
+    if (!vscode.workspace.isTrusted || !config().get("legacy.enabled", true)) return;
     const editor = vscode.window.activeTextEditor;
     const routed = editor && chatModel(editor, "chat");
     if (routed) return routed;
@@ -211,6 +212,19 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
   updateStatus();
   context.subscriptions.push(
     log, provider, status, repository, python, dashboard,
+    registerTask(context, () => {
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) return "*";
+      const document = editor.document;
+      const language = document.languageId;
+      return (language === "python" && python.available
+        ? python.at(document.uri.toString(), document.version, document.getText(), document.offsetAt(editor.selection.active))
+        : embeddedLanguage(language, document.getText(), document.offsetAt(editor.selection.active))) ??
+        (language === "typescriptreact" ? "typescript" : language);
+    }, () => models().filter(model => model.manifest.capabilities.includes("chat")).flatMap(model =>
+      model.manifest.language_ids.map(language => ({
+        id: model.manifest.id, language, path: model.path,
+      }))), log),
     vscode.window.registerWebviewViewProvider(dashboardId, dashboard),
     vscode.workspace.onDidGrantWorkspaceTrust(() => {
       updateStatus();
