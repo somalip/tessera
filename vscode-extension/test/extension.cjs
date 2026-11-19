@@ -20,6 +20,39 @@ exports.run = async function () {
   });
   await vscode.window.showTextDocument(document);
   const provider = await vscode.extensions.getExtension("tinycoders.tinycoders").activate();
+  const { Dashboard, dashboardId } = require("../dist/views/dashboard");
+  const commands = await vscode.commands.getCommands();
+  assert.ok(commands.includes(dashboardId + ".focus"));
+  await vscode.commands.executeCommand("tinycoders.openDashboard");
+
+  const installed = {
+    manifest: { id: "python-tiny", quant: "Q4_K_M", version: "1.0.0",
+      language_ids: ["python"], capabilities: ["fim", "chat"], size_bytes: 490000000 },
+  };
+  let state = { trusted: true, language: "python", active: installed, models: [installed] };
+  const dashboard = new Dashboard(() => state);
+  let refreshed = false;
+  const listener = dashboard.onDidChangeTreeData(() => { refreshed = true; });
+  try {
+    const [editorGroup, models, actions] = dashboard.getChildren();
+    assert.equal(dashboard.getChildren(editorGroup)[0].label, "python-tiny");
+    const modelRows = dashboard.getChildren(models);
+    assert.equal(modelRows[0].description, "python · 1.0.0");
+    assert.equal(modelRows.find(row => row.id === "tinycoders.addLocalModel").command.command,
+      "tinycoders.addLocalModel");
+    assert.ok(modelRows.some(row => row.id === "tinycoders.switchVersion"));
+    assert.ok(dashboard.getChildren(actions).some(row => row.id === "tinycoders.refactor"));
+
+    state = { trusted: true, language: "rust", models: [] };
+    dashboard.refresh();
+    assert.equal(refreshed, true);
+    assert.equal(dashboard.getChildren(dashboard.getChildren()[0])[0].label, "No matching model");
+    state = { trusted: false, models: [] };
+    assert.deepEqual(dashboard.getChildren().map(row => row.id), ["editor", "tools"]);
+  } finally {
+    listener.dispose();
+    dashboard.dispose();
+  }
   const cursor = new vscode.Position(1, 4);
   const context = { triggerKind: vscode.InlineCompletionTriggerKind.Invoke };
   const cancelled = new vscode.CancellationTokenSource();

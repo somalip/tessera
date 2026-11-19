@@ -135,6 +135,23 @@
       {
         "command": "tinycoders.exportMetrics",
         "title": "TinyCoders: Export Local Metrics"
+      },
+      {
+        "command": "tinycoders.openDashboard",
+        "title": "TinyCoders: Open Dashboard"
+      },
+      {
+        "command": "tinycoders.addLocalModel",
+        "title": "TinyCoders: Add Local GGUF",
+        "enablement": "isWorkspaceTrusted"
+      },
+      {
+        "command": "tinycoders.openChat",
+        "title": "TinyCoders: Open Chat"
+      },
+      {
+        "command": "tinycoders.showOutput",
+        "title": "TinyCoders: Show Output"
       }
     ],
     "chatParticipants": [
@@ -144,7 +161,25 @@
         "fullName": "TinyCoders",
         "description": "Chat with the active local TinyCoders model"
       }
-    ]
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "tinycoders",
+          "title": "TinyCoders",
+          "icon": "$(chip)"
+        }
+      ]
+    },
+    "views": {
+      "tinycoders": [
+        {
+          "id": "tinycoders.dashboard",
+          "name": "Dashboard",
+          "icon": "$(chip)"
+        }
+      ]
+    }
   },
   "description": "Local per-language GGUF routing, inline completion, and chat.",
   "repository": {

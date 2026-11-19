@@ -17,6 +17,7 @@ import { Lifecycle } from "./router/lifecycle";
 import { selectModel } from "./router/policy";
 import { PythonRegions } from "./router/pythonRegions";
 import { LocalMetrics } from "./telemetry";
+import { Dashboard, dashboardId } from "./views/dashboard";
 
 export function activate(context: vscode.ExtensionContext): InlineCompletion {
   const metrics = new LocalMetrics();
@@ -46,7 +47,7 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
       if (!path) continue;
       try {
         const file = statSync(path);
-        if (!file.isFile() || file.size >= 1_000_000_000) throw new Error("Invalid GGUF file size");
+        if (!file.isFile() || file.size === 0 || file.size >= 1_000_000_000) throw new Error("Invalid GGUF file size");
         localModels.push({
           path, memoryBytes: modelMemoryBytes(file.size, 2048),
           manifest: {
@@ -116,13 +117,22 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
   };
   registerCodeActions(context, (editor, action) => chatModel(editor, action === "explain" ? "chat" : "edit"), log);
 
+  const dashboard = new Dashboard(() => {
+    const editor = vscode.window.activeTextEditor;
+    return {
+      trusted: vscode.workspace.isTrusted,
+      language: editor?.document.languageId,
+      active: editor && candidate(editor.document, editor.selection.active),
+      models: models(),
+    };
+  });
+
   const updateStatus = () => {
     const editor = vscode.window.activeTextEditor;
     const model = editor && candidate(editor.document, editor.selection.active);
     status.text = model ? `$(chip) ${model.manifest.id}` : "$(chip) TinyCoders";
-    status.tooltip = model ? "Choose a TinyCoders model" : "Install or configure a TinyCoders model";
-    status.command = !model && config().get("registryUrl")
-      ? "tinycoders.installModel" : "tinycoders.pickModel";
+    status.tooltip = "Open the TinyCoders sidebar";
+    dashboard.refresh();
   };
   const prewarm = () => {
     const editor = vscode.window.activeTextEditor;
@@ -177,11 +187,44 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
   };
 
   refresh();
-  status.command = "tinycoders.pickModel";
+  status.command = "tinycoders.openDashboard";
   status.show();
   updateStatus();
   context.subscriptions.push(
-    log, provider, status, repository, python, registerChat(() => {
+    log, provider, status, repository, python, dashboard,
+    vscode.window.createTreeView(dashboardId, { treeDataProvider: dashboard, showCollapseAll: true }),
+    vscode.workspace.onDidGrantWorkspaceTrust(() => {
+      updateStatus();
+      void scan().catch(showError);
+    }),
+    vscode.commands.registerCommand("tinycoders.openDashboard",
+      () => vscode.commands.executeCommand(`${dashboardId}.focus`)),
+    vscode.commands.registerCommand("tinycoders.showOutput", () => log.show()),
+    vscode.commands.registerCommand("tinycoders.openChat", () =>
+      vscode.commands.executeCommand("workbench.action.chat.open", { query: "@tinycoders ", isPartialQuery: true })),
+    vscode.commands.registerCommand("tinycoders.addLocalModel", async () => {
+      if (!vscode.workspace.isTrusted) return;
+      const language = await vscode.window.showQuickPick([
+        { label: "Python", setting: "pythonModelPath" },
+        { label: "TypeScript", setting: "typescriptModelPath" },
+      ], { placeHolder: "Choose a language for the local Qwen2.5-Coder model" });
+      if (!language) return;
+      const [file] = await vscode.window.showOpenDialog({
+        canSelectMany: false, canSelectFolders: false, filters: { GGUF: ["gguf"] }, openLabel: "Use Model",
+      }) ?? [];
+      if (!file || file.scheme !== "file") return;
+      try {
+        const model = await vscode.workspace.fs.stat(file);
+        if (!(model.type & vscode.FileType.File) || model.size === 0 || model.size >= 1_000_000_000 ||
+            !file.fsPath.toLowerCase().endsWith(".gguf")) {
+          throw new Error("Choose a nonempty local GGUF file smaller than 1 GB.");
+        }
+        await config().update(language.setting, file.fsPath, vscode.ConfigurationTarget.Global);
+      } catch (error) {
+        showError(error);
+      }
+    }),
+    registerChat(() => {
       const editor = vscode.window.activeTextEditor;
       return editor && chatModel(editor, "chat");
     }, log), { dispose: () => { void lifecycle.dispose(); } },
@@ -192,6 +235,7 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
       python.close(document.uri.toString());
     }),
     vscode.window.onDidChangeActiveTextEditor(() => {
+      updateStatus();
       void scan().catch(error => log.appendLine(String(error)));
     }),
     vscode.window.onDidChangeWindowState(state => { if (state.focused) prewarm(); }),
