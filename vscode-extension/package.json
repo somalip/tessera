@@ -21,5 +21,39 @@
   },
   "dependencies": {
     "ajv": "8.17.1"
+  },
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onLanguage:python"
+  ],
+  "categories": [
+    "Machine Learning",
+    "Programming Languages"
+  ],
+  "contributes": {
+    "configuration": {
+      "title": "TinyCoders",
+      "properties": {
+        "tinycoders.serverPath": {
+          "type": "string",
+          "scope": "machine",
+          "default": "llama-server",
+          "description": "Path to the local llama.cpp server executable."
+        },
+        "tinycoders.pythonModelPath": {
+          "type": "string",
+          "scope": "machine",
+          "default": "",
+          "description": "Path to a local Qwen2.5-Coder GGUF for Python FIM."
+        },
+        "tinycoders.gpuLayers": {
+          "type": "integer",
+          "minimum": 0,
+          "scope": "machine",
+          "default": 0,
+          "description": "Number of model layers to offload to the GPU."
+        }
+      }
+    }
   }
 }
