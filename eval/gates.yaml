@@ -1,0 +1,15 @@
+humaneval:
+  pass_at_1: {minimum: 0.20, improvement: 0.02}
+multiple:
+  pass_at_1: {minimum: 0.20, improvement: 0.02}
+fim:
+  exact_match: {minimum: 0.15, improvement: 0.0}
+  edit_similarity: {minimum: 0.55, improvement: 0.0}
+repo:
+  pass_at_1: {minimum: 0.20, improvement: 0.0}
+edit:
+  pass_at_1: {minimum: 0.20, improvement: 0.0}
+real_world:
+  pass_at_1: {minimum: 0.20, improvement: 0.0}
+quality:
+  pass_at_1: {minimum: 1.0, improvement: 0.0}
