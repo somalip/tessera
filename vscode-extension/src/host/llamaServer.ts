@@ -36,6 +36,7 @@ export class LlamaServer {
     private readonly contextLength: number,
     private readonly gpuLayers = 0,
     private readonly minimumBuild = "local",
+    private readonly paged = false,
   ) {}
 
   get alive(): boolean {
@@ -52,10 +53,20 @@ export class LlamaServer {
   }
 
   private async launch(): Promise<LlamaClient> {
+    const gpuLayers = this.paged ? 0 : this.gpuLayers;
+    const env = { ...process.env };
+    if (gpuLayers === 0) env.GGML_METAL_DEVICES = "0";
+    if (this.paged) {
+      // Keep both older and newer llama.cpp builds on unlocked, file-backed weights.
+      delete env.LLAMA_ARG_MLOCK;
+      delete env.LLAMA_ARG_DIO;
+      env.LLAMA_ARG_MMAP = "1";
+      env.LLAMA_ARG_LOAD_MODE = "mmap";
+    }
     if (this.minimumBuild !== "local") {
       const required = /^b(\d+)$/.exec(this.minimumBuild);
       const { stdout, stderr } = await promisify(execFile)(this.executable, ["--version"], {
-        timeout: 5000, signal: this.abort.signal, windowsHide: true,
+        env, timeout: 5000, signal: this.abort.signal, windowsHide: true,
       });
       const actual = /version:\s*b?(\d+)/i.exec(stdout + stderr);
       if (!required || !actual || Number(actual[1]) < Number(required[1])) {
@@ -67,10 +78,11 @@ export class LlamaServer {
     this.abort.signal.throwIfAborted();
     const child = spawn(this.executable, [
       "--host", "127.0.0.1", "--port", String(port), "--model", this.modelPath,
-      "--ctx-size", String(this.contextLength), "--n-gpu-layers", String(this.gpuLayers),
+      "--ctx-size", String(this.contextLength), "--n-gpu-layers", String(gpuLayers),
       "--parallel", "1", "--api-key", apiKey, "--cache-ram", "0",
-      ...(this.gpuLayers === 0 ? ["--device", "none"] : []),
-    ], { stdio: ["ignore", "ignore", "pipe"], windowsHide: true });
+      ...(gpuLayers === 0 ? ["--device", "none"] : []),
+      ...(this.paged ? ["--no-repack", "--no-warmup"] : []),
+    ], { env, stdio: ["ignore", "ignore", "pipe"], windowsHide: true });
     this.process = child;
     this.exited = new Promise(resolve => { child.once("close", () => resolve()); });
     let error: Error | undefined;
@@ -78,7 +90,7 @@ export class LlamaServer {
     child.stderr.on("data", chunk => { diagnostics = (diagnostics + String(chunk)).slice(-2000); });
     child.on("error", cause => { error = cause; });
     const origin = `http://127.0.0.1:${port}`;
-    const deadline = Date.now() + 30_000;
+    const deadline = Date.now() + (this.paged ? 120_000 : 30_000);
     while (Date.now() < deadline) {
       this.abort.signal.throwIfAborted();
       if (error) throw error;

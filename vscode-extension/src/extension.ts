@@ -8,7 +8,7 @@ import type { Manifest } from "./contracts";
 import type { InferenceHost } from "./host/client";
 import { LlamaServer } from "./host/llamaServer";
 import { modelMemoryBytes } from "./host/memory";
-import { registerChat } from "./providers/chat";
+import { registerChat, registerPrompt } from "./providers/chat";
 import { registerCodeActions } from "./providers/codeActions";
 import { InlineCompletion } from "./providers/inlineCompletion";
 import { fetchIndex, ModelStore, type InstalledModel } from "./registry/download";
@@ -39,8 +39,9 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
   const refresh = () => {
     const stopped = lifecycle?.dispose();
     const settings = config();
-    lifecycle = new Lifecycle(settings.get("memoryMiB", 0) * 1024 ** 2 || freemem() * 0.6,
-      settings.get("maxModels", 2), settings.get("idleMinutes", 5) * 60_000, stopped);
+    const budget = settings.get("memoryMiB", 0) * 1024 ** 2;
+    lifecycle = new Lifecycle(budget || freemem() * 0.6,
+      settings.get("maxModels", 2), settings.get("idleMinutes", 5) * 60_000, stopped, budget === 0);
     localModels = [];
     for (const language of ["python", "typescript"]) {
       const path = settings.get<string>(`${language}ModelPath`);
@@ -99,24 +100,45 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
       use<T>(operation: (host: InferenceHost) => Promise<T>) {
         const settings = config();
         return active.use<T>(model.path, model.memoryBytes,
-          () => new LlamaServer(settings.get("serverPath", "llama-server"), model.path,
+          paged => new LlamaServer(settings.get("serverPath", "llama-server"), model.path,
             model.manifest.context_length, settings.get("gpuLayers", 0),
-            model.manifest.min_runtime.llama_cpp_build), operation);
+            model.manifest.min_runtime.llama_cpp_build, paged), operation);
       },
+    };
+  };
+  const completionSettings = (document: vscode.TextDocument) => {
+    const settings = vscode.workspace.getConfiguration("tinycoders", document);
+    return {
+      automatic: settings.get("autocomplete", true),
+      comments: settings.get("commentCompletions", true),
     };
   };
   const provider = new InlineCompletion((document, position) => {
     const model = candidate(document, position);
     return model && endpoint(model);
-  }, log, metrics, (document, position) => config().get("repositoryContext", true)
+  }, log, metrics, completionSettings, (document, position) => config().get("repositoryContext", true)
     ? repository.retrieve(document, position) : Promise.resolve([]));
 
   const chatModel = (editor: vscode.TextEditor, capability: "chat" | "edit") => {
     const model = candidate(editor.document, editor.selection.active, capability);
     return model && endpoint(model);
   };
+  const selectChat = () => {
+    if (!vscode.workspace.isTrusted) return;
+    const editor = vscode.window.activeTextEditor;
+    const routed = editor && chatModel(editor, "chat");
+    if (routed) return routed;
+    const available = models().filter(model => model.manifest.capabilities.includes("chat"));
+    const fallback = available.find(model => model.manifest.id === config().get("generalist")) ??
+      (available.length === 1 ? available[0] : undefined);
+    return fallback && endpoint(fallback);
+  };
   registerCodeActions(context, (editor, action) => chatModel(editor, action === "explain" ? "chat" : "edit"), log);
 
+  const showError = (error: unknown) => {
+    log.appendLine(String(error));
+    void vscode.window.showErrorMessage(`TinyCoders: ${String(error)}`);
+  };
   const dashboard = new Dashboard(() => {
     const editor = vscode.window.activeTextEditor;
     return {
@@ -125,7 +147,7 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
       active: editor && candidate(editor.document, editor.selection.active),
       models: models(),
     };
-  });
+  }, showError);
 
   const updateStatus = () => {
     const editor = vscode.window.activeTextEditor;
@@ -136,6 +158,7 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
   };
   const prewarm = () => {
     const editor = vscode.window.activeTextEditor;
+    if (!editor || !completionSettings(editor.document).automatic) return;
     const model = editor && candidate(editor.document, editor.selection.active);
     if (model) void endpoint(model).use(async () => undefined).catch(error => log.appendLine(String(error)));
   };
@@ -181,10 +204,6 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
     installedModels = await store.installed();
     updateStatus();
   };
-  const showError = (error: unknown) => {
-    log.appendLine(String(error));
-    void vscode.window.showErrorMessage(`TinyCoders: ${String(error)}`);
-  };
 
   refresh();
   status.command = "tinycoders.openDashboard";
@@ -192,7 +211,7 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
   updateStatus();
   context.subscriptions.push(
     log, provider, status, repository, python, dashboard,
-    vscode.window.createTreeView(dashboardId, { treeDataProvider: dashboard, showCollapseAll: true }),
+    vscode.window.registerWebviewViewProvider(dashboardId, dashboard),
     vscode.workspace.onDidGrantWorkspaceTrust(() => {
       updateStatus();
       void scan().catch(showError);
@@ -224,10 +243,10 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
         showError(error);
       }
     }),
-    registerChat(() => {
-      const editor = vscode.window.activeTextEditor;
-      return editor && chatModel(editor, "chat");
-    }, log), { dispose: () => { void lifecycle.dispose(); } },
+    registerChat(selectChat, log), registerPrompt(selectChat, showError),
+    { dispose: () => { void lifecycle.dispose(); } },
+    vscode.commands.registerCommand("tinycoders.triggerCompletion", () =>
+      vscode.commands.executeCommand("editor.action.inlineSuggest.trigger")),
     vscode.languages.registerInlineCompletionItemProvider({ pattern: "**" }, provider),
     vscode.workspace.onDidChangeTextDocument(event => provider.cancel(event.document)),
     vscode.workspace.onDidCloseTextDocument(document => {
@@ -241,10 +260,11 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
     vscode.window.onDidChangeWindowState(state => { if (state.focused) prewarm(); }),
     vscode.window.onDidChangeTextEditorSelection(updateStatus),
     vscode.workspace.onDidChangeConfiguration(event => {
-      if (event.affectsConfiguration("tinycoders")) {
+      if (["memoryMiB", "maxModels", "idleMinutes", "serverPath", "gpuLayers", "pythonModelPath",
+        "typescriptModelPath"].some(setting => event.affectsConfiguration(`tinycoders.${setting}`))) {
         refresh();
-        updateStatus();
       }
+      if (event.affectsConfiguration("tinycoders")) updateStatus();
     }),
     vscode.commands.registerCommand("tinycoders.acceptCompletion", (id: string) => metrics.accept(id)),
     vscode.commands.registerCommand("tinycoders.exportMetrics", async () => {

@@ -21,8 +21,11 @@ fences and HTML script/style regions use local delimiter detection.
 The lifecycle serializes changes to model residency and waits for an evicted
 server to exit before starting its replacement. Inference leases protect
 models in use. The memory budget uses model size, runtime overhead, and context
-length estimates. The server disables the separate RAM prompt cache while
-retaining the active slot's reusable prefix.
+length estimates. Under the automatic budget, a model above the RAM target can
+run as the sole resident model with CPU-only, unlocked memory-mapped weights
+and reduced startup overhead. Explicit budgets are enforced. The server
+disables the separate RAM prompt cache while retaining the active slot's
+reusable prefix.
 
 ## Evaluation and release
 

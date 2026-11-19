@@ -19,7 +19,8 @@ const server = http.createServer(async (request, response) => {
     response.on("close", () => clearTimeout(timer));
     return;
   }
-  const text = prompt === "<|fim_prefix|>def f():\n    <|fim_suffix|>\n<|fim_middle|>"
+  const text = prompt === "<|fim_prefix|>def f():\n    <|fim_suffix|>\n<|fim_middle|>" ||
+    prompt === "<|fim_prefix|>def f():\n    # tinycoders: return an answer\n    <|fim_suffix|><|fim_middle|>"
     ? "return 42" : "";
   response.setHeader("Content-Type", "text/event-stream");
   response.write("data: " + JSON.stringify({ choices: [{ text }] }) + "\n\n");

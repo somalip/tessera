@@ -74,7 +74,19 @@
           "type": "integer",
           "minimum": 0,
           "default": 0,
-          "description": "Estimated model memory budget in MiB. Zero uses 60% of free RAM."
+          "description": "Estimated model memory limit in MiB. Zero uses 60% of free RAM as a target and allows one disk-backed CPU model to exceed it."
+        },
+        "tinycoders.autocomplete": {
+          "type": "boolean",
+          "scope": "language-overridable",
+          "default": true,
+          "description": "Show TinyCoders inline suggestions automatically as you type."
+        },
+        "tinycoders.commentCompletions": {
+          "type": "boolean",
+          "scope": "language-overridable",
+          "default": true,
+          "description": "Allow a tinycoders: instruction comment to trigger a suggestion on the next blank line when automatic suggestions are off."
         },
         "tinycoders.maxModels": {
           "type": "integer",
@@ -146,6 +158,16 @@
         "enablement": "isWorkspaceTrusted"
       },
       {
+        "command": "tinycoders.ask",
+        "title": "TinyCoders: Ask",
+        "enablement": "isWorkspaceTrusted"
+      },
+      {
+        "command": "tinycoders.triggerCompletion",
+        "title": "TinyCoders: Trigger Inline Completion",
+        "enablement": "isWorkspaceTrusted && editorIsOpen"
+      },
+      {
         "command": "tinycoders.openChat",
         "title": "TinyCoders: Open Chat"
       },
@@ -175,6 +197,7 @@
       "tinycoders": [
         {
           "id": "tinycoders.dashboard",
+          "type": "webview",
           "name": "Dashboard",
           "icon": "$(chip)"
         }

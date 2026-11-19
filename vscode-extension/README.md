@@ -12,10 +12,24 @@ configure its HTTPS URL and trusted Ed25519 public key in **Settings**, then
 choose **Install From Registry**.
 
 Set `tinycoders.serverPath` in **Settings** if the compatible `llama-server`
-executable is outside PATH. Open a supported file and type to trigger inline
-suggestions. Use **Choose Routing Model** to pin a model for the file or workspace.
+executable is outside PATH. With the default `tinycoders.memoryMiB: 0`, a model
+that exceeds the automatic RAM target can run alone on the CPU with unlocked,
+memory-mapped GGUF weights. The operating system can reclaim these pages and
+read them back from the model file as needed. Context and compute buffers still
+require system memory, and paging can slow inference. A positive memory limit
+enforces the configured budget.
 
-Open TinyCoders Chat from the dashboard or use `@tinycoders` in VS Code Chat.
+Open a supported file and type for suggestions. Set `tinycoders.autocomplete`
+to `false` to stop suggestions as you type. Run **TinyCoders: Trigger Inline
+Completion** for a suggestion on demand. Or type `# tinycoders: return the sum`
+in Python (use `// tinycoders: return the sum` in TypeScript) and press Enter.
+Set `tinycoders.commentCompletions` to `false` to disable this comment trigger
+while automatic suggestions are off. Keep VS Code inline suggestions enabled.
+Use **Choose Routing Model** to pin a model for the file or workspace.
+
+Run **TinyCoders: Ask** to enter a prompt and open the response beside your editor.
+For a conversation, open TinyCoders Chat from the dashboard or use
+`@tinycoders` in VS Code Chat.
 Select code to explain, refactor, or generate tests from the dashboard.
 Refactors and generated tests open in a diff preview for review.
 

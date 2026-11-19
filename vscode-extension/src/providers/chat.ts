@@ -13,6 +13,57 @@ export function bindCancellation(token: vscode.CancellationToken) {
   return { signal: controller.signal, dispose: () => subscription.dispose() };
 }
 
+async function respond(
+  model: ChatModel, messages: Message[], signal: AbortSignal, write: (chunk: string) => void,
+): Promise<void> {
+  signal.throwIfAborted();
+  await model.use(async host => {
+    signal.throwIfAborted();
+    for await (const chunk of host.chat(fitMessages(messages, model.contextLength), signal)) write(chunk);
+  });
+}
+
+function editorContext(): Message {
+  const editor = vscode.window.activeTextEditor;
+  const selected = editor?.document.getText(editor.selection).slice(0, 400) ?? "";
+  return {
+    role: "system",
+    content: "You are the TinyCoders coding assistant. Give concise answers. " +
+      (selected ? `Current ${editor?.document.languageId} selection:\n${selected}` : ""),
+  };
+}
+
+export function registerPrompt(select: () => ChatModel | undefined, showError: (error: unknown) => void) {
+  return vscode.commands.registerCommand("tinycoders.ask", async () => {
+    const model = select();
+    if (!model) {
+      await vscode.window.showInformationMessage("Open a supported file or install a TinyCoders chat model.");
+      return;
+    }
+    const system = editorContext();
+    const prompt = (await vscode.window.showInputBox({ title: "Ask TinyCoders", prompt: "Enter a local coding prompt" }))?.trim();
+    if (!prompt) return;
+    await vscode.window.withProgress({
+      location: vscode.ProgressLocation.Notification, title: "TinyCoders is responding", cancellable: true,
+    }, async (_progress, token) => {
+      const cancellation = bindCancellation(token);
+      try {
+        let answer = "";
+        await respond(model, [system, { role: "user", content: prompt }], cancellation.signal,
+          chunk => { answer += chunk; });
+        if (cancellation.signal.aborted) return;
+        if (!answer.trim()) throw new Error("The local model returned an empty response.");
+        const document = await vscode.workspace.openTextDocument({ language: "markdown", content: answer });
+        await vscode.window.showTextDocument(document, { viewColumn: vscode.ViewColumn.Beside });
+      } catch (error) {
+        if (!cancellation.signal.aborted) showError(error);
+      } finally {
+        cancellation.dispose();
+      }
+    });
+  });
+}
+
 export function registerChat(select: () => ChatModel | undefined, log: vscode.OutputChannel) {
   return vscode.chat.createChatParticipant("tinycoders.local", async (request, context, stream, token) => {
     const model = select();
@@ -31,21 +82,9 @@ export function registerChat(select: () => ChatModel | undefined, log: vscode.Ou
         if (content) history.push({ role: "assistant", content });
       }
     }
-    const editor = vscode.window.activeTextEditor;
-    const selected = editor?.document.getText(editor.selection).slice(0, 400) ?? "";
-    const system: Message = {
-      role: "system",
-      content: "You are the TinyCoders coding assistant. Give concise answers. " +
-        (selected ? `Current ${editor?.document.languageId} selection:\n${selected}` : ""),
-    };
     try {
-      await model.use(async host => {
-        const messages = fitMessages([system, ...history, { role: "user", content: request.prompt }],
-          model.contextLength);
-        for await (const chunk of host.chat(messages, cancellation.signal)) {
-          stream.markdown(new vscode.MarkdownString(chunk));
-        }
-      });
+      await respond(model, [editorContext(), ...history, { role: "user", content: request.prompt }],
+        cancellation.signal, chunk => { stream.markdown(new vscode.MarkdownString(chunk)); });
     } catch (error) {
       if (!cancellation.signal.aborted) {
         log.appendLine(String(error));

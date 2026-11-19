@@ -25,6 +25,7 @@ export class Lifecycle {
     private readonly limit: number,
     private readonly idleMs: number,
     after: Promise<void> = Promise.resolve(),
+    private readonly allowPaging = false,
   ) {
     this.queue = after;
   }
@@ -43,7 +44,7 @@ export class Lifecycle {
     await entry.host.dispose();
   }
 
-  private async acquire(key: string, bytes: number, create: () => Host): Promise<Entry> {
+  private async acquire(key: string, bytes: number, create: (paged: boolean) => Host): Promise<Entry> {
     if (this.closed) throw new Error("Model lifecycle has shut down");
     let entry = this.entries.get(key);
     if (entry?.ready && !entry.host.alive && !entry.leases) {
@@ -51,22 +52,25 @@ export class Lifecycle {
       entry = undefined;
     }
     if (!entry) {
-      if (bytes > this.budget) throw new Error("Model exceeds the configured RAM budget");
+      const paged = bytes > this.budget;
+      if (paged && !this.allowPaging) throw new Error("Model exceeds the configured RAM budget");
+      const fits = (count: number, occupied: number) =>
+        paged ? count === 0 : count < this.limit && occupied + bytes <= this.budget;
       let occupied = [...this.entries.values()].reduce((sum, model) => sum + model.bytes, 0);
       const idle = [...this.entries].filter(([, model]) => !model.leases)
         .sort(([, left], [, right]) => left.lastUsed - right.lastUsed);
       const evictions: string[] = [];
       for (const [id, model] of idle) {
-        if (this.entries.size - evictions.length < this.limit && occupied + bytes <= this.budget) break;
+        if (fits(this.entries.size - evictions.length, occupied)) break;
         occupied -= model.bytes;
         evictions.push(id);
       }
-      if (this.entries.size - evictions.length >= this.limit || occupied + bytes > this.budget) {
+      if (!fits(this.entries.size - evictions.length, occupied)) {
         throw new Error("RAM budget or model limit reached while inference is active");
       }
       for (const id of evictions) await this.remove(id);
       if (this.closed) throw new Error("Model lifecycle has shut down");
-      entry = { host: create(), bytes, leases: 0, lastUsed: 0, ready: false };
+      entry = { host: create(paged), bytes, leases: 0, lastUsed: 0, ready: false };
       this.entries.set(key, entry);
     }
     clearTimeout(entry.idle);
@@ -75,7 +79,7 @@ export class Lifecycle {
   }
 
   async use<T>(
-    key: string, bytes: number, create: () => Host,
+    key: string, bytes: number, create: (paged: boolean) => Host,
     operation: (host: InferenceHost) => Promise<T>,
   ): Promise<T> {
     const entry = await this.serialize(() => this.acquire(key, bytes, create));

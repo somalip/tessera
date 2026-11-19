@@ -11,6 +11,23 @@ export interface CompletionModel {
   use<T>(operation: (host: InferenceHost) => Promise<T>): Promise<T>;
 }
 
+function isCommentTrigger(document: vscode.TextDocument, position: vscode.Position): boolean {
+  if (!position.line || document.lineAt(position.line).text.trim()) return false;
+  const previous = document.lineAt(position.line - 1).text;
+  switch (document.languageId) {
+    case "python": case "ruby": case "shellscript": case "yaml":
+      return /^\s*#\s*tinycoders:\s*\S/.test(previous);
+    case "sql":
+      return /^\s*--\s*tinycoders:\s*\S/.test(previous);
+    case "css":
+      return /^\s*\/\*\s*tinycoders:\s*\S.*\*\/\s*$/.test(previous);
+    case "html": case "markdown":
+      return /^\s*<!--\s*tinycoders:\s*\S.*-->\s*$/.test(previous);
+    default:
+      return /^\s*\/\/\s*tinycoders:\s*\S/.test(previous);
+  }
+}
+
 export class InlineCompletion implements vscode.InlineCompletionItemProvider, vscode.Disposable {
   private readonly pending = new Map<string, AbortController>();
 
@@ -19,15 +36,19 @@ export class InlineCompletion implements vscode.InlineCompletionItemProvider, vs
       CompletionModel | undefined,
     private readonly log: vscode.OutputChannel,
     private readonly metrics: LocalMetrics,
+    private readonly settings: (document: vscode.TextDocument) => { automatic: boolean; comments: boolean },
     private readonly retrieve?: (document: vscode.TextDocument, position: vscode.Position) => Promise<Snippet[]>,
   ) {}
 
   async provideInlineCompletionItems(
     document: vscode.TextDocument, position: vscode.Position,
-    _context: vscode.InlineCompletionContext, token: vscode.CancellationToken,
+    context: vscode.InlineCompletionContext, token: vscode.CancellationToken,
   ): Promise<vscode.InlineCompletionItem[]> {
     const key = document.uri.toString();
     this.cancel(document);
+    const { automatic, comments } = this.settings(document);
+    if (context.triggerKind === vscode.InlineCompletionTriggerKind.Automatic &&
+        !automatic && !(comments && isCommentTrigger(document, position))) return [];
     const model = this.select(document, position);
     if (!model || token.isCancellationRequested) return [];
     const controller = new AbortController();

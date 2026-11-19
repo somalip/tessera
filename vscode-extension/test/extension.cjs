@@ -23,6 +23,8 @@ exports.run = async function () {
   const { Dashboard, dashboardId } = require("../dist/views/dashboard");
   const commands = await vscode.commands.getCommands();
   assert.ok(commands.includes(dashboardId + ".focus"));
+  assert.ok(commands.includes("tinycoders.ask"));
+  assert.ok(commands.includes("tinycoders.triggerCompletion"));
   await vscode.commands.executeCommand("tinycoders.openDashboard");
 
   const installed = {
@@ -30,28 +32,46 @@ exports.run = async function () {
       language_ids: ["python"], capabilities: ["fim", "chat"], size_bytes: 490000000 },
   };
   let state = { trusted: true, language: "python", active: installed, models: [installed] };
-  const dashboard = new Dashboard(() => state);
-  let refreshed = false;
-  const listener = dashboard.onDidChangeTreeData(() => { refreshed = true; });
+  const messages = [];
+  const received = new vscode.EventEmitter();
+  const disposed = new vscode.EventEmitter();
+  const errors = [];
+  const dashboard = new Dashboard(() => state, error => errors.push(error));
+  const webview = {
+    postMessage: async markup => messages.push(markup),
+    onDidReceiveMessage: received.event,
+  };
   try {
-    const [editorGroup, models, actions] = dashboard.getChildren();
-    assert.equal(dashboard.getChildren(editorGroup)[0].label, "python-tiny");
-    const modelRows = dashboard.getChildren(models);
-    assert.equal(modelRows[0].description, "python · 1.0.0");
-    assert.equal(modelRows.find(row => row.id === "tinycoders.addLocalModel").command.command,
-      "tinycoders.addLocalModel");
-    assert.ok(modelRows.some(row => row.id === "tinycoders.switchVersion"));
-    assert.ok(dashboard.getChildren(actions).some(row => row.id === "tinycoders.refactor"));
+    dashboard.resolveWebviewView({ webview, onDidDispose: disposed.event });
+    assert.match(webview.html, /python-tiny/);
+    assert.match(webview.html, /python · 1.0.0 · 490 MB/);
+    assert.match(webview.html, /Routed/);
+    assert.match(webview.html, /data-action="add"/);
+    assert.match(webview.html, /data-action="version"/);
+    assert.match(webview.html, /data-action="refactor"/);
+    assert.deepEqual(webview.options.localResourceRoots, []);
 
-    state = { trusted: true, language: "rust", models: [] };
+    state = { trusted: true, language: "<rust>", models: [] };
     dashboard.refresh();
-    assert.equal(refreshed, true);
-    assert.equal(dashboard.getChildren(dashboard.getChildren()[0])[0].label, "No matching model");
+    assert.match(messages.at(-1), /No matching model/);
+    assert.match(messages.at(-1), /&lt;rust&gt;/);
+    assert.match(messages.at(-1), /No models installed/);
+    dashboard.refresh();
+    assert.equal(messages.length, 1);
+
     state = { trusted: false, models: [] };
-    assert.deepEqual(dashboard.getChildren().map(row => row.id), ["editor", "tools"]);
+    received.fire("ready");
+    assert.match(messages.at(-1), /Workspace trust required/);
+    assert.match(messages.at(-1), /data-action="trust"/);
+    assert.doesNotMatch(messages.at(-1), /data-action="refactor"|Installed models/);
+    assert.deepEqual(errors, []);
+    disposed.fire();
+    dashboard.refresh();
+    assert.equal(messages.length, 2);
   } finally {
-    listener.dispose();
     dashboard.dispose();
+    received.dispose();
+    disposed.dispose();
   }
   const cursor = new vscode.Position(1, 4);
   const context = { triggerKind: vscode.InlineCompletionTriggerKind.Invoke };
@@ -69,6 +89,24 @@ exports.run = async function () {
       current.dispose();
     }
     if (!real) {
+      await config.update("autocomplete", false, global);
+      const marked = await vscode.workspace.openTextDocument({
+        language: "python", content: "def f():\n    # tinycoders: return an answer\n    ",
+      });
+      const automatic = { triggerKind: vscode.InlineCompletionTriggerKind.Automatic };
+      const markedCursor = new vscode.Position(2, 4);
+      const token = new vscode.CancellationTokenSource();
+      try {
+        const complete = (doc, position, trigger) =>
+          provider.provideInlineCompletionItems(doc, position, trigger, token.token);
+        assert.deepEqual(await complete(document, cursor, automatic), []);
+        assert.equal((await complete(document, cursor, context))[0]?.insertText, "return 42");
+        assert.equal((await complete(marked, markedCursor, automatic))[0]?.insertText, "return 42");
+        await config.update("commentCompletions", false, global);
+        assert.deepEqual(await complete(marked, markedCursor, automatic), []);
+      } finally {
+        token.dispose();
+      }
       const slow = await vscode.workspace.openTextDocument({ language: "python", content: "def slow():\n    " });
       const cancellation = new vscode.CancellationTokenSource();
       try {

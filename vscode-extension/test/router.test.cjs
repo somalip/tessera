@@ -111,6 +111,29 @@ test("eviction waits for shutdown and a crashed host is restarted", async () => 
   }
 });
 
+test("the automatic budget admits a paged model alone and protects its active lease", async () => {
+  const lifecycle = new Lifecycle(10, 2, 5000, Promise.resolve(), true);
+  const events = [];
+  const use = (key, bytes, operation = async () => {}) => lifecycle.use(key, bytes, paged => ({
+    alive: true,
+    start: async () => { events.push([key, paged]); return {}; },
+    dispose: () => events.push(["disposed", key]),
+  }), operation);
+  try {
+    await use("normal", 5);
+    await use("large", 20, async () => {
+      await assert.rejects(use("other", 5), /active/);
+    });
+    await use("other", 5);
+    assert.deepEqual(events, [
+      ["normal", false], ["disposed", "normal"], ["large", true],
+      ["disposed", "large"], ["other", false],
+    ]);
+  } finally {
+    await lifecycle.dispose();
+  }
+});
+
 test("Python syntax trees distinguish SQL strings from comments and ordinary strings", async () => {
   const { PythonRegions } = require("../dist/router/pythonRegions");
   const regions = new PythonRegions();
