@@ -1,27 +1,26 @@
 import { statSync } from "node:fs";
 import { freemem } from "node:os";
+import { join } from "node:path";
 import * as vscode from "vscode";
 import { qwenFim } from "./context/builder";
 import type { Manifest } from "./contracts";
 import type { InferenceHost } from "./host/client";
 import { LlamaServer } from "./host/llamaServer";
 import { InlineCompletion } from "./providers/inlineCompletion";
+import { fetchIndex, ModelStore, type InstalledModel } from "./registry/download";
 import { embeddedLanguage, projectLanguage } from "./router/detector";
 import { Lifecycle } from "./router/lifecycle";
 import { selectModel } from "./router/policy";
-
-interface Model {
-  manifest: Manifest;
-  path: string;
-  memoryBytes: number;
-}
 
 export function activate(context: vscode.ExtensionContext): InlineCompletion {
   const log = vscode.window.createOutputChannel("TinyCoders");
   const status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 25);
   const config = () => vscode.workspace.getConfiguration("tinycoders");
   const pins = new Map<string, string>();
-  let models: Model[] = [];
+  const store = new ModelStore(join(context.globalStorageUri.fsPath, "models"));
+  let localModels: InstalledModel[] = [];
+  let installedModels: InstalledModel[] = [];
+  const models = () => [...installedModels, ...localModels];
   let lifecycle: Lifecycle;
   let projectFiles = new Set<string>();
   let projectFolder: string | undefined;
@@ -32,14 +31,14 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
     const settings = config();
     lifecycle = new Lifecycle(settings.get("memoryMiB", 0) * 1024 ** 2 || freemem() * 0.6,
       settings.get("maxModels", 2), settings.get("idleMinutes", 5) * 60_000);
-    models = [];
+    localModels = [];
     for (const language of ["python", "typescript"]) {
       const path = settings.get<string>(`${language}ModelPath`);
       if (!path) continue;
       try {
         const file = statSync(path);
         if (!file.isFile() || file.size >= 1_000_000_000) throw new Error("Invalid GGUF file size");
-        models.push({
+        localModels.push({
           path, memoryBytes: file.size + 128 * 1024 ** 2,
           manifest: {
             schema_version: 1, id: `${language}-local`, version: "0.0.0",
@@ -63,7 +62,7 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
   ) => {
     if (!vscode.workspace.isTrusted) return;
     const folder = vscode.workspace.getWorkspaceFolder(document.uri)?.uri.toString();
-    return selectModel(models, {
+    return selectModel(models(), {
       language: document.languageId,
       filename: document.uri.fsPath,
       embedded: embeddedLanguage(document.languageId, document.getText(), document.offsetAt(position)),
@@ -73,7 +72,7 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
       generalist: config().get("generalist"), capability,
     });
   };
-  const endpoint = (model: Model) => ({
+  const endpoint = (model: InstalledModel) => ({
     contextLength: model.manifest.context_length,
     tokens: model.manifest.prompt_formats.fim,
     use<T>(operation: (host: InferenceHost) => Promise<T>) {
@@ -121,6 +120,15 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
     prewarm();
   };
 
+  const loadInstalled = async () => {
+    installedModels = await store.installed();
+    updateStatus();
+  };
+  const showError = (error: unknown) => {
+    log.appendLine(String(error));
+    void vscode.window.showErrorMessage(`TinyCoders: ${String(error)}`);
+  };
+
   refresh();
   status.command = "tinycoders.pickModel";
   status.show();
@@ -141,19 +149,69 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
         updateStatus();
       }
     }),
+    vscode.commands.registerCommand("tinycoders.installModel", async () => {
+      if (!vscode.workspace.isTrusted) return;
+      const settings = config();
+      const url = settings.get("registryUrl", "");
+      const key = settings.get("registryPublicKey", "");
+      if (!url || !key) {
+        await vscode.commands.executeCommand("workbench.action.openSettings", "tinycoders.registry");
+        return;
+      }
+      try {
+        const index = await fetchIndex(url, key, AbortSignal.timeout(15_000));
+        const entries = index.models.map(entry => ({
+          label: entry.id, description: entry.version, detail: entry.language_ids.join(", "), entry,
+        }));
+        const choice = await vscode.window.showQuickPick(entries, { placeHolder: "Select a model version" });
+        if (!choice) return;
+        await vscode.window.withProgress({
+          location: vscode.ProgressLocation.Notification, title: `Installing ${choice.label}`, cancellable: true,
+        }, async (_progress, token) => {
+          const controller = new AbortController();
+          const cancellation = token.onCancellationRequested(() => controller.abort());
+          try {
+            await store.install(choice.entry, AbortSignal.any([controller.signal, AbortSignal.timeout(900_000)]));
+            await loadInstalled();
+            prewarm();
+          } catch (error) {
+            if (!controller.signal.aborted) throw error;
+          } finally {
+            cancellation.dispose();
+          }
+        });
+      } catch (error) {
+        showError(error);
+      }
+    }),
+    vscode.commands.registerCommand("tinycoders.switchVersion", async () => {
+      if (!vscode.workspace.isTrusted) return;
+      try {
+        const id = await vscode.window.showQuickPick(installedModels.map(model => model.manifest.id));
+        if (!id) return;
+        const version = await vscode.window.showQuickPick(await store.versions(id));
+        if (!version) return;
+        await store.activate(id, version);
+        await loadInstalled();
+        prewarm();
+      } catch (error) {
+        showError(error);
+      }
+    }),
     vscode.commands.registerCommand("tinycoders.pickModel", async () => {
       const editor = vscode.window.activeTextEditor;
       if (!editor) return;
       const options = [
         { label: "Automatic", id: "" },
-        ...models.map(({ manifest }) => ({ label: manifest.id, id: manifest.id })),
+        ...models().map(({ manifest }) => ({ label: manifest.id, id: manifest.id })),
       ];
-      if (!models.length) {
-        await vscode.commands.executeCommand("workbench.action.openSettings", "@ext:tinycoders.tinycoders");
-        return;
-      }
+      options.push({ label: "Install a model…", id: "install" });
       const choice = await vscode.window.showQuickPick(options, { placeHolder: "Select a model" });
       if (!choice) return;
+      if (choice.id === "install") {
+        await vscode.commands.executeCommand("tinycoders.installModel");
+        return;
+      }
       const folder = vscode.workspace.getWorkspaceFolder(editor.document.uri);
       const scope = folder ? await vscode.window.showQuickPick(["File", "Workspace"]) : "File";
       if (scope === "File") {
@@ -167,6 +225,6 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
       prewarm();
     }),
   );
-  void scan().catch(error => log.appendLine(String(error)));
+  void loadInstalled().then(scan).catch(error => log.appendLine(String(error)));
   return provider;
 }
