@@ -1,7 +1,7 @@
 const assert = require("node:assert/strict");
 const { createHash, generateKeyPairSync, sign } = require("node:crypto");
 const { execFileSync } = require("node:child_process");
-const { mkdtemp, rm } = require("node:fs/promises");
+const { mkdtemp, rm, writeFile } = require("node:fs/promises");
 const os = require("node:os");
 const path = require("node:path");
 const { test } = require("node:test");
@@ -69,5 +69,9 @@ test("installer fails closed on tampering, installs upgrades, and switches offli
   assert.equal((await store.installed())[0].manifest.version, "2.0.0");
   globalThis.fetch.mock.mockImplementation(() => { throw new Error("offline"); });
   await store.activate("python-tiny", "1.0.0");
-  assert.equal((await store.installed())[0].manifest.version, "1.0.0");
+  const [active] = await store.installed();
+  assert.equal(active.manifest.version, "1.0.0");
+  await writeFile(active.path, "GGUF mock bytex");
+  assert.deepEqual(await store.installed(), []);
+  await assert.rejects(store.activate("python-tiny", "1.0.0"), /SHA-256/);
 });

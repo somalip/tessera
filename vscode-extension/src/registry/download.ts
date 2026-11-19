@@ -7,6 +7,7 @@ import { pipeline } from "node:stream/promises";
 import Ajv from "ajv/dist/2020";
 import * as zip from "yauzl";
 import { manifestSchema, registrySchema, type Manifest, type Registry } from "../contracts";
+import { modelMemoryBytes } from "../host/memory";
 
 const validator = new Ajv();
 const isRegistry = validator.compile<Registry>(registrySchema);
@@ -123,7 +124,7 @@ async function modelAt(directory: string, id: string, version: string): Promise<
   const path = join(directory, `model.${manifest.quant}.gguf`);
   const file = await stat(path);
   if (!file.isFile() || file.size !== manifest.size_bytes) throw new Error("Invalid model size");
-  return { manifest, path, memoryBytes: file.size + 128 * 1024 ** 2 };
+  return { manifest, path, memoryBytes: modelMemoryBytes(file.size, manifest.context_length) };
 }
 
 export class ModelStore {
@@ -137,7 +138,8 @@ export class ModelStore {
   async activate(id: string, version: string): Promise<void> {
     if (!versionPattern.test(version)) throw new Error("Invalid model version");
     const root = this.modelRoot(id);
-    await modelAt(join(root, version), id, version);
+    const model = await modelAt(join(root, version), id, version);
+    if (await sha256(model.path) !== model.manifest.sha256) throw new Error("Installed model SHA-256 mismatch");
     const temporary = await mkdtemp(join(root, ".activation-"));
     try {
       await writeFile(join(temporary, "active"), version);
@@ -161,7 +163,9 @@ export class ModelStore {
         const root = this.modelRoot(name);
         try {
           const version = await readFile(join(root, "active"), "utf8");
-          if (versionPattern.test(version)) return await modelAt(join(root, version), name, version);
+          if (!versionPattern.test(version)) return;
+          const model = await modelAt(join(root, version), name, version);
+          if (await sha256(model.path) === model.manifest.sha256) return model;
         } catch {
           // An incomplete or damaged install is unavailable.
         }

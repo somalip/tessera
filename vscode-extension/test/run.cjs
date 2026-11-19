@@ -10,7 +10,11 @@ async function main() {
       vscodeExecutablePath: process.env.VSCODE_EXECUTABLE || undefined,
       extensionDevelopmentPath: path.resolve(__dirname, ".."),
       extensionTestsPath: path.join(__dirname, "extension.cjs"),
-      extensionTestsEnv: { TINYCODERS_TEST_HOME: directory },
+      extensionTestsEnv: {
+        TINYCODERS_TEST_HOME: directory,
+        TINYCODERS_REAL_SERVER: process.env.TINYCODERS_REAL_SERVER ?? "",
+        TINYCODERS_REAL_MODEL: process.env.TINYCODERS_REAL_MODEL ?? "",
+      },
       launchArgs: ["--disable-extensions", "--disable-workspace-trust", "--user-data-dir", directory],
     });
   } finally {

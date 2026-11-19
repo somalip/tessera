@@ -1,7 +1,8 @@
-import { spawn, type ChildProcess } from "node:child_process";
+import { execFile, spawn, type ChildProcess } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { createServer } from "node:net";
 import { setTimeout as delay } from "node:timers/promises";
+import { promisify } from "node:util";
 import { LlamaClient } from "./client";
 
 async function availablePort(): Promise<number> {
@@ -24,6 +25,8 @@ async function availablePort(): Promise<number> {
 export class LlamaServer {
   private process?: ChildProcess;
   private pending?: Promise<LlamaClient>;
+  private exited?: Promise<void>;
+  private stopping?: Promise<void>;
   private readonly abort = new AbortController();
   private healthy = false;
 
@@ -32,6 +35,7 @@ export class LlamaServer {
     private readonly modelPath: string,
     private readonly contextLength: number,
     private readonly gpuLayers = 0,
+    private readonly minimumBuild = "local",
   ) {}
 
   get alive(): boolean {
@@ -40,23 +44,35 @@ export class LlamaServer {
   }
 
   start(): Promise<LlamaClient> {
-    this.pending ??= this.launch().catch(error => {
-      this.dispose();
+    this.pending ??= this.launch().catch(async error => {
+      await this.dispose();
       throw error;
     });
     return this.pending;
   }
 
   private async launch(): Promise<LlamaClient> {
+    if (this.minimumBuild !== "local") {
+      const required = /^b(\d+)$/.exec(this.minimumBuild);
+      const { stdout, stderr } = await promisify(execFile)(this.executable, ["--version"], {
+        timeout: 5000, signal: this.abort.signal, windowsHide: true,
+      });
+      const actual = /version:\s*b?(\d+)/i.exec(stdout + stderr);
+      if (!required || !actual || Number(actual[1]) < Number(required[1])) {
+        throw new Error(`Model requires llama.cpp ${this.minimumBuild}`);
+      }
+    }
     const port = await availablePort();
     const apiKey = randomUUID();
     this.abort.signal.throwIfAborted();
     const child = spawn(this.executable, [
       "--host", "127.0.0.1", "--port", String(port), "--model", this.modelPath,
       "--ctx-size", String(this.contextLength), "--n-gpu-layers", String(this.gpuLayers),
-      "--parallel", "1", "--api-key", apiKey,
+      "--parallel", "1", "--api-key", apiKey, "--cache-ram", "0",
+      ...(this.gpuLayers === 0 ? ["--device", "none"] : []),
     ], { stdio: ["ignore", "ignore", "pipe"], windowsHide: true });
     this.process = child;
+    this.exited = new Promise(resolve => { child.once("close", () => resolve()); });
     let error: Error | undefined;
     let diagnostics = "";
     child.stderr.on("data", chunk => { diagnostics = (diagnostics + String(chunk)).slice(-2000); });
@@ -80,8 +96,21 @@ export class LlamaServer {
     throw new Error(`llama-server failed to become ready. ${diagnostics}`);
   }
 
-  dispose(): void {
+  dispose(): Promise<void> {
     this.abort.abort();
-    this.process?.kill();
+    this.stopping ??= this.terminate();
+    return this.stopping;
+  }
+
+  private async terminate(): Promise<void> {
+    const child = this.process;
+    if (!child || child.exitCode !== null || child.signalCode !== null) return;
+    const force = setTimeout(() => child.kill("SIGKILL"), 1500);
+    try {
+      child.kill();
+      await this.exited;
+    } finally {
+      clearTimeout(force);
+    }
   }
 }

@@ -12,9 +12,17 @@ const server = http.createServer(async (request, response) => {
   let body = "";
   for await (const chunk of request) body += chunk;
   const { prompt } = JSON.parse(body);
+  if (prompt.includes("def slow()")) {
+    response.writeHead(200, { "Content-Type": "text/event-stream" });
+    response.write('data: {"choices":[{"text":"return"}]}\n\n');
+    const timer = setTimeout(() => response.end("data: [DONE]\n\n"), 5000);
+    response.on("close", () => clearTimeout(timer));
+    return;
+  }
   const text = prompt === "<|fim_prefix|>def f():\n    <|fim_suffix|>\n<|fim_middle|>"
     ? "return 42" : "";
-  response.setHeader("Content-Type", "application/json");
-  response.end(JSON.stringify({ choices: [{ text }] }));
+  response.setHeader("Content-Type", "text/event-stream");
+  response.write("data: " + JSON.stringify({ choices: [{ text }] }) + "\n\n");
+  response.end("data: [DONE]\n\n");
 });
 server.listen(Number(flag("--port")), flag("--host"));

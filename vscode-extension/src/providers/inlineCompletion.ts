@@ -2,6 +2,7 @@ import { setTimeout as delay } from "node:timers/promises";
 import * as vscode from "vscode";
 import type { Snippet } from "../context/bm25";
 import { buildFim, type FimTokens } from "../context/builder";
+import type { LocalMetrics } from "../telemetry";
 import type { InferenceHost } from "../host/client";
 
 export interface CompletionModel {
@@ -17,6 +18,7 @@ export class InlineCompletion implements vscode.InlineCompletionItemProvider, vs
     private readonly select: (document: vscode.TextDocument, position: vscode.Position) =>
       CompletionModel | undefined,
     private readonly log: vscode.OutputChannel,
+    private readonly metrics: LocalMetrics,
     private readonly retrieve?: (document: vscode.TextDocument, position: vscode.Position) => Promise<Snippet[]>,
   ) {}
 
@@ -40,13 +42,21 @@ export class InlineCompletion implements vscode.InlineCompletionItemProvider, vs
       const lineComment = ["python", "ruby", "shellscript", "yaml"].includes(document.languageId) ? "#" : "//";
       const prompt = buildFim(document.getText(), document.offsetAt(position),
         model.contextLength, model.tokens, context, lineComment);
+      const requested = performance.now();
+      let firstToken: number | undefined;
       const result = await model.use(async host => {
         signal.throwIfAborted();
-        return host.complete(prompt, [...Object.values(model.tokens), "<|endoftext|>"], signal);
+        const started = performance.now();
+        return host.complete(prompt, [...Object.values(model.tokens), "<|endoftext|>"], signal,
+          () => { firstToken ??= performance.now() - started; });
       });
-      return !signal.aborted && document.version === version && result
-        ? [new vscode.InlineCompletionItem(result, new vscode.Range(position, position))]
-        : [];
+      if (signal.aborted || document.version !== version || !result) return [];
+      const item = new vscode.InlineCompletionItem(result, new vscode.Range(position, position));
+      item.command = {
+        title: "Record accepted TinyCoders suggestion", command: "tinycoders.acceptCompletion",
+        arguments: [this.metrics.record(firstToken, performance.now() - requested)],
+      };
+      return [item];
     } catch (error) {
       if (!signal.aborted) this.log.appendLine(String(error));
       return [];

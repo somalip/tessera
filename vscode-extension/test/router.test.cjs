@@ -74,6 +74,55 @@ test("lifecycle evicts the least recently used model and protects in-flight leas
     await use("go", 15);
     assert.deepEqual(disposed, ["typescript", "rust", "python"]);
   } finally {
-    lifecycle.dispose();
+    await lifecycle.dispose();
+  }
+});
+
+test("eviction waits for shutdown and a crashed host is restarted", async () => {
+  const lifecycle = new Lifecycle(10, 1, 5000);
+  let release;
+  let running = false;
+  let started = 0;
+  const first = () => ({
+    get alive() { return running; },
+    async start() { running = true; started += 1; return {}; },
+    async dispose() {
+      if (running) await new Promise(resolve => { release = resolve; });
+      running = false;
+    },
+  });
+  const useFirst = () => lifecycle.use("first", 10, first, async () => {});
+  try {
+    await useFirst();
+    running = false;
+    await useFirst();
+    assert.equal(started, 2);
+    const next = lifecycle.use("next", 10, () => {
+      assert.equal(running, false);
+      return { alive: true, start: async () => ({}), dispose() {} };
+    }, async () => true);
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(typeof release, "function");
+    assert.equal(running, true);
+    release();
+    assert.equal(await next, true);
+  } finally {
+    await lifecycle.dispose();
+  }
+});
+
+test("Python syntax trees distinguish SQL strings from comments and ordinary strings", async () => {
+  const { PythonRegions } = require("../dist/router/pythonRegions");
+  const regions = new PythonRegions();
+  try {
+    await regions.initialize();
+    const source = '# """SELECT 1\nlabel = "café"\nquery = r"""\nSELECT * FROM a\n"""\n';
+    assert.equal(regions.at("test", 1, source, source.indexOf("SELECT")), undefined);
+    assert.equal(regions.at("test", 1, source, source.lastIndexOf("SELECT")), "sql");
+    assert.equal(regions.at("test", 1, source, source.length), undefined);
+    const editing = 'query = """SELECT * FROM a';
+    assert.equal(regions.at("test", 2, editing, editing.length), "sql");
+  } finally {
+    regions.dispose();
   }
 });
