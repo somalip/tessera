@@ -4,11 +4,11 @@ exports.embeddedLanguage = embeddedLanguage;
 exports.projectLanguage = projectLanguage;
 const aliases = {
     py: "python", ts: "typescript", tsx: "typescriptreact", js: "javascript",
-    jsx: "javascriptreact", rs: "rust", "c++": "cpp", hpp: "cpp", kt: "kotlin",
+    jsx: "javascriptreact", yml: "yaml", regexp: "regex", rs: "rust", "c++": "cpp", hpp: "cpp", kt: "kotlin",
 };
 function embeddedLanguage(language, source, offset) {
     const before = source.slice(0, offset);
-    if (language === "markdown") {
+    if (language === "markdown" || language === "mdx") {
         let open;
         const lines = before.split(/\r?\n/);
         lines.pop();
@@ -23,7 +23,8 @@ function embeddedLanguage(language, source, offset) {
                 && line.trim().replace(/[`~]/g, "") === "")
                 open = undefined;
         }
-        return open?.language ? aliases[open.language] ?? open.language : undefined;
+        if (open)
+            return aliases[open.language] ?? (open.language || "plaintext");
     }
     if (language === "html") {
         let region;

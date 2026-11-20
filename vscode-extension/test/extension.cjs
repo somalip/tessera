@@ -33,12 +33,14 @@ exports.run = async function () {
     manifest: { id: "python-tiny", quant: "Q4_K_M", version: "1.0.0",
       language_ids: ["python"], capabilities: ["fim", "chat"], size_bytes: 490000000 },
   };
+  const { LocalMetrics } = require("../dist/telemetry");
+  const metrics = new LocalMetrics();
   let state = { trusted: true, advanced: true, language: "python", active: installed, models: [installed] };
   const messages = [];
   const received = new vscode.EventEmitter();
   const disposed = new vscode.EventEmitter();
   const errors = [];
-  const dashboard = new Dashboard(() => state, error => errors.push(error), async advanced => { state = { ...state, advanced }; });
+  const dashboard = new Dashboard(() => ({ ...state, usage: metrics.usage() }), error => errors.push(error), async advanced => { state = { ...state, advanced }; });
   const webview = {
     postMessage: async markup => messages.push(markup),
     onDidReceiveMessage: received.event,
@@ -49,12 +51,16 @@ exports.run = async function () {
       onDidChangeVisibility: () => new vscode.Disposable(() => {}),
     });
     assert.match(webview.html, /System resources/);
+    assert.match(webview.html, /Usage appears after your first completed model request/);
+    metrics.recordInference("python<&>", { outputTokens: 20, tokensPerSecond: 10 });
+    metrics.accept(metrics.record(50, 120));
     assert.match(webview.html, /data-action="resource-limits"/);
     assert.match(webview.html, /python-tiny/);
     assert.match(webview.html, /python · 1.0.0 · 490 MB/);
     assert.match(webview.html, /Routed/);
     assert.match(webview.html, /data-action="add"/);
     assert.match(webview.html, /data-action="manage"/);
+    assert.match(webview.html, /data-action="workflow" class="primary"/);
     assert.match(webview.html, /data-action="advanced" aria-pressed="true"/);
     received.fire("simple");
     await Promise.resolve();
@@ -62,10 +68,15 @@ exports.run = async function () {
     assert.match(simpleMarkup, /data-action="simple" aria-pressed="true"/);
     assert.match(simpleMarkup, /data-action="install"/);
     assert.match(simpleMarkup, /data-action="manage"/);
-    assert.doesNotMatch(simpleMarkup, /data-action="refactor"/);
+    assert.match(simpleMarkup, /10 tok\/s · python&lt;&amp;&gt;/);
+    assert.match(simpleMarkup, /Most-used model/);
+    assert.match(simpleMarkup, /100% \(1 \/ 1\)/);
+    assert.doesNotMatch(simpleMarkup, /data-action="refactor"|Inline first token/);
     received.fire("advanced");
     await Promise.resolve();
-    assert.match(messages.pop(), /data-action="advanced" aria-pressed="true"/);
+    const advancedMarkup = messages.pop();
+    assert.match(advancedMarkup, /data-action="advanced" aria-pressed="true"/);
+    assert.match(advancedMarkup, /Inline first token \(p95\)<\/dt><dd>50 ms/);
     assert.match(webview.html, /data-action="refactor"/);
     assert.match(webview.html, /data-action="ask" class="primary"/);
     assert.match(webview.html, /<ul aria-labelledby="models-heading">/);
@@ -87,7 +98,7 @@ exports.run = async function () {
     assert.match(messages.at(-1), /No matching model/);
     assert.match(messages.at(-1), /&lt;rust&gt;/);
     assert.match(messages.at(-1), /No models installed/);
-    assert.match(messages.at(-1), /data-action="install" class="primary"/);
+    assert.match(messages.at(-1), /data-action="workflow" class="primary"/);
     dashboard.refresh();
     assert.equal(messages.length, 2);
 
@@ -124,13 +135,34 @@ exports.run = async function () {
       const cppFim = path.join(process.env.TESSERA_TEST_HOME, "cpp-fim.gguf");
       const cppChat = path.join(process.env.TESSERA_TEST_HOME, "cpp-chat.gguf");
       await Promise.all([writeFile(cppFim, "stub"), writeFile(cppChat, "stub")]);
-      await config.update("cppAutocompleteModelPath", cppFim, global);
       await config.update("cppModelPath", cppChat, global);
       const token = new vscode.CancellationTokenSource();
       try {
         const cpp = await vscode.workspace.openTextDocument({
           language: "cpp", content: "int answer() {\n    // Return the C++ answer\n    \n}\n",
         });
+        const originalReport = provider.reportRoute;
+        const routed = [];
+        provider.reportRoute = (doc, route) => {
+          if (doc === cpp) routed.push(route.model?.path);
+          originalReport(doc, route);
+        };
+        try {
+          await provider.provideInlineCompletionItems(cpp, new vscode.Position(2, 4), context, token.token);
+          assert.equal(routed.at(-1), cppChat);
+          await assert.rejects(async () => vscode.commands.executeCommand("tessera.saveWorkflow", "C / C++", {}), /Enter a language ID/);
+          await vscode.commands.executeCommand("tessera.saveWorkflow", "C/C++", {
+            router: "", autocomplete: "qwen-coder-autocomplete", parser: "", generator: "cpp-local",
+          });
+          await provider.provideInlineCompletionItems(cpp, new vscode.Position(2, 4), context, token.token);
+          assert.match(routed.at(-1), /qwen-coder-autocomplete/);
+          await vscode.commands.executeCommand("tessera.saveWorkflow", "cpp");
+          await provider.provideInlineCompletionItems(cpp, new vscode.Position(2, 4), context, token.token);
+          assert.equal(routed.at(-1), cppChat);
+        } finally {
+          provider.reportRoute = originalReport;
+        }
+        await config.update("cppAutocompleteModelPath", cppFim, global);
         const complete = await provider.provideInlineCompletionItems(cpp, new vscode.Position(2, 4), context, token.token);
         assert.equal(complete[0]?.insertText, "return 42;");
         const instruction = await vscode.workspace.openTextDocument({
@@ -138,6 +170,23 @@ exports.run = async function () {
         });
         const generate = await provider.provideInlineCompletionItems(instruction, new vscode.Position(1, 0), context, token.token);
         assert.equal(generate[0]?.insertText, "int answer() { return 42; }");
+        const priorReport = provider.reportRoute;
+        const stages = [];
+        provider.reportRoute = (doc, route) => {
+          if (doc === instruction) stages.push(route.mode);
+          priorReport(doc, route);
+        };
+        try {
+          await vscode.commands.executeCommand("tessera.saveWorkflow", "cpp", {
+            router: "qwen-coder-chat", autocomplete: "", parser: "cpp-autocomplete-local", generator: "cpp-local",
+          });
+          const result = await provider.provideInlineCompletionItems(instruction, new vscode.Position(1, 0), context, token.token);
+          assert.deepEqual(stages, ["Comment routing", "Comment parsing", "Inline generation"]);
+          assert.equal(result[0]?.insertText, "int answer() { return 42; }");
+        } finally {
+          provider.reportRoute = priorReport;
+          await vscode.commands.executeCommand("tessera.saveWorkflow", "cpp");
+        }
         const automatic = { triggerKind: vscode.InlineCompletionTriggerKind.Automatic };
         const loop = await vscode.workspace.openTextDocument({
           language: "cpp", content: "// write a for loop\n// Print the loop index.\n",

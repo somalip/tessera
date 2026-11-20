@@ -10,10 +10,26 @@ export interface InferenceHost {
 
 export class IncompleteCodeError extends Error {}
 
+export interface InferenceUsage {
+  outputTokens?: number;
+  tokensPerSecond?: number;
+}
+
+const streamOptions = { include_usage: true };
+
 type ResponseChunk = {
+  usage?: { completion_tokens?: number };
+  timings?: { predicted_n?: number; predicted_per_second?: number };
   choices?: Array<{ text?: string; delta?: { content?: string }; finish_reason?: string }>;
   error?: { message?: string };
 };
+
+function readUsage(event: ResponseChunk, usage: InferenceUsage): void {
+  const tokens = event.usage?.completion_tokens ?? event.timings?.predicted_n;
+  const speed = event.timings?.predicted_per_second;
+  if (typeof tokens === "number" && Number.isSafeInteger(tokens) && tokens >= 0) usage.outputTokens = tokens;
+  if (typeof speed === "number" && Number.isFinite(speed) && speed > 0) usage.tokensPerSecond = speed;
+}
 
 async function* events(response: Response): AsyncIterable<ResponseChunk> {
   if (!response.body) throw new Error("llama-server returned an empty response");
@@ -47,6 +63,7 @@ export class LlamaClient implements InferenceHost {
   constructor(
     private readonly origin: string, private readonly apiKey: string,
     private readonly contextLength: number,
+    private readonly onUsage?: (usage: InferenceUsage) => void,
   ) {}
 
   private async post(path: string, body: object, signal: AbortSignal) {
@@ -63,34 +80,44 @@ export class LlamaClient implements InferenceHost {
 
   async complete(prompt: string, stop: string[], signal: AbortSignal, onFirstToken?: () => void, maxTokens = 96): Promise<string> {
     const response = await this.post("/v1/completions", {
-      prompt, stop, max_tokens: maxTokens, temperature: 0, stream: true,
+      prompt, stop, max_tokens: maxTokens, temperature: 0, stream: true, stream_options: streamOptions,
     }, signal);
+    const usage: InferenceUsage = {};
     if (response.headers.get("Content-Type")?.includes("application/json")) {
-      const text = ((await response.json()) as ResponseChunk).choices?.[0]?.text ?? "";
+      const event = (await response.json()) as ResponseChunk;
+      const text = event.choices?.[0]?.text ?? "";
+      readUsage(event, usage);
       if (text) onFirstToken?.();
+      if (!signal.aborted) this.onUsage?.(usage);
       return text;
     }
     let text = "";
     for await (const event of events(response)) {
+      readUsage(event, usage);
       const chunk = event.choices?.[0]?.text;
       if (chunk && !text) onFirstToken?.();
       text += chunk ?? "";
     }
+    if (!signal.aborted) this.onUsage?.(usage);
     return text;
   }
 
   async *chat(messages: Message[], signal: AbortSignal, codeTokens?: number): AsyncIterable<string> {
     const response = await this.post("/v1/chat/completions", {
       messages, max_tokens: codeTokens ?? Math.min(512, Math.floor(this.contextLength / 4)), stream: true,
+      stream_options: streamOptions,
       ...(codeTokens === undefined ? {} : { temperature: 0, chat_template_kwargs: { enable_thinking: false } }),
     }, signal);
+    const usage: InferenceUsage = {};
     let finished = false;
     for await (const event of events(response)) {
+      readUsage(event, usage);
       const choice = event.choices?.[0];
       const content = choice?.delta?.content;
       if (content) yield content;
       if (choice?.finish_reason === "stop") finished = true;
     }
+    if (!signal.aborted) this.onUsage?.(usage);
     if (codeTokens !== undefined && !finished) {
       throw new IncompleteCodeError("The local model did not finish generating the inline code.");
     }

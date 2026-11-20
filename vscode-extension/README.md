@@ -20,6 +20,32 @@ system resources, and diagnostics. Tessera remembers your mode selection.
 - **Add Local GGUF** lets you choose a model role and browse to an existing file.
 - **Choose Model** pins a compatible model for the current file or workspace.
 
+**Models & Workflow** opens an editor tab. In **Model library**, download
+recommended models, search Hugging Face or paste a model repository URL,
+select packages from a signed registry, or browse for existing Qwen-compatible
+GGUFs. The Hugging Face browser shows the declared license and downloads
+selected, checksum-verified GGUF variants from a pinned public revision.
+It supports single-file text models under 1 GB. Other weight formats,
+sharded models, gated repositories, and architectures unsupported by your
+llama.cpp build require a compatible alternative. **Test inference** checks
+that a model can load and generate text locally. Linked GGUFs stay at their
+original locations. Files grouped in one import share the selected capabilities.
+
+In **Workflow**, enter a VS Code language ID such as `cpp` or `python`.
+Preview a recommendation to download any missing models and populate the
+graph. Edit the graph by dragging models onto nodes or opening a node’s VS Code model picker,
+then save. A workflow
+applies to this workspace. Use `*` to set a default for languages without a
+specific workflow. **Restore automatic routing** removes the selected workflow.
+
+- **Autocomplete** receives normal inline suggestions.
+- **Generator** receives chat, edit, and inline code-generation requests.
+  Edits require a generator with edit capability.
+- **Comment parser** optionally condenses inline comment requests.
+- **Router** uses language rules by default. Assign a chat-capable routing
+  model to decide whether each inline comment goes through the connected
+  parser or directly to the generator.
+
 In **Advanced** mode, **System resources** shows machine-wide CPU usage,
 non-free RAM (including cached memory), and per-device GPU utilization when
 available. GPU readings use macOS accelerator counters or `nvidia-smi`.
@@ -66,6 +92,9 @@ For a conversation, open Tessera Chat from the dashboard or use
 Select code to explain, refactor, or generate tests from the dashboard.
 Refactors and generated tests open in a diff preview for review.
 
-The extension retains aggregate completion metrics in memory for the current
-session. **Tessera: Export Local Metrics** writes them to a file you choose.
+The Tessera sidebar shows session usage, including the latest reported generation
+speed, the most-used model by completed request count, reported output tokens,
+and inline suggestion acceptance. Advanced mode also shows p95 inline latency.
+Usage stays in memory for the current session. **Tessera: Export Local Metrics**
+writes aggregate inline completion metrics to a file you choose.
 The extension sends inference requests only to its local model process.

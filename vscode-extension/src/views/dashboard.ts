@@ -3,6 +3,7 @@ import * as vscode from "vscode";
 import { SystemResources } from "../host/resources";
 import type { InstalledModel } from "../registry/download";
 import type { InlineRoute } from "../providers/inlineCompletion";
+import type { LocalMetrics } from "../telemetry";
 import { dashboardHtml, renderDashboard, renderResources } from "./dashboardHtml";
 
 export const dashboardId = "tessera.dashboard";
@@ -14,6 +15,7 @@ export interface DashboardState {
   active?: InstalledModel;
   lastInline?: InlineRoute;
   models: readonly InstalledModel[];
+  usage: ReturnType<LocalMetrics["usage"]>;
 }
 
 const editorActions = [
@@ -32,6 +34,7 @@ function actions({ trusted, language, advanced }: DashboardState) {
       : language ? [{ id: "route", label: "Choose Model…", command: "tessera.pickModel" }] : [],
     editor: trusted ? (advanced && language ? editorActions : editorActions.slice(0, 2)) : [],
     models: trusted ? [
+      { id: "workflow", label: "Models & Workflow", command: "tessera.openWorkflow" },
       { id: "install", label: "Download Models…", command: "tessera.installModel" },
       { id: "manage", label: "Manage Models…", command: "tessera.manageModels" },
       { id: "add", label: "Add Local GGUF…", command: "tessera.addLocalModel" },

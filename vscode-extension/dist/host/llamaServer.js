@@ -31,19 +31,23 @@ class LlamaServer {
     gpuLayers;
     minimumBuild;
     paged;
+    cpuThreads;
+    onUsage;
     process;
     pending;
     exited;
     stopping;
     abort = new AbortController();
     healthy = false;
-    constructor(executable, modelPath, contextLength, gpuLayers = 0, minimumBuild = "local", paged = false) {
+    constructor(executable, modelPath, contextLength, gpuLayers = 0, minimumBuild = "local", paged = false, cpuThreads = 0, onUsage) {
         this.executable = executable;
         this.modelPath = modelPath;
         this.contextLength = contextLength;
         this.gpuLayers = gpuLayers;
         this.minimumBuild = minimumBuild;
         this.paged = paged;
+        this.cpuThreads = cpuThreads;
+        this.onUsage = onUsage;
     }
     get alive() {
         return this.healthy && !this.abort.signal.aborted
@@ -85,6 +89,7 @@ class LlamaServer {
             "--host", "127.0.0.1", "--port", String(port), "--model", this.modelPath,
             "--ctx-size", String(this.contextLength), "--n-gpu-layers", String(gpuLayers),
             "--parallel", "1", "--api-key", apiKey, "--cache-ram", "0",
+            ...(this.cpuThreads > 0 ? ["--threads", String(this.cpuThreads), "--threads-batch", String(this.cpuThreads)] : []),
             ...(gpuLayers === 0 ? ["--device", "none"] : []),
             ...(this.paged ? ["--no-repack", "--no-warmup"] : []),
         ], { env, stdio: ["ignore", "ignore", "pipe"], windowsHide: true });
@@ -108,7 +113,7 @@ class LlamaServer {
             }).catch(() => undefined);
             if (response?.ok && child.exitCode === null && child.signalCode === null) {
                 this.healthy = true;
-                return new client_1.LlamaClient(origin, apiKey, this.contextLength);
+                return new client_1.LlamaClient(origin, apiKey, this.contextLength, this.onUsage);
             }
             await (0, promises_1.setTimeout)(100, undefined, { signal: this.abort.signal });
         }

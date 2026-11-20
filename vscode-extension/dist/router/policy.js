@@ -13,7 +13,13 @@ function selectModel(models, route) {
     const byLanguage = (id) => eligible.find(({ manifest }) => id !== undefined &&
         (manifest.vscode_language_ids.includes(id) || manifest.language_ids.includes(id)));
     const byGlob = eligible.find(({ manifest }) => manifest.file_globs.some(glob => (0, node_path_1.matchesGlob)(route.filename.replaceAll("\\", "/"), glob)));
-    return byId(route.override) ?? byLanguage(route.embedded) ?? byLanguage(route.project)
+    const explicit = byId(route.override) ?? byLanguage(route.embedded);
+    if (explicit)
+        return explicit;
+    if (route.embedded && ["markdown", "mdx"].includes(route.language) && route.capability === "fim") {
+        return siblings[route.embedded]?.map(byLanguage).find(Boolean) ?? byId(route.generalist);
+    }
+    return byLanguage(route.project)
         ?? byLanguage(route.language) ?? byGlob
         ?? (siblings[route.project ?? route.language] ?? []).map(byLanguage).find(Boolean)
         ?? byId(route.generalist);

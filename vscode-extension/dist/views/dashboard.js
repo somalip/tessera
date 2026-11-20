@@ -36,6 +36,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Dashboard = exports.dashboardId = void 0;
 const node_crypto_1 = require("node:crypto");
 const vscode = __importStar(require("vscode"));
+const resources_1 = require("../host/resources");
 const dashboardHtml_1 = require("./dashboardHtml");
 exports.dashboardId = "tessera.dashboard";
 const editorActions = [
@@ -46,35 +47,39 @@ const editorActions = [
     { id: "refactor", label: "Refactor Code", command: "tessera.refactor" },
     { id: "test", label: "Write Tests", command: "tessera.writeTests" },
 ];
-function actions({ trusted, language, models }) {
+function actions({ trusted, language, advanced }) {
     return {
         routing: !trusted
             ? [{ id: "trust", label: "Manage Workspace Trust…", command: "workbench.trust.manage" }]
-            : language ? [{ id: "route", label: "Choose Routing Model…", command: "tessera.pickModel" }] : [],
-        editor: trusted && language ? editorActions : [],
+            : language ? [{ id: "route", label: "Choose Model…", command: "tessera.pickModel" }] : [],
+        editor: trusted ? (advanced && language ? editorActions : editorActions.slice(0, 2)) : [],
         models: trusted ? [
+            { id: "workflow", label: "Models & Workflow", command: "tessera.openWorkflow" },
+            { id: "install", label: "Download Models…", command: "tessera.installModel" },
+            { id: "manage", label: "Manage Models…", command: "tessera.manageModels" },
             { id: "add", label: "Add Local GGUF…", command: "tessera.addLocalModel" },
-            { id: "install", label: "Install From Registry…", command: "tessera.installModel" },
-            ...(models.some(model => model.manifest.quant !== "local")
-                ? [{ id: "version", label: "Switch Version…", command: "tessera.switchVersion" }] : []),
         ] : [],
-        tools: [
+        tools: advanced ? [
             { id: "settings", label: "Settings", command: "workbench.action.openSettings",
                 args: ["@ext:tessera.tessera"] },
             { id: "output", label: "Show Output", command: "tessera.showOutput" },
             { id: "metrics", label: "Export Local Metrics…", command: "tessera.exportMetrics" },
-        ],
+        ] : [],
     };
 }
 class Dashboard {
     state;
     reportError;
+    setAdvanced;
     view;
     subscriptions = [];
     markup;
-    constructor(state, reportError) {
+    polling;
+    nextSample;
+    constructor(state, reportError, setAdvanced) {
         this.state = state;
         this.reportError = reportError;
+        this.setAdvanced = setAdvanced;
     }
     resolveWebviewView(view) {
         this.dispose();
@@ -83,12 +88,28 @@ class Dashboard {
         webview.options = { enableScripts: true, localResourceRoots: [] };
         this.subscriptions = [
             view.onDidDispose(() => this.dispose()),
+            view.onDidChangeVisibility(() => {
+                if (view.visible)
+                    this.monitor(view);
+                else
+                    this.stopMonitoring();
+            }),
             webview.onDidReceiveMessage((message) => {
                 if (typeof message !== "string")
                     return;
                 if (message === "ready") {
                     this.markup = undefined;
                     this.refresh();
+                    if (view.visible)
+                        this.monitor(view);
+                    return;
+                }
+                if (message === "simple" || message === "advanced") {
+                    void this.setAdvanced(message === "advanced").then(() => this.refresh(), this.reportError);
+                    return;
+                }
+                if (message === "resource-limits" && this.state().advanced) {
+                    void vscode.commands.executeCommand("tessera.resourceLimits").then(undefined, this.reportError);
                     return;
                 }
                 const action = Object.values(actions(this.state())).flat().find(item => item.id === message);
@@ -107,12 +128,38 @@ class Dashboard {
             return;
         const state = this.state();
         const markup = (0, dashboardHtml_1.renderDashboard)(state, actions(state));
+        if (!state.advanced)
+            this.stopMonitoring();
+        else if (this.view.visible)
+            this.monitor(this.view);
         if (markup === this.markup)
             return;
         this.markup = markup;
         void this.view.webview.postMessage(markup);
     }
+    monitor(view) {
+        if (this.polling || !this.state().advanced)
+            return;
+        const controller = new AbortController();
+        const { signal } = controller;
+        this.polling = controller;
+        const resources = new resources_1.SystemResources();
+        const poll = async () => {
+            const sample = await resources.sample(signal);
+            if (signal.aborted)
+                return;
+            void view.webview.postMessage({ resources: (0, dashboardHtml_1.renderResources)(sample) });
+            this.nextSample = setTimeout(() => { void poll(); }, 2000);
+        };
+        void poll();
+    }
+    stopMonitoring() {
+        this.polling?.abort();
+        this.polling = undefined;
+        clearTimeout(this.nextSample);
+    }
     dispose() {
+        this.stopMonitoring();
         this.view = undefined;
         this.markup = undefined;
         for (const subscription of this.subscriptions.splice(0))

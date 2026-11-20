@@ -13,6 +13,12 @@ const server = http.createServer(async (request, response) => {
   for await (const chunk of request) body += chunk;
   const { prompt, stop, max_tokens, messages } = JSON.parse(body);
   if (request.url === "/v1/chat/completions") {
+    if (messages?.[0]?.content.startsWith("Classify this coding request.") && max_tokens === 8 &&
+        flag("--model").includes("/qwen-coder-chat/")) {
+      response.setHeader("Content-Type", "text/event-stream");
+      response.end('data: {"choices":[{"delta":{"content":"PARSE"},"finish_reason":"stop"}]}\n\ndata: [DONE]\n\n');
+      return;
+    }
     const task = /^(?:Actual request|Request): (.+)$/m.exec(messages?.[1]?.content ?? "")?.[1];
     if (task === "write a for loop") {
       const user = messages[1].content;
@@ -65,7 +71,7 @@ const server = http.createServer(async (request, response) => {
   }
   const comment = /# Request: (.+)\n# Brief:<\|fim_suffix\|>/.exec(prompt)?.[1];
   if (comment) {
-    if (!flag("--model").endsWith("/parsing.gguf") || max_tokens !== 64) {
+    if (!/\/(parsing|cpp-fim)\.gguf$/.test(flag("--model")) || max_tokens !== 64) {
       response.writeHead(400).end();
       return;
     }

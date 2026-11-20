@@ -10,11 +10,37 @@ function p95(samples) {
     return Math.round(sorted[Math.ceil(sorted.length * 0.95) - 1]);
 }
 class LocalMetrics {
+    onChange;
     firstToken = [];
     completed = [];
     pending = new Set();
     offered = 0;
     accepted = 0;
+    modelRequests = new Map();
+    requests = 0;
+    outputTokens = null;
+    latestSpeed;
+    constructor(onChange) {
+        this.onChange = onChange;
+    }
+    recordInference(model, { outputTokens, tokensPerSecond }) {
+        this.requests += 1;
+        this.modelRequests.set(model, (this.modelRequests.get(model) ?? 0) + 1);
+        if (outputTokens !== undefined)
+            this.outputTokens = (this.outputTokens ?? 0) + outputTokens;
+        if (tokensPerSecond !== undefined)
+            this.latestSpeed = { model, tokensPerSecond };
+        this.onChange?.();
+    }
+    usage() {
+        let mostUsed;
+        for (const [model, requests] of this.modelRequests) {
+            if (!mostUsed || requests > mostUsed.requests)
+                mostUsed = { model, requests };
+        }
+        return { requests: this.requests, outputTokens: this.outputTokens, latestSpeed: this.latestSpeed,
+            mostUsed, completions: this.export() };
+    }
     record(firstTokenMs, completedMs) {
         const id = (0, node_crypto_1.randomUUID)();
         this.offered += 1;
@@ -29,11 +55,14 @@ class LocalMetrics {
         this.completed.push(completedMs);
         if (this.completed.length > sampleLimit)
             this.completed.shift();
+        this.onChange?.();
         return id;
     }
     accept(id) {
-        if (this.pending.delete(id))
-            this.accepted += 1;
+        if (!this.pending.delete(id))
+            return;
+        this.accepted += 1;
+        this.onChange?.();
     }
     export() {
         return {

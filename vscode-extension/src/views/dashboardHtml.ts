@@ -32,7 +32,7 @@ export function inlineRouteName(route: InlineRoute): string {
   return "No matching model";
 }
 
-export function renderDashboard({ trusted, advanced, language, active, lastInline, models }: DashboardState, groups: Groups): string {
+export function renderDashboard({ trusted, advanced, language, active, lastInline, models, usage }: DashboardState, groups: Groups): string {
   const routed = lastInline?.model ?? active;
   const routing = !trusted ? "Workspace trust required" : (advanced && lastInline ? inlineRouteName(lastInline) : routed?.manifest.id) ??
     (language ? "No matching model" : "Open a source file");
@@ -80,13 +80,38 @@ export function renderDashboard({ trusted, advanced, language, active, lastInlin
     <h2 id="models-heading">Installed models</h2>
     <div class="section-content">
       ${modelRows ? `<ul aria-labelledby="models-heading">${modelRows}</ul>` : '<p class="muted">No models installed.</p>'}
-      ${groups.models.length ? `<div class="model-actions">${buttons(groups.models, "install")}</div>` : ""}
+      ${groups.models.length ? `<div class="model-actions">${buttons(groups.models, "workflow")}</div>` : ""}
     </div>
   </section>` : ""}
+  ${renderUsage(usage, advanced)}
   ${groups.tools.length ? `<section aria-labelledby="tools-heading">
     <h2 id="tools-heading">Tools</h2>
     <div class="section-content">${buttons(groups.tools)}</div>
   </section>` : ""}`;
+}
+
+function renderUsage(usage: DashboardState["usage"], advanced: boolean): string {
+  const { requests, outputTokens, mostUsed, latestSpeed, completions } = usage;
+  const number = new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 });
+  const count = (value: number) => number.format(value);
+  const latency = (value: number | null) => value === null ? "—" : `${count(value)} ms`;
+  const row = (label: string, value: string) => `<div class="usage-row"><dt>${label}</dt><dd>${escapeHtml(value)}</dd></div>`;
+  const acceptance = completions.acceptance_rate === null ? "—"
+    : `${count(completions.acceptance_rate * 100)}% (${count(completions.accepted)} / ${count(completions.offered)})`;
+  return `<section aria-labelledby="usage-heading">
+    <h2 id="usage-heading">Session usage</h2>
+    <div class="section-content">
+      ${requests ? `<dl class="usage">
+        ${row("Latest reported speed", latestSpeed ? `${count(latestSpeed.tokensPerSecond)} tok/s · ${latestSpeed.model}` : "Unavailable")}
+        ${row("Most-used model", mostUsed ? `${mostUsed.model} · ${count(mostUsed.requests)} requests` : "—")}
+        ${row("Completed model requests", count(requests))}
+        ${row("Reported output tokens", outputTokens === null ? "Unavailable" : count(outputTokens))}
+        ${row("Inline acceptance", acceptance)}
+        ${advanced ? row("Inline first token (p95)", latency(completions.first_token_p95_ms)) +
+          row("Inline completion latency (p95)", latency(completions.completed_request_p95_ms)) : ""}
+      </dl>` : '<p class="muted">Usage appears after your first completed model request.</p>'}
+    </div>
+  </section>`;
 }
 
 export function renderResources(sample: ResourceSample): string {
@@ -186,6 +211,9 @@ export function dashboardHtml(markup: string, nonce: string): string {
     .model-heading { justify-content: space-between; }
     .model-heading strong { font-weight: 600; }
     .model-actions { margin-block-start: 5px; }
+    .usage { margin: 0 4px; }
+    .usage-row { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0 8px; padding-block: 3px; }
+    .usage-row dd { margin: 0; font-variant-numeric: tabular-nums; }
     .resource { margin: 4px 4px 8px; }
     .resource-label { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0 8px; }
     meter { display: block; width: 100%; height: 8px; margin-top: 3px; }

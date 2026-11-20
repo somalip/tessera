@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.qwenFim = void 0;
 exports.repositoryContext = repositoryContext;
 exports.buildFim = buildFim;
+exports.buildDocumentation = buildDocumentation;
 exports.qwenFim = {
     prefix: "<|fim_prefix|>", suffix: "<|fim_suffix|>", middle: "<|fim_middle|>",
 };
@@ -47,4 +48,14 @@ function buildFim(source, offset, contextLength, tokens, snippets = [], lineComm
     const right = front(source.slice(offset, offset + remainder), Math.floor(remainder / 4));
     const left = back(source.slice(Math.max(0, offset - remainder), offset), remainder - Buffer.byteLength(right));
     return tokens.prefix + extras + left + tokens.suffix + right + tokens.middle;
+}
+function buildDocumentation(source, offset) {
+    const clean = (text) => text.replace(/<\|[^\r\n|]*\|>/g, "");
+    const left = clean(back(source.slice(Math.max(0, offset - 480), offset), 480));
+    const right = clean(front(source.slice(offset, offset + 96), 96));
+    return "<|im_start|>system\nComplete Markdown prose or Python docstrings. " +
+        "Output only the short text to insert at the cursor, on one line. " +
+        "Continue the existing wording. Do not repeat the surrounding text or invent commands.<|im_end|>\n" +
+        `<|im_start|>user\n${left}<CURSOR>${right}<|im_end|>\n` +
+        "<|im_start|>assistant\n<think>\n\n</think>\n\n";
 }

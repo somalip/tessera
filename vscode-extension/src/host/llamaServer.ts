@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import { createServer } from "node:net";
 import { setTimeout as delay } from "node:timers/promises";
 import { promisify } from "node:util";
-import { LlamaClient } from "./client";
+import { LlamaClient, type InferenceUsage } from "./client";
 
 async function availablePort(): Promise<number> {
   const server = createServer();
@@ -38,6 +38,7 @@ export class LlamaServer {
     private readonly minimumBuild = "local",
     private readonly paged = false,
     private readonly cpuThreads = 0,
+    private readonly onUsage?: (usage: InferenceUsage) => void,
   ) {}
 
   get alive(): boolean {
@@ -103,7 +104,7 @@ export class LlamaServer {
       }).catch(() => undefined);
       if (response?.ok && child.exitCode === null && child.signalCode === null) {
         this.healthy = true;
-        return new LlamaClient(origin, apiKey, this.contextLength);
+        return new LlamaClient(origin, apiKey, this.contextLength, this.onUsage);
       }
       await delay(100, undefined, { signal: this.abort.signal });
     }

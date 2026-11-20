@@ -1,7 +1,7 @@
 {
   "name": "tessera",
   "displayName": "Tessera",
-  "version": "0.1.8",
+  "version": "0.3.2",
   "publisher": "tessera",
   "private": true,
   "engines": {
@@ -194,6 +194,15 @@
       {
         "command": "tessera.resourceLimits",
         "title": "Tessera: Resource Limits"
+      },
+      {
+        "command": "tessera.browseModels",
+        "title": "Tessera: Find Hugging Face GGUF Models",
+        "enablement": "isWorkspaceTrusted"
+      },
+      {
+        "command": "tessera.openWorkflow",
+        "title": "Tessera: Models & Workflow"
       },
       {
         "command": "tessera.openDashboard",

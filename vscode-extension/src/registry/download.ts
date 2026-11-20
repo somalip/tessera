@@ -1,6 +1,6 @@
 import { createHash, createPublicKey, verify } from "node:crypto";
 import { createReadStream, createWriteStream } from "node:fs";
-import { mkdir, mkdtemp, readFile, readdir, rename, rm, stat, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, open, readFile, readdir, rename, rm, stat, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
@@ -65,7 +65,7 @@ async function download(url: string, maxBytes: number, signal: AbortSignal, upst
   })());
 }
 
-async function smallDownload(url: string, maxBytes: number, signal: AbortSignal): Promise<Buffer> {
+export async function smallDownload(url: string, maxBytes: number, signal: AbortSignal): Promise<Buffer> {
   const chunks: Buffer[] = [];
   for await (const chunk of await download(url, maxBytes, signal)) chunks.push(chunk as Buffer);
   return Buffer.concat(chunks);
@@ -230,8 +230,17 @@ export class ModelStore {
       if ((await stat(payload)).size !== entry.size_bytes || await sha256(payload) !== entry.sha256) {
         throw new Error("Model download SHA-256 or size mismatch");
       }
-      if (upstreamManifest) await writeFile(join(unpacked, "manifest.json"), JSON.stringify(upstreamManifest));
-      else await extract(payload, unpacked, signal);
+      if (upstreamManifest) {
+        const handle = await open(payload);
+        try {
+          const signature = Buffer.alloc(4);
+          await handle.read(signature, 0, signature.length, 0);
+          if (signature.toString("ascii") !== "GGUF") throw new Error("Download is not a GGUF model");
+        } finally {
+          await handle.close();
+        }
+        await writeFile(join(unpacked, "manifest.json"), JSON.stringify(upstreamManifest));
+      } else await extract(payload, unpacked, signal);
       const model = await modelAt(unpacked, entry.id, entry.version);
       if ((upstreamManifest ? entry.sha256 : await sha256(model.path)) !== model.manifest.sha256 ||
           JSON.stringify([...model.manifest.language_ids].sort()) !==

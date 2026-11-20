@@ -64,11 +64,9 @@ function editorContext() {
 }
 function registerPrompt(select, showError) {
     return vscode.commands.registerCommand("tessera.ask", async () => {
-        const model = select();
-        if (!model) {
-            await vscode.window.showInformationMessage("Open a supported file or install a Tessera chat model.");
+        const model = await select();
+        if (!model)
             return;
-        }
         const system = editorContext();
         const prompt = (await vscode.window.showInputBox({ title: "Ask Tessera", prompt: "Enter a local coding prompt" }))?.trim();
         if (!prompt)
@@ -131,8 +129,8 @@ function registerChat(select, log) {
         }
     });
 }
-function fitMessages(messages, contextLength) {
-    let bytes = Math.max(0, contextLength - Math.min(512, Math.floor(contextLength / 4)));
+function fitMessages(messages, contextLength, outputTokens = Math.min(512, Math.floor(contextLength / 4))) {
+    let bytes = Math.max(0, contextLength - outputTokens);
     const retained = [];
     for (const message of [...messages].reverse()) {
         if (bytes <= 24)

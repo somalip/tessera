@@ -1,3 +1,4 @@
+import type { Workflow } from "../router/workflow";
 import { setTimeout as delay } from "node:timers/promises";
 import * as vscode from "vscode";
 import type { Snippet } from "../context/bm25";
@@ -10,12 +11,12 @@ import { isPythonProject, projectMessages } from "./projectPrompt";
 import { cppAnswerKind, cppCommentRequest, cppFinishedCode, cppGenerationProblem, cppShouldContinue, cppSystemPrompt, foreignCppSnippet } from "./cppSnippet";
 
 export interface InlineRoute {
-  mode: "Autocomplete" | "Comment parsing" | "Inline generation";
+  mode: "Autocomplete" | "Comment routing" | "Comment parsing" | "Inline generation";
   parser?: InstalledModel;
   model?: InstalledModel;
 }
 
-export type InlineModelRole = "chat" | "comment-parser" | "python-comment";
+export type InlineModelRole = "router" | "chat" | "comment-parser" | "python-comment";
 
 export interface CompletionModel {
   installed: InstalledModel;
@@ -81,6 +82,24 @@ function cppProjectComment(document: vscode.TextDocument, position: vscode.Posit
   }
   const request = cppCommentRequest(lines);
   return request && { instruction: request.instruction, line: position.line - lines.length + request.start };
+}
+
+async function shouldParse(model: CompletionModel, instruction: string, signal: AbortSignal): Promise<boolean> {
+  return model.use(async host => {
+    signal.throwIfAborted();
+    const messages = fitMessages([
+      { role: "system", content: "Classify this coding request. Output PARSE for a verbose request that benefits from a short brief. Output DIRECT if it is concise or has precise formatting or implementation details. Output one word only." },
+      { role: "user", content: instruction.slice(0, 600) },
+    ], model.contextLength, 8);
+    let route = "";
+    try {
+      for await (const chunk of host.chat(messages, signal, 8)) route += chunk;
+    } catch (error) {
+      if (error instanceof IncompleteCodeError) return false;
+      throw error;
+    }
+    return /^PARSE[.!]?$/i.test(route.trim());
+  });
 }
 
 async function condenseInstruction(model: CompletionModel, instruction: string, signal: AbortSignal): Promise<string> {
@@ -210,6 +229,7 @@ export class InlineCompletion implements vscode.InlineCompletionItemProvider, vs
     private readonly retrieve?: (document: vscode.TextDocument, position: vscode.Position) => Promise<Snippet[]>,
     private readonly reportRoute?: (document: vscode.TextDocument, route: InlineRoute) => void,
     private readonly validateProject?: (code: string, newFile: boolean) => string | undefined,
+    private readonly workflow?: (document: vscode.TextDocument) => Workflow | undefined,
   ) {}
 
   async provideInlineCompletionItems(
@@ -240,13 +260,19 @@ export class InlineCompletion implements vscode.InlineCompletionItemProvider, vs
     const instruction = project?.instruction ?? (afterComment && position.character === document.lineAt(position.line).text.length
       ? inlineInstruction(document, position) : undefined);
     const pythonComment = instruction !== undefined && document.languageId === "python";
-    const needsParser = pythonComment && !project;
+    const configured = this.workflow?.(document);
+    const needsParser = instruction !== undefined && (configured ? Boolean(configured.parser) : pythonComment && !project);
+    const needsRouter = needsParser && Boolean(configured?.router);
+    const router = needsRouter ? this.select(document, position, "router") : undefined;
     const parser = needsParser ? this.select(document, position, "comment-parser") : undefined;
     const chat = instruction ? this.select(document, position, pythonComment ? "python-comment" : "chat") : undefined;
-    if (instruction && (!chat || (needsParser && !parser))) {
-      const missingParser = needsParser && !parser;
-      this.reportRoute?.(document, { mode: missingParser ? "Comment parsing" : "Inline generation" });
-      const message = missingParser
+    const parserUnavailable = needsParser && !parser;
+    const routerUnavailable = needsRouter && !router;
+    if (instruction && (!chat || parserUnavailable || routerUnavailable)) {
+      const missing = routerUnavailable ? "router" : parserUnavailable ? "parser" : "generator";
+      this.reportRoute?.(document, { mode: routerUnavailable ? "Comment routing"
+        : parserUnavailable ? "Comment parsing" : "Inline generation" });
+      const message = configured ? `Connect an available ${missing} in the Tessera workflow.` : parserUnavailable
         ? "Set tessera.parsingAutocompleteModelPath to parse Python comment requests."
         : pythonComment ? "Set tessera.pythonModelPath to generate code from Python comment requests."
         : "Set up a Tessera chat-capable model for inline code generation.";
@@ -268,12 +294,14 @@ export class InlineCompletion implements vscode.InlineCompletionItemProvider, vs
         await delay(180, undefined, { signal });
         const requested = performance.now();
         let brief = instruction;
-        if (parser) {
-          this.reportRoute?.(document, { mode: "Comment parsing", model: parser.installed });
-          brief = await condenseInstruction(parser, instruction, signal);
+        if (router) this.reportRoute?.(document, { mode: "Comment routing", model: router.installed });
+        const parsedBy = parser && (!router || await shouldParse(router, instruction, signal)) ? parser : undefined;
+        if (parsedBy) {
+          this.reportRoute?.(document, { mode: "Comment parsing", model: parsedBy.installed });
+          brief = await condenseInstruction(parsedBy, instruction, signal);
         }
         signal.throwIfAborted();
-        this.reportRoute?.(document, { mode: "Inline generation", model: chat.installed, parser: parser?.installed });
+        this.reportRoute?.(document, { mode: "Inline generation", model: chat.installed, parser: parsedBy?.installed });
         let firstToken: number | undefined;
         const result = await generateCode(chat, document, position, brief, signal,
           () => { firstToken ??= performance.now() - requested; }, project?.line, this.validateProject);
