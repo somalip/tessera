@@ -1,0 +1,26 @@
+{
+  "build": "b8180",
+  "runtime": {
+    "darwin-arm64": {
+      "name": "llama-b8180-bin-macos-arm64.tar.gz",
+      "sha256": "3ffaaddfb62e6f45d4275106adc80e4806d07d4fc790e1784eec3b51e988213e"
+    },
+    "darwin-x64": {
+      "name": "llama-b8180-bin-macos-x64.tar.gz",
+      "sha256": "45f95b68ae8cf1d23a59063cd0c26ee11ce059e060a24f9d1a312aa6634f117c"
+    },
+    "linux-x64": {
+      "name": "llama-b8180-bin-ubuntu-x64.tar.gz",
+      "sha256": "f7598c35ec4aa0bd5c8100e5e99e35095f5a32dd48ebf6314d39310be8c3c62f"
+    },
+    "windows-x64": {
+      "name": "llama-b8180-bin-win-cpu-x64.zip",
+      "sha256": "e39c35b8e5e69e7bf2fae9355d1435dda68bb8bee3a6cebd77ecd0ef550b445b"
+    }
+  },
+  "starter": {
+    "url": "https://huggingface.co/Qwen/Qwen2.5-Coder-0.5B-Instruct-GGUF/resolve/bf1da6ca8f02b444067db175f02a14e74f49c5c0/qwen2.5-coder-0.5b-instruct-q4_k_m.gguf",
+    "sha256": "1d9614638d18024d0fbb36575a15f1302a3adf044df10345688ec4f6e1c4ff32",
+    "size_bytes": 491400064
+  }
+}

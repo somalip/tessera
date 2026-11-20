@@ -1,0 +1,10 @@
+extends: python.yaml
+smoke: true
+context_length: 256
+sequence_length: 128
+gradient_accumulation: 1
+cpt_steps: 1
+sft_steps: 1
+rs_steps: 1
+rejection_candidates: 0
+output: artifacts/python-smoke

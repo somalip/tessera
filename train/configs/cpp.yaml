@@ -1,0 +1,5 @@
+extends: base.yaml
+language: cpp
+model_id: cpp-tiny
+vscode_language_ids: ["cpp"]
+file_globs: ["**/*.cpp", "**/*.hpp", "**/*.cc", "**/*.cxx", "**/*.hxx"]

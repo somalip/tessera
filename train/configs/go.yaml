@@ -1,0 +1,5 @@
+extends: base.yaml
+language: go
+model_id: go-tiny
+vscode_language_ids: ["go"]
+file_globs: ["**/*.go"]

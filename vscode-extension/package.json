@@ -1,0 +1,245 @@
+{
+  "name": "tessera",
+  "displayName": "Tessera",
+  "version": "0.1.8",
+  "publisher": "tessera",
+  "private": true,
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "scripts": {
+    "check": "eslint src && tsc --noEmit",
+    "build": "tsc",
+    "vscode:prepublish": "npm run build",
+    "package": "vsce package --skip-license --out ../artifacts/tessera.vsix"
+  },
+  "devDependencies": {
+    "@types/node": "22.15.30",
+    "@types/vscode": "1.96.0",
+    "@types/yauzl": "2.10.3",
+    "@vscode/test-electron": "2.5.2",
+    "@vscode/vsce": "4.1.1",
+    "eslint": "9.39.1",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.48.0"
+  },
+  "dependencies": {
+    "@vscode/tree-sitter-wasm": "0.3.1",
+    "ajv": "8.20.0",
+    "yauzl": "3.4.0"
+  },
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "categories": [
+    "Machine Learning",
+    "Programming Languages"
+  ],
+  "contributes": {
+    "configuration": {
+      "title": "Tessera",
+      "properties": {
+        "tessera.serverPath": {
+          "type": "string",
+          "scope": "machine",
+          "default": "llama-server",
+          "description": "Path to the local llama.cpp server executable."
+        },
+        "tessera.pythonAutocompleteModelPath": {
+          "type": "string",
+          "scope": "machine",
+          "default": "",
+          "description": "Path to the small Python autocomplete GGUF. Preferred for inline suggestions."
+        },
+        "tessera.parsingAutocompleteModelPath": {
+          "type": "string",
+          "scope": "machine",
+          "default": "",
+          "description": "Path to the local Qwen2.5-Coder GGUF for structured-data autocomplete and condensing Python comment requests."
+        },
+        "tessera.documentationAutocompleteModelPath": {
+          "type": "string",
+          "scope": "machine",
+          "default": "",
+          "description": "Path to the local Qwen3.5 documentation GGUF for prose and Python docstring autocomplete."
+        },
+        "tessera.pythonModelPath": {
+          "type": "string",
+          "scope": "machine",
+          "default": "",
+          "description": "Path to the local Python GGUF for comment-to-code generation and Python chat."
+        },
+        "tessera.cpuThreads": {
+          "type": "integer",
+          "minimum": 0,
+          "scope": "machine",
+          "default": 0,
+          "description": "Maximum inference and prompt-processing threads per model server. Zero uses llama.cpp defaults."
+        },
+        "tessera.gpuLayers": {
+          "type": "integer",
+          "minimum": 0,
+          "scope": "machine",
+          "default": 0,
+          "description": "Number of model layers to offload to the GPU per server. Zero runs inference on the CPU."
+        },
+        "tessera.typescriptModelPath": {
+          "type": "string",
+          "scope": "machine",
+          "default": "",
+          "description": "Path to a local Qwen2.5-Coder GGUF for TypeScript FIM."
+        },
+        "tessera.generalist": {
+          "type": "string",
+          "default": "",
+          "description": "Model ID to use as a last resort."
+        },
+        "tessera.memoryMiB": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0,
+          "description": "Estimated model memory limit in MiB. Zero uses 60% of free RAM as a target and allows one disk-backed CPU model to exceed it."
+        },
+        "tessera.autocomplete": {
+          "type": "boolean",
+          "scope": "language-overridable",
+          "default": true,
+          "description": "Show Tessera inline suggestions automatically as you type."
+        },
+        "tessera.commentCompletions": {
+          "type": "boolean",
+          "scope": "language-overridable",
+          "default": true,
+          "description": "Let a Python comment or a tessera: comment in other languages trigger a suggestion on the next blank line when automatic suggestions are off."
+        },
+        "tessera.maxModels": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 2,
+          "description": "Maximum number of resident models."
+        },
+        "tessera.idleMinutes": {
+          "type": "number",
+          "minimum": 0.01,
+          "default": 5,
+          "description": "Minutes before an idle model is unloaded."
+        },
+        "tessera.registryUrl": {
+          "type": "string",
+          "scope": "machine",
+          "default": "",
+          "description": "HTTPS URL of the signed Tessera registry JSON."
+        },
+        "tessera.registryPublicKey": {
+          "type": "string",
+          "scope": "machine",
+          "default": "",
+          "description": "PEM-encoded trusted Ed25519 public key for the registry."
+        },
+        "tessera.repositoryContext": {
+          "type": "boolean",
+          "default": true,
+          "description": "Include nearby workspace snippets and local language service definitions in inline completions."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "tessera.pickModel",
+        "title": "Tessera: Pick Model"
+      },
+      {
+        "command": "tessera.installModel",
+        "title": "Tessera: Install Model"
+      },
+      {
+        "command": "tessera.switchVersion",
+        "title": "Tessera: Switch Installed Model Version"
+      },
+      {
+        "command": "tessera.explain",
+        "title": "Tessera: Explain Code"
+      },
+      {
+        "command": "tessera.refactor",
+        "title": "Tessera: Refactor Code"
+      },
+      {
+        "command": "tessera.writeTests",
+        "title": "Tessera: Write Tests"
+      },
+      {
+        "command": "tessera.exportMetrics",
+        "title": "Tessera: Export Local Metrics"
+      },
+      {
+        "command": "tessera.resourceLimits",
+        "title": "Tessera: Resource Limits"
+      },
+      {
+        "command": "tessera.openDashboard",
+        "title": "Tessera: Open Dashboard"
+      },
+      {
+        "command": "tessera.addLocalModel",
+        "title": "Tessera: Add Local GGUF",
+        "enablement": "isWorkspaceTrusted"
+      },
+      {
+        "command": "tessera.ask",
+        "title": "Tessera: Ask",
+        "enablement": "isWorkspaceTrusted"
+      },
+      {
+        "command": "tessera.triggerCompletion",
+        "title": "Tessera: Trigger Inline Completion",
+        "enablement": "isWorkspaceTrusted && editorIsOpen"
+      },
+      {
+        "command": "tessera.openChat",
+        "title": "Tessera: Open Chat"
+      },
+      {
+        "command": "tessera.showOutput",
+        "title": "Tessera: Show Output"
+      }
+    ],
+    "chatParticipants": [
+      {
+        "id": "tessera.local",
+        "name": "tessera",
+        "fullName": "Tessera",
+        "description": "Chat with the active local Tessera model"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "tessera",
+          "title": "Tessera",
+          "icon": "$(chip)"
+        }
+      ]
+    },
+    "views": {
+      "tessera": [
+        {
+          "id": "tessera.dashboard",
+          "type": "webview",
+          "name": "Dashboard",
+          "icon": "$(chip)"
+        }
+      ]
+    }
+  },
+  "description": "Local per-language GGUF routing, inline completion, and chat.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/somalip/tessera.git",
+    "directory": "vscode-extension"
+  },
+  "extensionKind": [
+    "ui"
+  ]
+}
