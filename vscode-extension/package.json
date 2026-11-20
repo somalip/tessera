@@ -10,7 +10,7 @@
   "scripts": {
     "check": "eslint src && tsc --noEmit",
     "build": "tsc",
-    "vscode:prepublish": "npm run build",
+    "vscode:prepublish": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\" && npm run build",
     "package": "vsce package --skip-license --out ../artifacts/tessera.vsix"
   },
   "devDependencies": {

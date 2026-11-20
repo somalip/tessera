@@ -5,7 +5,8 @@ import zipfile
 from pathlib import Path
 
 from eval.report import digest
-from package.build_manifest import build
+from package.build_manifest import LIMIT, build
+from tools.prepare_release import verify_model
 from train.config import load
 
 
@@ -38,6 +39,17 @@ class PackageTests(unittest.TestCase):
                 weights.truncate(1_000_000_000)
             with self.assertRaisesRegex(ValueError, "size ceiling"):
                 build(model, metadata, report, license_file, "MIT", root / "large.tcm")
+
+    def test_experimental_release_rejects_archive_at_size_ceiling(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            model = root / "model.gguf"
+            model.write_bytes(b"GGUFtest")
+            package = root / "model.tcm"
+            with package.open("wb") as archive:
+                archive.truncate(LIMIT)
+            with self.assertRaisesRegex(ValueError, "size ceiling"):
+                verify_model(model, package, root / "LICENSE", "documentation-tiny")
 
     def test_config_inheritance(self) -> None:
         config = load(Path("train/configs/python-smoke.yaml"))

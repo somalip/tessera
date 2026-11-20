@@ -8,7 +8,13 @@ __pycache__/
 .pytest_cache/
 .vscode-test/
 
-# Keep trained model weights and checkpoint directories local.
+# Local work and generated release inputs.
+/artifacts/
+/vscode-extension/dist/
+/.vscode/tasks.json
+/test.py
+/test2.cpp
+*.vsix
 *.gguf
 *.ggml
 *.tcm
@@ -21,25 +27,3 @@ __pycache__/
 pytorch_model*.bin
 checkpoint/
 checkpoint-*/
-artifacts/python-local/base/
-
-# Downloaded runtimes and the upstream exercise checkout.
-artifacts/python-v2/llama-b12244/
-artifacts/python-v2/llama-b12244-bin-macos-arm64.tar.gz
-artifacts/python-base-comparison/llama-metal
-artifacts/python-strength/llama-metal
-artifacts/python-strength/exercism/
-artifacts/python-strength/exercism.tar.gz
-artifacts/cpp-models/base/
-artifacts/cpp-models/instruct/
-artifacts/cpp-models/tooling/
-artifacts/cpp-models/*/*.export.log
-artifacts/cpp-models/*/*.quantize.log
-artifacts/cpp-models/*/evaluation.log
-artifacts/cpp-models/*/evaluation.json.tmp
-artifacts/cpp-models/tessera-cpp.vsix
-artifacts/cpp-models/tinycoders-0.1.22-cpp.vsix
-artifacts/cpp-models/competency/*.vsix
-artifacts/cpp-models/competency/*/*evaluation.log
-artifacts/cpp-models/competency/*/export.log
-artifacts/cpp-models/competency/*/quantize*.log

@@ -43,20 +43,5 @@ to release assets for TinyCoders and the experimental Qwen3.5 specialty
 variants. Each specialty is available as a standalone GGUF and as a TCM
 archive with its manifest, license, and evaluation report.
 
-Publish the assets before deploying the landing page. From this worktree,
-with the TinyCoders VSIX built by `make vsix` and the general-purpose model
-artifacts available from the parent checkout, run:
-
-```sh
-gh release create tinycoders-downloads-v1 \
-  --repo somalip/tessera --target codex/tinycoders \
-  --title "TinyCoders downloads" --prerelease \
-  --notes "TinyCoders VS Code installer and four experimental specialty variants based on Apache-2.0 Qwen3.5-0.8B Q8_0. The variants share the upstream weights and add specialty chat templates." \
-  artifacts/tinycoders.vsix \
-  ../artifacts/general-models/LICENSE \
-  ../artifacts/general-models/{documentation,english,diagrams,summaries}/*-tiny.Q8_0.gguf \
-  ../artifacts/general-models/{documentation,english,diagrams,summaries}/*-tiny.tcm
-```
-
-The release tag is part of the public download URLs. Verify the linked assets
-are present on the release before deploying `index.html`.
+Follow the [release instructions](../releases/README.md) to verify and upload
+the assets before deploying the landing page.

@@ -1,8 +1,0 @@
-{
-  "case": "top_words",
-  "model_sha256": "dcc8017024c9427e20ce07c50f018388530d1c4c8c08f874f5daff603ad51b98",
-  "checked_library_iterators": true,
-  "passed": false,
-  "returncode": 134,
-  "finding": "The generated partial_sort middle iterator exceeds the end when k exceeds the number of distinct words."
-}
