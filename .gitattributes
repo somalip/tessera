@@ -1,2 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Keep the upstream model license byte-identical to the copies in the TCMs.
+/docs/research/general-models/LICENSE -text whitespace=cr-at-eol

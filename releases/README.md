@@ -8,7 +8,15 @@ With the Python development dependencies installed, verify the installer, model 
 .venv/bin/python -m tools.prepare_release
 ```
 
-The command lists the upload paths and writes `artifacts/SHA256SUMS.txt`. Using an authenticated GitHub CLI, publish from the repository root after pushing the release commit:
+The command lists the upload paths and writes `artifacts/SHA256SUMS.txt`. Push the release commit before publishing.
+
+## Publish with GitHub Desktop and GitHub.com
+
+Click **Push origin** in GitHub Desktop. On GitHub.com, open **Releases** and choose **Draft a new release**. Create the tag `tinycoders-downloads-v1` on the release branch. Use the notes in [tinycoders-downloads-v1.md](tinycoders-downloads-v1.md), select **Set as a pre-release**, and attach every file listed by the verification command. Publish after all uploads finish.
+
+## Publish with GitHub CLI
+
+Run this command from the repository root with an authenticated GitHub CLI:
 
 ```sh
 gh release create tinycoders-downloads-v1 \
