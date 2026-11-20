@@ -31,12 +31,21 @@ export function verifyIndex(content: Buffer, signature: Buffer, publicKey: strin
   return index;
 }
 
-async function download(url: string, maxBytes: number, signal: AbortSignal) {
+async function download(url: string, maxBytes: number, signal: AbortSignal, upstream = false) {
   const parsed = new URL(url);
   if (parsed.protocol !== "https:" || parsed.username || parsed.password) {
     throw new Error("Registry and model URLs must use HTTPS without credentials");
   }
-  const response = await fetch(parsed, { signal, redirect: "error" });
+  let response = await fetch(parsed, { signal, redirect: upstream ? "manual" : "error" });
+  if (upstream && [301, 302, 303, 307, 308].includes(response.status)) {
+    const location = response.headers.get("location");
+    await response.body?.cancel();
+    const asset = location && new URL(location, parsed);
+    if (!asset || !["https://cas-bridge.xethub.hf.co", "https://cdn-lfs.huggingface.co",
+      "https://us.aws.cdn.hf.co", "https://eu.aws.cdn.hf.co", "https://cdn-lfs.hf.co", "https://cdn-lfs-us-1.hf.co", "https://cdn-lfs-eu-1.hf.co"].includes(asset.origin) ||
+      asset.username || asset.password) throw new Error("Unexpected Hugging Face download redirect");
+    response = await fetch(asset, { signal, redirect: "error" });
+  }
   if (!response.ok || !response.body) throw new Error(`Download returned HTTP ${response.status}`);
   return Readable.from((async function* () {
     const reader = response.body!.getReader();
@@ -155,6 +164,27 @@ export class ModelStore {
       .map(entry => entry.name);
   }
 
+  async inventory(): Promise<InstalledModel[]> {
+    await mkdir(this.root, { recursive: true });
+    const entries = await readdir(this.root, { withFileTypes: true });
+    const groups = await Promise.all(entries.filter(entry => entry.isDirectory() && idPattern.test(entry.name))
+      .map(async ({ name: id }) => Promise.all((await this.versions(id)).sort().map(async version => {
+        try {
+          return await modelAt(join(this.modelRoot(id), version), id, version);
+        } catch {
+          return undefined;
+        }
+      }))));
+    return groups.flat().filter(model => model !== undefined);
+  }
+
+  async remove(id: string, version: string): Promise<void> {
+    if (!versionPattern.test(version)) throw new Error("Invalid model version");
+    // A missing active version is ignored by installed(). Keep the pointer intact
+    // so removing a version never overwrites a concurrent activation.
+    await rm(join(this.modelRoot(id), version), { recursive: true, force: true });
+  }
+
   async installed(): Promise<InstalledModel[]> {
     await mkdir(this.root, { recursive: true });
     const entries = await readdir(this.root, { withFileTypes: true });
@@ -173,24 +203,37 @@ export class ModelStore {
     return models.filter(model => model !== undefined);
   }
 
-  async install(entry: ModelEntry, signal: AbortSignal): Promise<void> {
+  async install(
+    entry: ModelEntry, signal: AbortSignal, options: { upstreamManifest?: Manifest; progress?: (bytes: number) => void } = {},
+  ): Promise<void> {
+    const { upstreamManifest, progress } = options;
     if (!versionPattern.test(entry.version) || !Number.isSafeInteger(entry.size_bytes)
       || entry.size_bytes <= 0 || entry.size_bytes >= limit) throw new Error("Invalid registry entry");
     const root = this.modelRoot(entry.id);
     await mkdir(root, { recursive: true });
     const staging = await mkdtemp(join(root, ".install-"));
     try {
-      const archive = join(staging, "model.tcm");
-      await pipeline(await download(entry.url, entry.size_bytes, signal),
-        createWriteStream(archive), { signal });
-      if ((await stat(archive)).size !== entry.size_bytes || await sha256(archive) !== entry.sha256) {
-        throw new Error("Model package SHA-256 or size mismatch");
-      }
       const unpacked = join(staging, "package");
       await mkdir(unpacked);
-      await extract(archive, unpacked, signal);
+      if (upstreamManifest && (!isManifest(upstreamManifest) || !/^[A-Za-z0-9_-]+$/.test(upstreamManifest.quant) ||
+          new URL(entry.url).origin !== "https://huggingface.co")) throw new Error("Invalid upstream model metadata");
+      const payload = upstreamManifest ? join(unpacked, `model.${upstreamManifest.quant}.gguf`) : join(staging, "model.tcm");
+      let received = 0;
+      await pipeline(await download(entry.url, entry.size_bytes, signal, Boolean(upstreamManifest)),
+        async function* (source: AsyncIterable<Buffer>) {
+          for await (const chunk of source) {
+            received += chunk.length;
+            progress?.(received);
+            yield chunk;
+          }
+        }, createWriteStream(payload), { signal });
+      if ((await stat(payload)).size !== entry.size_bytes || await sha256(payload) !== entry.sha256) {
+        throw new Error("Model download SHA-256 or size mismatch");
+      }
+      if (upstreamManifest) await writeFile(join(unpacked, "manifest.json"), JSON.stringify(upstreamManifest));
+      else await extract(payload, unpacked, signal);
       const model = await modelAt(unpacked, entry.id, entry.version);
-      if (await sha256(model.path) !== model.manifest.sha256 ||
+      if ((upstreamManifest ? entry.sha256 : await sha256(model.path)) !== model.manifest.sha256 ||
           JSON.stringify([...model.manifest.language_ids].sort()) !==
           JSON.stringify([...entry.language_ids].sort())) {
         throw new Error("Model weights or languages do not match the signed package");

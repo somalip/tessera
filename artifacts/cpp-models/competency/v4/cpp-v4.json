@@ -1,0 +1,54 @@
+{
+  "benchmark_sha256": "9ecebfa93fc1fa2bdab2025a4d875446364a10ce1bf56b42503c32160efdb7c0",
+  "model_sha256": "9943fbb590bef1335ada116e980e7cdf1f82938e1be008be1f03c79e50c542c6",
+  "model": "artifacts/cpp-models/competency/v4/cpp-generation-v4.Q4_0.gguf",
+  "size_bytes": 934954496,
+  "language": "cpp",
+  "passed": 0,
+  "total": 6,
+  "stopped": 5,
+  "cases": [
+    {
+      "id": "free_slots",
+      "passed": false,
+      "stopped": false,
+      "inference_ms": 50508,
+      "answer": "```cpp\n#include <vector>\n#include <algorithm>\n#include <cassert>\n\nstd::vector<std::pair<int, int>> free_slots(int limit, std::vector<std::pair<int, int>> busy) {\n    if (limit <= 0) return {};\n\n    std::vector<std::pair<int, int>> free;\n    for (const auto& interval : busy) {\n        if (interval.first < 0 || interval.second > limit || interval.first >= interval.second) continue;\n        if (free.empty() || free.back().second < interval.first) {\n            free.push_back(interval);\n        } else {\n            free.back().second = std::max(free.back().second, interval.second);\n        }\n    }\n\n    std::vector<std::pair<int, int>> merged;\n    for (const auto& interval : free) {\n        if (merged.empty() || merged.back().second < interval.first) {\n            merged.push_back(interval);\n        } else {\n            merged.back().second = std::max(merged.back().second, interval.second);\n        }\n    }\n\n    return merged;\n}\n\nvoid test_free_slots() {\n    assert(free_slots(10, {{0, 5}, {6, 10}, {1, 3}}) == {{0, 1}, {3, 5}});\n    assert(free_slots(5, {{0, 5}, {6, 10}, {1, 3}}) == {{0, 1}, {3, 5}});\n    assert(free_slots(0, {{0, 5}, {6, 10}, {1, 3}}) == {});\n    assert(free_slots(1, {{0, 5}, {6, 10}, {1, 3}}) == {{0, 1}, {3, 5}});\n    assert(free_slots(10, {{0, 5}, {6, 10}, {1, 3}, {4, 6}}) == {{0, 1}, {3, 5}});\n    assert(free_slots(10, {{0, 5}, {6, 10}, {1, 3}, {4, 6}, {7, 10}}) == {{0, 1}, {3, 5}});\n    assert(free_slots(10, {{0, 5}, {6, 10}, {1, 3}, {4, 6}, {7, 10}, {8, 10}}) == {{0, 1}, {3, 5}});\n    assert(free_slots(10, {{0, 5}, {6, 10}, {1, 3}, {4, 6}, {7, 10}, {8, 10}, {9, 10}}) == {{0, 1}, {3, 5}});\n    assert(free_slots(10, {{0, 5}, {6, 10}, {1, 3}, {4, 6}, {7, 10}, {8, 10}, {9, 10}, {11, 15}}) == {{0, 1}, {3, 5}});\n    assert(free_slots(10, {{0, 5}, {6, 10}, {1, 3}, {4, 6}, {7, 10}, {8, 10}, {9, 10}, {11, 15}, {16, 20}}) =="
+    },
+    {
+      "id": "shortest_span",
+      "passed": false,
+      "stopped": true,
+      "inference_ms": 12745,
+      "answer": "```cpp\n#include <vector>\n#include <algorithm>\n#include <numeric>\n\nint shortest_span(const std::vector<int>& values, long long threshold) {\n    int n = values.size();\n    std::vector<long long> prefix_sum(n + 1);\n    std::partial_sum(values.begin(), values.end(), prefix_sum.begin() + 1);\n\n    int min_span = n + 1;\n    for (int start = 0; start < n; ++start) {\n        for (int end = start; end < n; ++end) {\n            long long sum = prefix_sum[end + 1] - prefix_sum[start];\n            if (sum >= threshold && end - start + 1 < min_span) {\n                min_span = end - start + 1;\n            }\n        }\n    }\n    return min_span == n + 1 ? 0 : min_span;\n}\n```"
+    },
+    {
+      "id": "build_layers",
+      "passed": false,
+      "stopped": true,
+      "inference_ms": 80066,
+      "answer": "```cpp\n#include <vector>\n#include <unordered_map>\n#include <queue>\n#include <algorithm>\n\nstd::vector<std::vector<int>> build_layers(int n, const std::vector<std::pair<int,int>>& prerequisites) {\n    std::vector<std::vector<int>> layers;\n    std::unordered_map<int, std::vector<int>> graph;\n    std::unordered_map<int, int> in_degree;\n    std::queue<int> q;\n\n    // Build the graph and in-degree map\n    for (const auto& p : prerequisites) {\n        graph[p.first].push_back(p.second);\n        in_degree[p.second]++;\n    }\n\n    // Find all nodes with in-degree 0\n    for (int i = 0; i < n; ++i) {\n        if (in_degree[i] == 0) {\n            q.push(i);\n        }\n    }\n\n    // Perform topological sorting\n    while (!q.empty()) {\n        int current = q.front();\n        q.pop();\n        layers.push_back({current});\n\n        for (int neighbor : graph[current]) {\n            in_degree[neighbor]--;\n            if (in_degree[neighbor] == 0) {\n                q.push(neighbor);\n            }\n        }\n    }\n\n    // Check if there are any remaining nodes with in-degree > 0\n    for (int i = 0; i < n; ++i) {\n        if (in_degree[i] > 0) {\n            return {}; // Cycle detected\n        }\n    }\n\n    return layers;\n}\n```"
+    },
+    {
+      "id": "top_words",
+      "passed": false,
+      "stopped": true,
+      "inference_ms": 24726,
+      "answer": "```cpp\n#include <vector>\n#include <string>\n#include <algorithm>\n#include <unordered_map>\n#include <cassert>\n\nstd::vector<std::string> top_words(const std::vector<std::string>& words, int k) {\n    if (k <= 0) return {};\n\n    std::unordered_map<std::string, int> word_counts;\n    for (const auto& word : words) {\n        ++word_counts[word];\n    }\n\n    std::vector<std::pair<std::string, int>> sorted_words(word_counts.begin(), word_counts.end());\n    std::sort(sorted_words.begin(), sorted_words.end(), [](const auto& a, const auto& b) {\n        return a.second == b.second ? a.first < b.first : a.second > b.second;\n    });\n\n    std::vector<std::string> top_k_words;\n    for (int i = 0; i < std::min(k, sorted_words.size()); ++i) {\n        top_k_words.push_back(sorted_words[i].first);\n    }\n\n    return top_k_words;\n}\n\n// Test cases\nvoid test_top_words() {\n    assert(top_words({}, 3) == {});\n    assert(top_words({\"apple\", \"banana\", \"apple\", \"orange\", \"banana\"}, 2) == {\"banana\", \"apple\"});\n    assert(top_words({\"hello\", \"world\", \"hello\", \"cpp\"}, 1) == {\"hello\"});\n    assert(top_words({\"cpp\", \"is\", \"fun\", \"cpp\"}, 3) == {\"cpp\", \"fun\", \"is\"});\n    assert(top_words({\"fun\", \"is\", \"cpp\", \"fun\"}, 2) == {\"fun\", \"cpp\"});\n    assert(top_words({\"fun\", \"is\", \"cpp\", \"fun\"}, 0) == {});\n    assert(top_words({\"fun\", \"is\", \"cpp\", \"fun\"}, -1) == {});\n}\n\nint main() {\n    test_top_words();\n    return 0;\n}\n```"
+    },
+    {
+      "id": "stock_cli",
+      "passed": false,
+      "stopped": true,
+      "inference_ms": 11335,
+      "answer": "```cpp\n#include <iostream>\n#include <unordered_map>\n#include <string>\n#include <cassert>\n\nint main() {\n    std::unordered_map<std::string, int> inventory;\n    std::string command;\n\n    while (std::getline(std::cin, command)) {\n        if (command == \"PUT name\") {\n            std::string name;\n            std::cin >> name;\n            inventory[name]++;\n        } else if (command == \"TAKE name\") {\n            std::string name;\n            std::cin >> name;\n            if (inventory[name] > 0) {\n                inventory[name]--;\n            }\n        } else if (command == \"QUERY name\") {\n            std::string name;\n            std::cin >> name;\n            if (inventory.count(name) > 0) {\n                std::cout << inventory[name] << std::endl;\n            }\n        }\n    }\n\n    return 0;\n}\n```"
+    },
+    {
+      "id": "finite_sum",
+      "passed": false,
+      "stopped": true,
+      "inference_ms": 4021,
+      "answer": "double finite_sum(const std::vector<double>& samples) {\n    double total = 0;\n    for (double sample : samples) {\n        if (std::isfinite(sample)) {\n            total += sample;\n        }\n    }\n    return total;\n}"
+    }
+  ]
+}

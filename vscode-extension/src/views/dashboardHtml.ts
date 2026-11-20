@@ -32,14 +32,14 @@ export function inlineRouteName(route: InlineRoute): string {
   return "No matching model";
 }
 
-export function renderDashboard({ trusted, language, active, lastInline, models }: DashboardState, groups: Groups): string {
-  const routed = lastInline ? lastInline.model : active;
-  const routing = !trusted ? "Workspace trust required" : lastInline ? inlineRouteName(lastInline) : active?.manifest.id ??
+export function renderDashboard({ trusted, advanced, language, active, lastInline, models }: DashboardState, groups: Groups): string {
+  const routed = lastInline?.model ?? active;
+  const routing = !trusted ? "Workspace trust required" : (advanced && lastInline ? inlineRouteName(lastInline) : routed?.manifest.id) ??
     (language ? "No matching model" : "Open a source file");
   const routingDetail = !trusted ? "Trust this workspace to use local models and code actions."
-    : lastInline ? `Last inline request · ${lastInline.mode}`
-    : active ? "Default autocomplete route."
-    : language ? "Choose a routing model or add one below."
+    : advanced && lastInline ? `Last inline request · ${lastInline.mode}`
+    : active ? "Automatic routing for this editor."
+    : language ? "Download a compatible model or choose an installed one."
     : "Routing follows the language at your cursor.";
   const modelRows = models.map(model => {
     const { manifest } = model;
@@ -55,7 +55,11 @@ export function renderDashboard({ trusted, language, active, lastInline, models 
     </li>`;
   }).join("");
 
-  return `<section aria-labelledby="routing-heading">
+  return `<div class="mode-picker" role="group" aria-label="Dashboard mode">
+    <button type="button" data-action="simple" aria-pressed="${!advanced}">Simple</button>
+    <button type="button" data-action="advanced" aria-pressed="${advanced}">Advanced</button>
+  </div>
+  <section aria-labelledby="routing-heading">
     <h2 id="routing-heading">Current editor</h2>
     <div class="section-content">
       <div class="routing-heading">
@@ -63,8 +67,8 @@ export function renderDashboard({ trusted, language, active, lastInline, models 
         ${trusted && language ? `<span class="language">${escapeHtml(language)}</span>` : ""}
       </div>
       <p class="muted">${escapeHtml(routingDetail)}</p>
-      ${trusted && lastInline?.model ? `<p class="muted" title="${escapeHtml(lastInline.model.path)}">${escapeHtml(lastInline.model.manifest.id)}</p>` : ""}
-      ${trusted && lastInline?.parser ? `<p class="muted" title="${escapeHtml(lastInline.parser.path)}">Parsed by ${escapeHtml(basename(lastInline.parser.path))}</p>` : ""}
+      ${trusted && advanced && lastInline?.model ? `<p class="muted" title="${escapeHtml(lastInline.model.path)}">${escapeHtml(lastInline.model.manifest.id)}</p>` : ""}
+      ${trusted && advanced && lastInline?.parser ? `<p class="muted" title="${escapeHtml(lastInline.parser.path)}">Parsed by ${escapeHtml(basename(lastInline.parser.path))}</p>` : ""}
       ${buttons(groups.routing)}
     </div>
   </section>
@@ -76,13 +80,13 @@ export function renderDashboard({ trusted, language, active, lastInline, models 
     <h2 id="models-heading">Installed models</h2>
     <div class="section-content">
       ${modelRows ? `<ul aria-labelledby="models-heading">${modelRows}</ul>` : '<p class="muted">No models installed.</p>'}
-      ${groups.models.length ? `<div class="model-actions">${buttons(groups.models, models.length ? undefined : "add")}</div>` : ""}
+      ${groups.models.length ? `<div class="model-actions">${buttons(groups.models, "install")}</div>` : ""}
     </div>
   </section>` : ""}
-  <section aria-labelledby="tools-heading">
+  ${groups.tools.length ? `<section aria-labelledby="tools-heading">
     <h2 id="tools-heading">Tools</h2>
     <div class="section-content">${buttons(groups.tools)}</div>
-  </section>`;
+  </section>` : ""}`;
 }
 
 export function renderResources(sample: ResourceSample): string {
@@ -122,6 +126,22 @@ export function dashboardHtml(markup: string, nonce: string): string {
       --section-divider: var(--vscode-sideBarSectionHeader-border, var(--vscode-widget-border, transparent));
       padding-block: 4px 12px;
     }
+    .mode-picker {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      margin: 6px 12px 12px;
+      gap: 2px;
+      background: var(--vscode-editorWidget-background);
+      border: 1px solid var(--vscode-widget-border, transparent);
+      border-radius: 4px;
+      padding: 2px;
+    }
+    .mode-picker button { text-align: center; }
+    .mode-picker button[aria-pressed="true"] {
+      background: var(--vscode-button-secondaryBackground);
+      color: var(--vscode-button-secondaryForeground);
+    }
+    main:not(:has([data-action="advanced"][aria-pressed="true"])) #resources { display: none; }
     h2 {
       margin: 0;
       padding: 5px 16px;
@@ -209,7 +229,7 @@ export function dashboardHtml(markup: string, nonce: string): string {
 <body>
   <main aria-label="Tessera dashboard">
     <div id="dashboard-content">${markup}</div>
-    <section aria-labelledby="resources-heading">
+    <section id="resources" aria-labelledby="resources-heading">
       <h2 id="resources-heading">System resources</h2>
       <div class="section-content">
         <div id="resource-usage"><p class="muted">Sampling…</p></div>

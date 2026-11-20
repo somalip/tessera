@@ -1,0 +1,54 @@
+{
+  "benchmark_sha256": "4e5835f3a8b4110d2c26722a6411ac72a3afa2eaf2fcff93952c9cf138ec3494",
+  "model_sha256": "0a9841f599e5bd33569c186697d2371a9d1001c4fda0d230e78e754d2379599a",
+  "model": "artifacts/cpp-models/competency/v2/cpp-generation-v2.Q4_0.gguf",
+  "size_bytes": 934954656,
+  "language": "cpp",
+  "passed": 0,
+  "total": 6,
+  "stopped": 6,
+  "cases": [
+    {
+      "id": "free_slots",
+      "passed": false,
+      "stopped": true,
+      "inference_ms": 6205,
+      "answer": "for (int i = 0; i < busy.size(); ++i) {\n    if (busy[i].first >= limit || busy[i].second <= 0) continue;\n    int start = std::max(0, busy[i].first);\n    int end = std::min(limit - 1, busy[i].second - 1);\n    for (int j = i + 1; j < busy.size(); ++j) {\n        if (busy[j].first <= start || busy[j].second >= end) continue;\n        if (start > busy[j].first && end < busy[j].second) {\n            start = std::max(start, busy[j].first);\n            end = std::min(end, busy[j].second);\n        }\n    }\n    free_slots.push_back({start, end});\n}\nif (free_slots.empty() || limit <= 0) return {};\nfor (int i = 1; i < free_slots.size(); ++i) {\n    if (free_slots[i - 1].second >= free_slots[i].first) return {};\n}\nreturn free_slots;"
+    },
+    {
+      "id": "shortest_span",
+      "passed": false,
+      "stopped": true,
+      "inference_ms": 3265,
+      "answer": "for (int i = 0; i < values.size(); ++i) {\n    for (int j = i; j < values.size(); ++j) {\n        int sum = std::accumulate(values.begin() + i, values.begin() + j + 1, 0);\n        if (sum >= threshold && (j - i + 1) < min_span) {\n            min_span = j - i + 1;\n        }\n    }\n}\nreturn min_span;"
+    },
+    {
+      "id": "build_layers",
+      "passed": false,
+      "stopped": true,
+      "inference_ms": 3868,
+      "answer": "for (int i = 0; i < n; ++i) {\n    if (!in_degree[i]) {\n        queue.push(i);\n    }\n}\n\nwhile (!queue.empty()) {\n    int current = queue.front();\n    queue.pop();\n    result.push_back(current);\n\n    for (const auto& pair : prerequisites) {\n        if (pair.first == current && --in_degree[pair.second] == 0) {\n            queue.push(pair.second);\n        }\n    }\n}\n\nif (result.size() != n) {\n    return {};\n}\n\nreturn result;"
+    },
+    {
+      "id": "top_words",
+      "passed": false,
+      "stopped": true,
+      "inference_ms": 3144,
+      "answer": "for (int i = 0; i < k && !words.empty(); ++i) {\n    auto it = std::max_element(words.begin(), words.end(),\n                               [](const std::string& a, const std::string& b) {\n                                   return std::tie(a.size(), a) > std::tie(b.size(), b);\n                               });\n    if (it != words.end()) {\n        result.push_back(*it);\n        words.erase(it);\n    }\n}"
+    },
+    {
+      "id": "stock_cli",
+      "passed": false,
+      "stopped": true,
+      "inference_ms": 1460,
+      "answer": "for (int i = 0; i < 10; ++i) {\n    std::cout << \"Hello, World!\" << std::endl;\n}"
+    },
+    {
+      "id": "finite_sum",
+      "passed": false,
+      "stopped": true,
+      "inference_ms": 1387,
+      "answer": "for (const auto& sample : samples) {\n    if (!std::isnan(sample)) {\n        total += sample;\n    }\n}"
+    }
+  ]
+}

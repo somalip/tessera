@@ -1,0 +1,29 @@
+{
+  "base": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+  "revision": "2e1fd397ee46e1388853d2af2c993145b0f1098a",
+  "base_sha256": "c1b9b30e907950516ba3c646bdf570d8084c25a6410a0cdca80cf04b11bc13a8",
+  "data_license": "CC0-1.0",
+  "seed": 42,
+  "device": "mps",
+  "examples": 12,
+  "epoch_losses": [
+    0.6508458579579989,
+    0.5440480634570122,
+    0.42642604062954587
+  ],
+  "corpus_audit": {
+    "benchmarks": {
+      "holdout.jsonl": "4e5835f3a8b4110d2c26722a6411ac72a3afa2eaf2fcff93952c9cf138ec3494",
+      "v1-holdout.jsonl": "b37c6c6bf65d138bc7ee0df7577c2e7f5bb5b2707c6b9341cb556b97c4c3979c"
+    },
+    "holdout_sha256": "4e5835f3a8b4110d2c26722a6411ac72a3afa2eaf2fcff93952c9cf138ec3494",
+    "training_sha256": "59768f2b91605cd253301812bd61ec5d7c51c841667a29f874b1c4e4e4178d09",
+    "excluded_for_overlap": [
+      "reachable",
+      "counts"
+    ],
+    "layers": 4,
+    "epochs": 3,
+    "batch_size": 1
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "benchmark_sha256": "9ecebfa93fc1fa2bdab2025a4d875446364a10ce1bf56b42503c32160efdb7c0",
+  "model_sha256": "dcc8017024c9427e20ce07c50f018388530d1c4c8c08f874f5daff603ad51b98",
+  "model": "artifacts/cpp-models/competency/v4/cpp-generation-v4.Q4_K_M.gguf",
+  "size_bytes": 986048000,
+  "language": "cpp",
+  "passed": 2,
+  "total": 6,
+  "stopped": 6,
+  "cases": [
+    {
+      "id": "free_slots",
+      "passed": false,
+      "stopped": true,
+      "inference_ms": 26729,
+      "plan": "- Define a function `free_slots` that takes two parameters: `limit` (an integer representing the maximum size of the free slots) and `busy` (a vector of pairs representing the busy intervals).\n- Initialize an empty vector `free_slots` to store the remaining free slots.\n- Iterate through each busy interval in the `busy` vector:\n  - If the interval is empty or reversed, skip it.\n  - If the interval overlaps with the previous interval in `free_slots`, merge them.\n  - If the interval does not overlap with the previous interval in `free_slots`, add it to `free_slots`.\n- If `limit` is less than or equal to 0, return an empty vector.\n- Return the `free_slots` vector.\n- For each busy interval,",
+      "answer": "```cpp\n#include <vector>\n#include <algorithm>\n\nstd::vector<std::pair<int, int>> free_slots(int limit, std::vector<std::pair<int, int>> busy) {\n    if (limit <= 0) return {};\n\n    std::vector<std::pair<int, int>> free_slots;\n    for (const auto& interval : busy) {\n        if (interval.first > interval.second) continue; // Skip reversed intervals\n        if (free_slots.empty() || free_slots.back().second < interval.first) {\n            free_slots.push_back(interval);\n        } else {\n            free_slots.back().second = std::max(free_slots.back().second, interval.second);\n        }\n    }\n\n    return free_slots;\n}\n```"
+    },
+    {
+      "id": "shortest_span",
+      "passed": false,
+      "stopped": true,
+      "inference_ms": 16178,
+      "plan": "- Define a function `shortest_span` that takes a vector of integers `values` and a long long `threshold`.\n- Initialize variables to keep track of the current sum of the span, the minimum length found, and the start index of the span.\n- Iterate through the vector using two pointers: `start` and `end`.\n- For each `end` pointer, add the value at `end` to the current sum.\n- If the current sum is greater than or equal to the threshold, update the minimum length found and the start index of the span.\n- If the current sum exceeds the threshold, move the `start` pointer to the right until the current sum is less than or equal to the threshold.\n- Continue this process until the end of the vector is reached.\n-",
+      "answer": "```cpp\n#include <vector>\n#include <algorithm>\n\nint shortest_span(const std::vector<int>& values, long long threshold) {\n    int min_length = INT_MAX;\n    int start = 0;\n    long long current_sum = 0;\n\n    for (int end = 0; end < values.size(); ++end) {\n        current_sum += values[end];\n\n        while (current_sum > threshold) {\n            current_sum -= values[start];\n            ++start;\n        }\n\n        if (current_sum >= threshold) {\n            min_length = std::min(min_length, end - start + 1);\n        }\n    }\n\n    return min_length == INT_MAX ? 0 : min_length;\n}\n```"
+    },
+    {
+      "id": "build_layers",
+      "passed": false,
+      "stopped": true,
+      "inference_ms": 28889,
+      "plan": "- **Input Parsing**: Parse the input string to extract the number of tasks `n` and the list of prerequisite pairs. Each pair is represented as a pair of integers `(a, b)`, where `a` must finish before `b`.\n- **Cycle Detection**: Use a topological sort algorithm to detect cycles in the graph formed by the prerequisites. If a cycle is detected, return an empty vector.\n- **Graph Construction**: Create an adjacency list representation of the graph using the prerequisite pairs.\n- **Topological Sort**: Perform a topological sort on the graph to determine the order in which tasks can be completed.\n- **Result Construction**: Construct the result vector by iterating through the sorted list of tasks and adding them to the result vector.\n- **Return Result**: Return the result vector",
+      "answer": "```cpp\n#include <vector>\n#include <unordered_map>\n#include <queue>\n#include <optional>\n\nstd::vector<std::vector<int>> build_layers(int n, const std::vector<std::pair<int,int>>& prerequisites) {\n    std::unordered_map<int, std::vector<int>> graph;\n    std::unordered_map<int, int> in_degree;\n    std::queue<int> q;\n    std::vector<std::vector<int>> result;\n\n    // Initialize graph and in_degree\n    for (int i = 0; i < n; ++i) {\n        graph[i] = {};\n        in_degree[i] = 0;\n    }\n\n    // Build graph and in_degree\n    for (const auto& p : prerequisites) {\n        graph[p.first].push_back(p.second);\n        in_degree[p.second]++;\n    }\n\n    // Find all sources (tasks with no prerequisites)\n    for (int i = 0; i < n; ++i) {\n        if (in_degree[i] == 0) {\n            q.push(i);\n        }\n    }\n\n    // Perform topological sort\n    while (!q.empty()) {\n        int current = q.front();\n        q.pop();\n        result.push_back({current});\n\n        for (int next : graph[current]) {\n            in_degree[next]--;\n            if (in_degree[next] == 0) {\n                q.push(next);\n            }\n        }\n    }\n\n    // Check for cycles\n    if (result.size() != n) {\n        return {};\n    }\n\n    return result;\n}\n```"
+    },
+    {
+      "id": "top_words",
+      "passed": true,
+      "stopped": true,
+      "inference_ms": 17536,
+      "plan": "- Define a function `top_words` that takes a vector of strings `words` and an integer `k`.\n- Initialize an empty vector `result` to store the top `k` words.\n- Create a map `word_count` to count the frequency of each word in the input vector.\n- Iterate through the map and add the top `k` words to the `result` vector.\n- If the size of the `result` vector exceeds `k`, remove the least frequent word from the `result` vector.\n- Return the `result` vector.\n- Handle edge cases such as when `k` is less than or equal to 0, when the input vector is empty, or when the input vector contains only one word.\n- Handle data structure complexity requirements such as using a",
+      "answer": "```cpp\n#include <vector>\n#include <string>\n#include <map>\n#include <algorithm>\n\nstd::vector<std::string> top_words(const std::vector<std::string>& words, int k) {\n    if (k <= 0 || words.empty()) return {};\n\n    std::map<std::string, int> word_count;\n    for (const auto& word : words) {\n        word_count[word]++;\n    }\n\n    std::vector<std::pair<std::string, int>> sorted_words(word_count.begin(), word_count.end());\n    std::partial_sort(sorted_words.begin(), sorted_words.begin() + k, sorted_words.end(),\n                      [](const std::pair<std::string, int>& a, const std::pair<std::string, int>& b) {\n                          return a.second == b.second ? a.first < b.first : a.second > b.second;\n                      });\n\n    std::vector<std::string> result;\n    for (int i = 0; i < k && i < sorted_words.size(); ++i) {\n        result.push_back(sorted_words[i].first);\n    }\n\n    return result;\n}\n```"
+    },
+    {
+      "id": "stock_cli",
+      "passed": false,
+      "stopped": true,
+      "inference_ms": 17105,
+      "plan": "- **Input Handling**: Read commands from standard input until EOF.\n- **Command Parsing**: Parse each command into its name and quantity.\n- **Data Structure**: Use a map to store the quantity of each item.\n- **Edge Cases**: Handle cases where the item does not exist in the map.\n- **Complexity**: The time complexity for each command is O(1) on average, assuming the map operations are efficient.",
+      "answer": "```cpp\n#include <iostream>\n#include <map>\n#include <string>\n#include <cassert>\n\nint main() {\n    std::map<std::string, int> inventory;\n\n    for (;;) {\n        std::string command;\n        std::cin >> command;\n\n        if (command == \"PUT\") {\n            std::string name;\n            int quantity;\n            std::cin >> name >> quantity;\n            inventory[name] += quantity;\n        } else if (command == \"TAKE\") {\n            std::string name;\n            int quantity;\n            std::cin >> name >> quantity;\n            if (inventory[name] >= quantity) {\n                inventory[name] -= quantity;\n            } else {\n                std::cout << \"ERROR: Insufficient quantity of \" << name << std::endl;\n            }\n        } else if (command == \"QUERY\") {\n            std::string name;\n            std::cin >> name;\n            if (inventory.count(name)) {\n                std::cout << inventory[name] << std::endl;\n            } else {\n                std::cout << \"ERROR: Item not found\" << std::endl;\n            }\n        } else if (command == \"EOF\") {\n            break;\n        } else {\n            std::cout << \"ERROR: Invalid command\" << std::endl;\n        }\n    }\n\n    return 0;\n}\n```"
+    },
+    {
+      "id": "finite_sum",
+      "passed": true,
+      "stopped": true,
+      "inference_ms": 9595,
+      "plan": "- **Constraint**: The function should only sum finite numbers.\n- **Edge case**: If the input vector is empty, the function should return 0.\n- **Data structure**: The function uses a `std::vector<double>` to store the samples.\n- **Complexity requirement**: The function should have a time complexity of O(n), where n is the number of samples in the vector.\n- **Input parsing**: The function parses the input vector by iterating through each element and checking if it is finite using the `std::isfinite` function.\n- **Output**: The function returns the total sum of finite numbers in the vector.",
+      "answer": "for (const auto& sample : samples) {\n    if (std::isfinite(sample)) {\n        total += sample;\n    }\n}"
+    }
+  ]
+}

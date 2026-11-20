@@ -83,14 +83,48 @@
     .sub { margin: 1.5rem 0 0; font-size: 1.25rem; color: var(--muted); max-width: 30rem; }
     .cta { display: inline-block; margin-top: 2.25rem; padding: .7rem 1.35rem; border-radius: 999px; background: var(--ink); color: #fff; font-size: .9375rem; font-weight: 500; }
     .cta:hover { opacity: .85; }
-    .hero-actions, .download-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+    .hero-actions, .download-actions, .download-primary { display: flex; flex-wrap: wrap; gap: .5rem; }
     .hero-actions { margin-top: 2.25rem; }
     .hero-actions .cta { margin-top: 0; }
     .download-button { display: inline-block; padding: .45rem .85rem; border: 1px solid var(--muted); border-radius: 999px; font-size: .875rem; font-weight: 500; }
     .download-button:hover { background: #f4f4f4; }
-    .download-list { margin: 1rem 0; padding: 0; list-style: none; }
-    .download-list li { padding: .85rem 0; border-bottom: 1px solid var(--line); }
-    .download-list h3 { margin: 0 0 .4rem; font-size: 1rem; font-weight: 500; }
+    .download-primary { margin-bottom: .75rem; }
+    .download-more { border-top: 1px solid var(--line); }
+    .download-more summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: .7rem 0;
+      font-size: .9375rem;
+      font-weight: 500;
+      cursor: pointer;
+      list-style: none;
+    }
+    .download-more summary::-webkit-details-marker { display: none; }
+    .download-more summary::after {
+      content: "";
+      flex: none;
+      width: .45rem;
+      height: .45rem;
+      margin-right: .35rem;
+      border: solid currentColor;
+      border-width: 0 1px 1px 0;
+      rotate: 45deg;
+    }
+    .download-more[open] summary::after { rotate: 225deg; }
+    .download-list { margin: .5rem 0 .75rem; padding: 0; list-style: none; }
+    .download-list li {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: .5rem 1rem;
+      padding: .55rem 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .download-list h3 { margin: 0; font-size: .9375rem; font-weight: 500; }
+    .download-license { color: var(--muted); font-size: .875rem; text-decoration: underline; }
     .rows { border-top: 1px solid var(--line); }
     .row { display: grid; grid-template-columns: 10rem 1fr; gap: 1rem; padding: 1.75rem 0; border-bottom: 1px solid var(--line); }
     .row h2 { margin: 0; font-size: 1rem; font-weight: 500; }
@@ -146,46 +180,45 @@
         <section class="row" id="downloads" aria-labelledby="downloads-heading">
           <h2 id="downloads-heading">Downloads</h2>
           <div>
-            <p>Use GGUF weights with llama.cpp or TinyCoders. The experimental TCM packages also include the model manifest, license, and evaluation report.</p>
-            <ul class="download-list">
-              <li>
-                <h3>TinyCoders for VS Code</h3>
-                <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/tinycoders.vsix">Download VSIX</a>
-              </li>
-              <li>
-                <h3>Qwen2.5-Coder 0.5B Instruct · Q4_K_M</h3>
-                <a class="download-button" href="https://huggingface.co/Qwen/Qwen2.5-Coder-0.5B-Instruct-GGUF/resolve/main/qwen2.5-coder-0.5b-instruct-q4_k_m.gguf?download=true" aria-label="Download Qwen2.5-Coder GGUF weights">Download GGUF</a>
-              </li>
-              <li>
-                <h3>Documentation · Q8_0</h3>
-                <div class="download-actions">
-                  <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/documentation-tiny.Q8_0.gguf" aria-label="Download Documentation GGUF weights">Download GGUF</a>
-                  <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/documentation-tiny.tcm" aria-label="Download Documentation TCM package">Download TCM</a>
-                </div>
-              </li>
-              <li>
-                <h3>English editing · Q8_0</h3>
-                <div class="download-actions">
-                  <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/english-tiny.Q8_0.gguf" aria-label="Download English editing GGUF weights">Download GGUF</a>
-                  <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/english-tiny.tcm" aria-label="Download English editing TCM package">Download TCM</a>
-                </div>
-              </li>
-              <li>
-                <h3>Mermaid diagrams · Q8_0</h3>
-                <div class="download-actions">
-                  <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/diagrams-tiny.Q8_0.gguf" aria-label="Download Mermaid diagrams GGUF weights">Download GGUF</a>
-                  <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/diagrams-tiny.tcm" aria-label="Download Mermaid diagrams TCM package">Download TCM</a>
-                </div>
-              </li>
-              <li>
-                <h3>Summaries · Q8_0</h3>
-                <div class="download-actions">
-                  <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/summaries-tiny.Q8_0.gguf" aria-label="Download Summaries GGUF weights">Download GGUF</a>
-                  <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/summaries-tiny.tcm" aria-label="Download Summaries TCM package">Download TCM</a>
-                </div>
-              </li>
-            </ul>
-            <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/LICENSE">Download model license</a>
+            <div class="download-primary">
+              <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/tinycoders.vsix">TinyCoders for VS Code (.vsix)</a>
+              <a class="download-button" href="https://huggingface.co/Qwen/Qwen2.5-Coder-0.5B-Instruct-GGUF/resolve/main/qwen2.5-coder-0.5b-instruct-q4_k_m.gguf?download=true" aria-label="Download Qwen2.5-Coder 0.5B Instruct Q4_K_M GGUF weights">Qwen2.5-Coder 0.5B (.gguf)</a>
+            </div>
+            <details class="download-more">
+              <summary>Experimental specialty models</summary>
+              <p>Use GGUF with llama.cpp or TinyCoders. TCM packages include a manifest, license, and evaluation report.</p>
+              <ul class="download-list">
+                <li>
+                  <h3>Documentation · Q8_0</h3>
+                  <div class="download-actions">
+                    <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/documentation-tiny.Q8_0.gguf" aria-label="Download Documentation GGUF weights">GGUF</a>
+                    <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/documentation-tiny.tcm" aria-label="Download Documentation TCM package">TCM</a>
+                  </div>
+                </li>
+                <li>
+                  <h3>English editing · Q8_0</h3>
+                  <div class="download-actions">
+                    <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/english-tiny.Q8_0.gguf" aria-label="Download English editing GGUF weights">GGUF</a>
+                    <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/english-tiny.tcm" aria-label="Download English editing TCM package">TCM</a>
+                  </div>
+                </li>
+                <li>
+                  <h3>Mermaid diagrams · Q8_0</h3>
+                  <div class="download-actions">
+                    <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/diagrams-tiny.Q8_0.gguf" aria-label="Download Mermaid diagrams GGUF weights">GGUF</a>
+                    <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/diagrams-tiny.tcm" aria-label="Download Mermaid diagrams TCM package">TCM</a>
+                  </div>
+                </li>
+                <li>
+                  <h3>Summaries · Q8_0</h3>
+                  <div class="download-actions">
+                    <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/summaries-tiny.Q8_0.gguf" aria-label="Download Summaries GGUF weights">GGUF</a>
+                    <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/summaries-tiny.tcm" aria-label="Download Summaries TCM package">TCM</a>
+                  </div>
+                </li>
+              </ul>
+              <a class="download-license" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/LICENSE">Model license</a>
+            </details>
           </div>
         </section>
         <div class="row" id="start">

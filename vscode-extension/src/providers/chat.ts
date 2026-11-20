@@ -33,13 +33,10 @@ function editorContext(): Message {
   };
 }
 
-export function registerPrompt(select: () => ChatModel | undefined, showError: (error: unknown) => void) {
+export function registerPrompt(select: () => ChatModel | undefined | Promise<ChatModel | undefined>, showError: (error: unknown) => void) {
   return vscode.commands.registerCommand("tessera.ask", async () => {
-    const model = select();
-    if (!model) {
-      await vscode.window.showInformationMessage("Open a supported file or install a Tessera chat model.");
-      return;
-    }
+    const model = await select();
+    if (!model) return;
     const system = editorContext();
     const prompt = (await vscode.window.showInputBox({ title: "Ask Tessera", prompt: "Enter a local coding prompt" }))?.trim();
     if (!prompt) return;

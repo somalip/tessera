@@ -74,4 +74,44 @@ test("installer fails closed on tampering, installs upgrades, and switches offli
   await writeFile(active.path, "GGUF mock bytex");
   assert.deepEqual(await store.installed(), []);
   await assert.rejects(store.activate("python-tiny", "1.0.0"), /SHA-256/);
+  assert.deepEqual((await store.inventory()).map(model => model.manifest.version), ["1.0.0", "2.0.0"]);
+  await store.remove("python-tiny", "1.0.0");
+  assert.deepEqual((await store.inventory()).map(model => model.manifest.version), ["2.0.0"]);
+  await store.activate("python-tiny", "2.0.0");
+  await store.remove("python-tiny", "2.0.0");
+  assert.deepEqual(await store.installed(), []);
+  assert.deepEqual(await store.inventory(), []);
+  await assert.rejects(store.remove("python-tiny", "../"), /Invalid model version/);
+});
+
+
+test("built-in assets report download progress and allow only a Hugging Face CDN redirect", async t => {
+  const root = await mkdtemp(path.join(os.tmpdir(), "tessera-release-"));
+  t.after(() => rm(root, { force: true, recursive: true }));
+  const store = new ModelStore(root);
+  const { builtInModels } = require("../dist/registry/catalog");
+  const { upstreamManifest, ...catalogEntry } = builtInModels[0];
+  const payload = Buffer.from("GGUF mock bytes");
+  const entry = { ...catalogEntry, sha256: hash(payload), size_bytes: payload.length };
+  const manifest = { ...upstreamManifest, sha256: entry.sha256, size_bytes: entry.size_bytes };
+  const urls = [];
+  let cdn = "https://example.org/model.tcm";
+  t.mock.method(globalThis, "fetch", async (url, options) => {
+    urls.push(String(url));
+    if (String(url) === entry.url) {
+      assert.equal(options.redirect, "manual");
+      return Response.redirect(cdn, 302);
+    }
+    assert.equal(options.redirect, "error");
+    return new Response(payload);
+  });
+  const signal = new AbortController().signal;
+  await assert.rejects(store.install(entry, signal, { upstreamManifest: manifest }), /Unexpected Hugging Face download redirect/);
+  assert.deepEqual(urls, [entry.url]);
+  cdn = "https://us.aws.cdn.hf.co/model.gguf";
+  const progress = [];
+  await store.install(entry, signal, { upstreamManifest: manifest, progress: bytes => progress.push(bytes) });
+  assert.deepEqual(urls, [entry.url, entry.url, cdn]);
+  assert.equal(progress.at(-1), payload.length);
+  assert.equal((await store.installed())[0].manifest.id, entry.id);
 });

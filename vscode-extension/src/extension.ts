@@ -11,6 +11,7 @@ import { modelMemoryBytes } from "./host/memory";
 import { registerChat, registerPrompt } from "./providers/chat";
 import { registerCodeActions } from "./providers/codeActions";
 import { InlineCompletion, type InlineRoute } from "./providers/inlineCompletion";
+import { builtInModels, type CatalogEntry } from "./registry/catalog";
 import { fetchIndex, ModelStore, type InstalledModel } from "./registry/download";
 import { embeddedLanguage, projectLanguage } from "./router/detector";
 import { Lifecycle } from "./router/lifecycle";
@@ -42,6 +43,22 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
   let projectFolder: string | undefined;
   let projectScan = 0;
 
+  const cppGlobs = ["**/*.cpp", "**/*.cc", "**/*.cxx", "**/*.hpp", "**/*.hh", "**/*.hxx"];
+  const localRoles = [
+    ["cpp-autocomplete-local", "cppAutocompleteModelPath", ["cpp"], cppGlobs, true],
+    ["cpp-local", "cppModelPath", ["cpp"], cppGlobs, false],
+    ["python-autocomplete-local", "pythonAutocompleteModelPath", ["python"], ["**/*.py", "**/*.pyi"], true],
+    ["parsing-autocomplete-local", "parsingAutocompleteModelPath",
+      ["json", "jsonc", "yaml", "toml", "sql", "regex"],
+      ["**/*.json", "**/*.jsonc", "**/*.yaml", "**/*.yml", "**/*.toml", "**/*.sql"], true],
+    ["documentation-autocomplete-local", "documentationAutocompleteModelPath",
+      ["markdown", "mdx", "restructuredtext", "asciidoc", "python-docstring"],
+      ["**/*.md", "**/*.mdx", "**/*.rst", "**/*.adoc"], true],
+    ["python-local", "pythonModelPath", ["python"], ["**/*.py", "**/*.pyi"], false],
+    ["typescript-local", "typescriptModelPath", ["typescript", "typescriptreact"],
+      ["**/*.ts", "**/*.tsx"], false],
+  ] satisfies Array<[string, string, string[], string[], boolean]>;
+
   const refresh = () => {
     const stopped = lifecycle?.dispose();
     const settings = config();
@@ -49,24 +66,13 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
     lifecycle = new Lifecycle(budget || freemem() * 0.6,
       settings.get("maxModels", 2), settings.get("idleMinutes", 5) * 60_000, stopped, budget === 0);
     localModels = [];
-    for (const [id, setting, languages, globs, inlineOnly] of [
-      ["python-autocomplete-local", "pythonAutocompleteModelPath", ["python"], ["**/*.py", "**/*.pyi"], true],
-      ["parsing-autocomplete-local", "parsingAutocompleteModelPath",
-        ["json", "jsonc", "yaml", "toml", "sql", "regex"],
-        ["**/*.json", "**/*.jsonc", "**/*.yaml", "**/*.yml", "**/*.toml", "**/*.sql"], true],
-      ["documentation-autocomplete-local", "documentationAutocompleteModelPath",
-        ["markdown", "mdx", "restructuredtext", "asciidoc", "python-docstring"],
-        ["**/*.md", "**/*.mdx", "**/*.rst", "**/*.adoc"], true],
-      ["python-local", "pythonModelPath", ["python"], ["**/*.py", "**/*.pyi"], false],
-      ["typescript-local", "typescriptModelPath", ["typescript", "typescriptreact"],
-        ["**/*.ts", "**/*.tsx"], false],
-    ] satisfies Array<[string, string, string[], string[], boolean]>) {
+    for (const [id, setting, languages, globs, inlineOnly] of localRoles) {
       const path = settings.get<string>(setting);
       if (!path) continue;
       try {
         const file = statSync(path);
         if (!file.isFile() || file.size === 0 || file.size >= 1_000_000_000) throw new Error("Invalid GGUF file size");
-        const contextLength = inlineOnly ? 768 : id === "python-local" ? 4096 : 2048;
+        const contextLength = inlineOnly ? 768 : ["python-local", "cpp-local"].includes(id) ? 4096 : 2048;
         localModels.push({
           path, memoryBytes: modelMemoryBytes(file.size, contextLength),
           manifest: {
@@ -83,6 +89,7 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
         log.appendLine(String(error));
       }
     }
+    return stopped;
   };
 
   const candidate = (
@@ -175,12 +182,14 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
     const editor = vscode.window.activeTextEditor;
     return {
       trusted: vscode.workspace.isTrusted,
+      advanced: context.globalState.get("advancedDashboard", false),
       language: editor?.document.languageId,
-      active: editor && candidate(editor.document, editor.selection.active),
+      active: editor && (candidate(editor.document, editor.selection.active) ??
+        candidate(editor.document, editor.selection.active, "chat")),
       lastInline: editor && inlineRoutes.get(editor.document.uri.toString()),
       models: models(),
     };
-  }, showError);
+  }, showError, advanced => context.globalState.update("advancedDashboard", advanced));
 
   const updateStatus = () => {
     const editor = vscode.window.activeTextEditor;
@@ -248,6 +257,42 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
     updateStatus();
   };
 
+  let modelOperation = false;
+  const manage = (operation: () => Promise<void>) => async () => {
+    if (!vscode.workspace.isTrusted || modelOperation) return;
+    modelOperation = true;
+    try {
+      await operation();
+    } catch (error) {
+      showError(error);
+    } finally {
+      modelOperation = false;
+    }
+  };
+
+  const chooseStoredModel = async (includeLocal: boolean) => {
+    const inventory = [...(includeLocal ? localModels : []), ...await store.inventory()];
+    if (!inventory.length) {
+      void vscode.window.showInformationMessage("Tessera has no models to manage.");
+      return;
+    }
+    const choice = await vscode.window.showQuickPick(inventory.map(model => ({
+      label: model.manifest.id,
+      description: model.manifest.quant === "local" ? "Linked GGUF"
+        : model.manifest.version + (installedModels.some(active => active.path === model.path) ? " · Active version" : ""),
+      detail: `${Math.ceil(model.manifest.size_bytes / 1_000_000)} MB · ${model.manifest.capabilities.join(", ")}`,
+      model,
+    })), { placeHolder: "Select a model or installed version" });
+    return choice?.model;
+  };
+
+  const activateVersion = async ({ manifest }: InstalledModel) => {
+    await store.activate(manifest.id, manifest.version);
+    inlineRoutes.clear();
+    await loadInstalled();
+    prewarm();
+  };
+
   refresh();
   status.command = "tessera.openDashboard";
   status.show();
@@ -264,13 +309,14 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
     vscode.commands.registerCommand("tessera.showOutput", () => log.show()),
     vscode.commands.registerCommand("tessera.openChat", () =>
       vscode.commands.executeCommand("workbench.action.chat.open", { query: "@tessera ", isPartialQuery: true })),
-    vscode.commands.registerCommand("tessera.addLocalModel", async () => {
-      if (!vscode.workspace.isTrusted) return;
+    vscode.commands.registerCommand("tessera.addLocalModel", manage(async () => {
       const language = await vscode.window.showQuickPick([
         { label: "Python (fast autocomplete)", setting: "pythonAutocompleteModelPath" },
         { label: "Structured data and SQL (autocomplete)", setting: "parsingAutocompleteModelPath" },
         { label: "Documentation (autocomplete)", setting: "documentationAutocompleteModelPath" },
         { label: "Python", setting: "pythonModelPath" },
+        { label: "C++ (fast autocomplete)", setting: "cppAutocompleteModelPath" },
+        { label: "C++", setting: "cppModelPath" },
         { label: "TypeScript", setting: "typescriptModelPath" },
       ], { placeHolder: "Choose a role for the local model" });
       if (!language) return;
@@ -288,8 +334,21 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
       } catch (error) {
         showError(error);
       }
-    }),
-    registerChat(selectChat, log), registerPrompt(selectChat, showError),
+    })),
+    registerChat(selectChat, log), registerPrompt(async () => {
+      if (!vscode.workspace.isTrusted) return;
+      const preferred = selectChat();
+      if (preferred) return preferred;
+      const choices = models().filter(model => model.manifest.capabilities.includes("chat"));
+      if (!choices.length) {
+        void vscode.window.showInformationMessage("Download or link a Tessera chat model from the sidebar.");
+        return;
+      }
+      const choice = await vscode.window.showQuickPick(choices.map(model => ({
+        label: model.manifest.id, description: model.manifest.language_ids.join(", "), model,
+      })), { placeHolder: "Choose a model for this prompt" });
+      return choice && endpoint(choice.model);
+    }, showError),
     { dispose: () => { void lifecycle.dispose(); } },
     vscode.commands.registerCommand("tessera.triggerCompletion", () =>
       vscode.commands.executeCommand("editor.action.inlineSuggest.trigger")),
@@ -309,7 +368,9 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
     vscode.workspace.onDidChangeConfiguration(event => {
       if (["memoryMiB", "maxModels", "idleMinutes", "serverPath", "gpuLayers", "cpuThreads", "pythonModelPath",
         "pythonAutocompleteModelPath", "parsingAutocompleteModelPath",
-        "documentationAutocompleteModelPath", "typescriptModelPath"].some(setting => event.affectsConfiguration(`tessera.${setting}`))) {
+        "documentationAutocompleteModelPath", "cppAutocompleteModelPath", "cppModelPath",
+        "typescriptModelPath"].some(setting => event.affectsConfiguration(`tessera.${setting}`))) {
+        inlineRoutes.clear();
         refresh();
         prewarm();
       }
@@ -346,56 +407,103 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
         showError(error);
       }
     }),
-    vscode.commands.registerCommand("tessera.installModel", async () => {
-      if (!vscode.workspace.isTrusted) return;
+    vscode.commands.registerCommand("tessera.installModel", manage(async () => {
       const settings = config();
       const url = settings.get("registryUrl", "");
       const key = settings.get("registryPublicKey", "");
-      if (!url || !key) {
+      const source = await vscode.window.showQuickPick([
+        { label: "Tessera catalog", description: "Qwen coding models for autocomplete and chat", builtIn: true },
+        { label: "Signed registry", description: url || "Configure an HTTPS registry", builtIn: false },
+      ], { placeHolder: "Choose a model catalog" });
+      if (!source) return;
+      if (!source.builtIn && (!url || !key)) {
         await vscode.commands.executeCommand("workbench.action.openSettings", "tessera.registry");
         return;
       }
-      try {
-        const index = await fetchIndex(url, key, AbortSignal.timeout(15_000));
-        const entries = index.models.map(entry => ({
-          label: entry.id, description: entry.version, detail: entry.language_ids.join(", "), entry,
-        }));
-        const choice = await vscode.window.showQuickPick(entries, { placeHolder: "Select a model version" });
-        if (!choice) return;
-        await vscode.window.withProgress({
-          location: vscode.ProgressLocation.Notification, title: `Installing ${choice.label}`, cancellable: true,
-        }, async (_progress, token) => {
-          const controller = new AbortController();
-          const cancellation = token.onCancellationRequested(() => controller.abort());
-          try {
-            await store.install(choice.entry, AbortSignal.any([controller.signal, AbortSignal.timeout(900_000)]));
-            await loadInstalled();
-            prewarm();
-          } catch (error) {
-            if (!controller.signal.aborted) throw error;
-          } finally {
-            cancellation.dispose();
-          }
-        });
-      } catch (error) {
-        showError(error);
+      const catalog: CatalogEntry[] = source.builtIn ? builtInModels
+        : (await vscode.window.withProgress({
+          location: vscode.ProgressLocation.Notification, title: "Loading Tessera registry",
+        }, () => fetchIndex(url, key, AbortSignal.timeout(15_000)))).models;
+      const inventory = await store.inventory();
+      const available = catalog.filter(entry => !inventory.some(({ manifest }) =>
+        manifest.id === entry.id && manifest.version === entry.version));
+      if (!available.length) {
+        void vscode.window.showInformationMessage("No new model versions are available from this catalog.");
+        return;
       }
-    }),
-    vscode.commands.registerCommand("tessera.switchVersion", async () => {
-      if (!vscode.workspace.isTrusted) return;
-      try {
-        const id = await vscode.window.showQuickPick(installedModels.map(model => model.manifest.id));
-        if (!id) return;
-        const version = await vscode.window.showQuickPick(await store.versions(id));
-        if (!version) return;
-        await store.activate(id, version);
-        await loadInstalled();
+      const choice = await vscode.window.showQuickPick(available.map(entry => ({
+        label: entry.id, description: `${entry.version} · ${Math.ceil(entry.size_bytes / 1_000_000)} MB`,
+        detail: entry.upstreamManifest?.capabilities.join(", ") ?? entry.language_ids.join(", "), entry,
+      })), { placeHolder: "Choose a model to download and install" });
+      if (!choice) return;
+      await vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification, title: `Installing ${choice.label}`, cancellable: true,
+      }, async (progress, token) => {
+        const controller = new AbortController();
+        const cancellation = token.onCancellationRequested(() => controller.abort());
+        if (token.isCancellationRequested) controller.abort();
+        let reported = 0;
+        try {
+          await store.install(choice.entry, AbortSignal.any([controller.signal, AbortSignal.timeout(900_000)]),
+            { upstreamManifest: choice.entry.upstreamManifest, progress: bytes => {
+              const percent = Math.floor(100 * bytes / choice.entry.size_bytes);
+              if (percent === reported) return;
+              progress.report({ increment: percent - reported,
+                message: percent === 100 ? "Verifying and unpacking…" : `${percent}% downloaded` });
+              reported = percent;
+            } });
+          inlineRoutes.clear();
+          await loadInstalled();
+          prewarm();
+          void vscode.window.showInformationMessage(`Installed ${choice.label} ${choice.entry.version}.`);
+        } catch (error) {
+          if (!controller.signal.aborted) throw error;
+        } finally {
+          cancellation.dispose();
+        }
+      });
+    })),
+    vscode.commands.registerCommand("tessera.switchVersion", manage(async () => {
+      const model = await chooseStoredModel(false);
+      if (model) await activateVersion(model);
+    })),
+    vscode.commands.registerCommand("tessera.manageModels", manage(async () => {
+      const model = await chooseStoredModel(true);
+      if (!model) return;
+      const { manifest } = model;
+      const role = localRoles.find(([id]) => id === manifest.id && localModels.includes(model));
+      const action = await vscode.window.showQuickPick(role
+        ? ["Unlink local GGUF"]
+        : ["Activate this version", "Remove this version"], { placeHolder: `Manage ${manifest.id}` });
+      if (action === "Activate this version") await activateVersion(model);
+      if (action === "Unlink local GGUF" && role) {
+        if (config().get(role[1]) !== model.path) return;
+        await config().update(role[1], undefined, vscode.ConfigurationTarget.Global);
+        inlineRoutes.clear();
+        refresh();
+        updateStatus();
         prewarm();
-      } catch (error) {
-        showError(error);
       }
-    }),
+      if (action === "Remove this version") {
+        const confirmed = await vscode.window.showWarningMessage(
+          `Remove ${manifest.id} ${manifest.version} from Tessera storage?`, { modal: true }, "Remove");
+        if (confirmed !== "Remove") return;
+        // Stop the current server before removing weights, including on Windows.
+        installedModels = installedModels.filter(active => active.path !== model.path);
+        inlineRoutes.clear();
+        updateStatus();
+        const stopped = refresh();
+        try {
+          await stopped;
+          await store.remove(manifest.id, manifest.version);
+        } finally {
+          await loadInstalled();
+          prewarm();
+        }
+      }
+    })),
     vscode.commands.registerCommand("tessera.pickModel", async () => {
+      if (!vscode.workspace.isTrusted) return;
       const editor = vscode.window.activeTextEditor;
       if (!editor) return;
       const options = [
@@ -418,6 +526,7 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
         pins.delete(editor.document.uri.toString());
         await context.workspaceState.update(`model:${folder.uri.toString()}`, choice.id || undefined);
       }
+      inlineRoutes.delete(editor.document.uri.toString());
       updateStatus();
       prewarm();
     }),

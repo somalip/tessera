@@ -1,0 +1,18 @@
+{
+  "base": "Qwen/Qwen2.5-Coder-0.5B",
+  "revision": "8123ea2e9354afb7ffcc6c8641d1b2f5ecf18301",
+  "base_sha256": "aff8914ec707fcaf9e2d4dc97197cded50b1c63e1d3a7a82e56f54d83ea47f80",
+  "data_license": "CC0-1.0",
+  "seed": 42,
+  "device": "mps",
+  "examples": 96,
+  "epoch_losses": [
+    0.3718275098750989,
+    0.142405917091916
+  ],
+  "corpus_audit": {
+    "holdout_sha256": "b37c6c6bf65d138bc7ee0df7577c2e7f5bb5b2707c6b9341cb556b97c4c3979c",
+    "training_sha256": "921d9777ccea5037492eda43530d268e48b1c43cd20ae045c506927389f3a888",
+    "overlap_exclusions": 0
+  }
+}

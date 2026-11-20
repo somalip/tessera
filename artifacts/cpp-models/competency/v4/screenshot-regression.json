@@ -1,0 +1,10 @@
+{
+  "extension": "tinycoders.tinycoders@0.1.23",
+  "model": "cpp-generation-v4.Q4_0.gguf",
+  "model_sha256": "9943fbb590bef1335ada116e980e7cdf1f82938e1be008be1f03c79e50c542c6",
+  "prompt": "// write a for loop",
+  "source": "#include <iostream>\n\nint main() {\n    for (int i = 0; i < 10; ++i) {\n        std::cout << i << \" \";\n    }\n    return 0;\n}",
+  "observed_for_loops": 1,
+  "compiled_and_ran_in_sandbox": true,
+  "automatic_suggestion_after_completed_program": false
+}

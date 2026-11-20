@@ -33,12 +33,12 @@ exports.run = async function () {
     manifest: { id: "python-tiny", quant: "Q4_K_M", version: "1.0.0",
       language_ids: ["python"], capabilities: ["fim", "chat"], size_bytes: 490000000 },
   };
-  let state = { trusted: true, language: "python", active: installed, models: [installed] };
+  let state = { trusted: true, advanced: true, language: "python", active: installed, models: [installed] };
   const messages = [];
   const received = new vscode.EventEmitter();
   const disposed = new vscode.EventEmitter();
   const errors = [];
-  const dashboard = new Dashboard(() => state, error => errors.push(error));
+  const dashboard = new Dashboard(() => state, error => errors.push(error), async advanced => { state = { ...state, advanced }; });
   const webview = {
     postMessage: async markup => messages.push(markup),
     onDidReceiveMessage: received.event,
@@ -54,7 +54,18 @@ exports.run = async function () {
     assert.match(webview.html, /python · 1.0.0 · 490 MB/);
     assert.match(webview.html, /Routed/);
     assert.match(webview.html, /data-action="add"/);
-    assert.match(webview.html, /data-action="version"/);
+    assert.match(webview.html, /data-action="manage"/);
+    assert.match(webview.html, /data-action="advanced" aria-pressed="true"/);
+    received.fire("simple");
+    await Promise.resolve();
+    const simpleMarkup = messages.pop();
+    assert.match(simpleMarkup, /data-action="simple" aria-pressed="true"/);
+    assert.match(simpleMarkup, /data-action="install"/);
+    assert.match(simpleMarkup, /data-action="manage"/);
+    assert.doesNotMatch(simpleMarkup, /data-action="refactor"/);
+    received.fire("advanced");
+    await Promise.resolve();
+    assert.match(messages.pop(), /data-action="advanced" aria-pressed="true"/);
     assert.match(webview.html, /data-action="refactor"/);
     assert.match(webview.html, /data-action="ask" class="primary"/);
     assert.match(webview.html, /<ul aria-labelledby="models-heading">/);
@@ -76,7 +87,7 @@ exports.run = async function () {
     assert.match(messages.at(-1), /No matching model/);
     assert.match(messages.at(-1), /&lt;rust&gt;/);
     assert.match(messages.at(-1), /No models installed/);
-    assert.match(messages.at(-1), /data-action="add" class="primary"/);
+    assert.match(messages.at(-1), /data-action="install" class="primary"/);
     dashboard.refresh();
     assert.equal(messages.length, 2);
 
@@ -108,6 +119,43 @@ exports.run = async function () {
       else assert.equal(items[0]?.insertText, "return 42");
     } finally {
       current.dispose();
+    }
+    if (!real) {
+      const cppFim = path.join(process.env.TESSERA_TEST_HOME, "cpp-fim.gguf");
+      const cppChat = path.join(process.env.TESSERA_TEST_HOME, "cpp-chat.gguf");
+      await Promise.all([writeFile(cppFim, "stub"), writeFile(cppChat, "stub")]);
+      await config.update("cppAutocompleteModelPath", cppFim, global);
+      await config.update("cppModelPath", cppChat, global);
+      const token = new vscode.CancellationTokenSource();
+      try {
+        const cpp = await vscode.workspace.openTextDocument({
+          language: "cpp", content: "int answer() {\n    // Return the C++ answer\n    \n}\n",
+        });
+        const complete = await provider.provideInlineCompletionItems(cpp, new vscode.Position(2, 4), context, token.token);
+        assert.equal(complete[0]?.insertText, "return 42;");
+        const instruction = await vscode.workspace.openTextDocument({
+          language: "cpp", content: "// tessera: Implement answer\n",
+        });
+        const generate = await provider.provideInlineCompletionItems(instruction, new vscode.Position(1, 0), context, token.token);
+        assert.equal(generate[0]?.insertText, "int answer() { return 42; }");
+        const automatic = { triggerKind: vscode.InlineCompletionTriggerKind.Automatic };
+        const loop = await vscode.workspace.openTextDocument({
+          language: "cpp", content: "// write a for loop\n// Print the loop index.\n",
+        });
+        const retry = await provider.provideInlineCompletionItems(loop, new vscode.Position(2, 0), automatic, token.token);
+        assert.match(retry[0]?.insertText, /int main\(\) \{\n    for \(int i/);
+        const finished = await vscode.workspace.openTextDocument({
+          language: "cpp", content: "int test_javascript_guard() { return 42; }\n",
+        });
+        const stopped = await provider.provideInlineCompletionItems(finished, new vscode.Position(1, 0), automatic, token.token);
+        assert.deepEqual(stopped, []);
+        const contaminated = await provider.provideInlineCompletionItems(finished, new vscode.Position(1, 0), context, token.token);
+        assert.deepEqual(contaminated, []);
+      } finally {
+        token.dispose();
+        await config.update("cppAutocompleteModelPath", undefined, global);
+        await config.update("cppModelPath", undefined, global);
+      }
     }
     if (!real || (process.env.TESSERA_REAL_PARSING && process.env.TESSERA_REAL_DOCS)) {
       const parsing = process.env.TESSERA_REAL_PARSING ||

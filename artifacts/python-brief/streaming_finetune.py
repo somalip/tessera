@@ -54,7 +54,8 @@ def checked_corpus():
     return list(records(dataset)), audit
 
 
-def fit(output, epochs, learning_rate, program_repeat, *, corpus_snapshot=None, max_length=768):
+def fit(output, epochs, learning_rate, program_repeat, *, corpus_snapshot=None, max_length=768,
+        active=ACTIVE, output_name="python-brief"):
     torch.set_num_threads(5)
     torch.manual_seed(42)
     config = AutoConfig.from_pretrained(BASE, local_files_only=True)
@@ -62,7 +63,7 @@ def fit(output, epochs, learning_rate, program_repeat, *, corpus_snapshot=None, 
     config.use_cache = False
     tokenizer = AutoTokenizer.from_pretrained(BASE, local_files_only=True)
     examples, audit = checked_corpus() if corpus_snapshot is None else corpus_snapshot
-    reader = GGUFReader(ACTIVE)
+    reader = GGUFReader(active)
     weights = {tensor.name: tensor.data for tensor in reader.tensors}
     embedding = weights["token_embd.weight"]
     rope = Qwen2RotaryEmbedding(config)
@@ -150,11 +151,11 @@ def fit(output, epochs, learning_rate, program_repeat, *, corpus_snapshot=None, 
         losses.append(sum(epoch_losses) / len(epoch_losses))
 
     output.mkdir(parents=True, exist_ok=True)
-    pending = output / "python-brief.f16.part"
-    final = output / "python-brief.f16.gguf"
+    pending = output / f"{output_name}.f16.part"
+    final = output / f"{output_name}.f16.gguf"
     if final.exists() or pending.exists():
         raise FileExistsError(final)
-    subprocess.run(["cp", "-c", str(ACTIVE), str(pending)], check=True)
+    subprocess.run(["cp", "-c", str(active), str(pending)], check=True)
     target_reader = GGUFReader(pending, "r+")
     target_weights = {tensor.name: tensor.data for tensor in target_reader.tensors}
     with torch.no_grad():
@@ -166,7 +167,7 @@ def fit(output, epochs, learning_rate, program_repeat, *, corpus_snapshot=None, 
             dest[:] = merged
     target_reader.data.flush()
     pending.rename(final)
-    report = {"active_f16_sha256": digest(ACTIVE), "trained_f16_sha256": digest(final),
+    report = {"active_f16_sha256": digest(active), "trained_f16_sha256": digest(final),
               "dataset": audit, "seed": 42, "epochs": epochs, "loss": losses,
               "learning_rate": learning_rate, "program_repeat": program_repeat,
               "trainable_parameters": sum(parameter.numel() for parameter in parameters),

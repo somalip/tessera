@@ -5,13 +5,22 @@ It routes the current file and cursor to a compatible GGUF model and runs
 the model in a CPU-first llama.cpp server on loopback.
 
 Open **Tessera** from the Activity Bar, click its status bar item, or run
-**Tessera: Open Dashboard**. The dashboard shows the model routed to the
-current editor and the configured models. Use **Add Local GGUF** to browse for
-a Python or TypeScript Qwen2.5-Coder model. To install from a signed registry,
-configure its HTTPS URL and trusted Ed25519 public key in **Settings**, then
-choose **Install From Registry**.
+**Tessera: Open Dashboard**. **Simple** mode shows the current model route,
+chat, and model management. **Advanced** mode adds code actions, route details,
+system resources, and diagnostics. Tessera remembers your mode selection.
 
-The dashboard's **System resources** section shows machine-wide CPU usage,
+- **Download Models** opens the built-in Tessera catalog or a signed registry.
+  The built-in catalog includes Qwen coding models for autocomplete, chat,
+  and code edits. For a custom registry, enter its HTTPS URL
+  and trusted Ed25519 public key in Tessera settings. Verified downloads install
+  into VS Code's extension storage and are available for routing immediately.
+- **Manage Models** lists downloaded versions and linked GGUFs. Activate a
+  downloaded version, remove its files from Tessera storage, or unlink an
+  existing GGUF while keeping its file on disk.
+- **Add Local GGUF** lets you choose a model role and browse to an existing file.
+- **Choose Model** pins a compatible model for the current file or workspace.
+
+In **Advanced** mode, **System resources** shows machine-wide CPU usage,
 non-free RAM (including cached memory), and per-device GPU utilization when
 available. GPU readings use macOS accelerator counters or `nvidia-smi`.
 **Resource Limits** opens the settings for Tessera model servers.
@@ -37,7 +46,6 @@ Completion** for a suggestion on demand. Or type `# tessera: return the sum`
 in Python (use `// tessera: return the sum` in TypeScript) and press Enter.
 Set `tessera.commentCompletions` to `false` to disable this comment trigger
 while automatic suggestions are off. Keep VS Code inline suggestions enabled.
-Use **Choose Routing Model** to pin a model for the file or workspace.
 
 To generate a standalone Python program, type a top-level comment such as
 `#make a snake game` and press Enter. The **Python** model receives the full

@@ -1,0 +1,34 @@
+{
+  "active_f16_sha256": "03b0f0f4a9dbb3803676d8c7592c0047b277f61466de5257c4abf28649ff9a33",
+  "trained_f16_sha256": "6aa9b18543f4f54a40795f930c267c513d4565202741aba93ec7203c385b70b1",
+  "dataset": {
+    "benchmarks": {
+      "holdout.jsonl": "9ecebfa93fc1fa2bdab2025a4d875446364a10ce1bf56b42503c32160efdb7c0",
+      "v1-holdout.jsonl": "b37c6c6bf65d138bc7ee0df7577c2e7f5bb5b2707c6b9341cb556b97c4c3979c"
+    },
+    "holdout_sha256": "9ecebfa93fc1fa2bdab2025a4d875446364a10ce1bf56b42503c32160efdb7c0",
+    "training_sha256": "6fc83f4e4aa323e5605da3661a913b0f55a8789880a18857dcf8dde4deac3ce3",
+    "excluded_for_overlap": [
+      "reachable",
+      "counts"
+    ],
+    "layers": 4,
+    "epochs": 2,
+    "batch_size": 1
+  },
+  "seed": 42,
+  "epochs": 2,
+  "loss": [
+    0.4344004000613495,
+    0.4062744293981571
+  ],
+  "learning_rate": 8e-05,
+  "program_repeat": 1,
+  "trainable_parameters": 589824,
+  "trained_layers": [
+    24,
+    25,
+    26,
+    27
+  ]
+}

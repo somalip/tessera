@@ -1,0 +1,54 @@
+{
+  "benchmark_sha256": "4e5835f3a8b4110d2c26722a6411ac72a3afa2eaf2fcff93952c9cf138ec3494",
+  "model_sha256": "0a1936b6da90dd402929d2cf6f2ca1e0fd32e58bd2f4a23061a03d6ba02801e0",
+  "model": "artifacts/cpp-models/chat/cpp-generation.Q4_K_M.gguf",
+  "size_bytes": 397807584,
+  "language": "cpp",
+  "passed": 0,
+  "total": 6,
+  "stopped": 5,
+  "cases": [
+    {
+      "id": "free_slots",
+      "passed": false,
+      "stopped": true,
+      "inference_ms": 2693,
+      "answer": "#include <algorithm>\n#include <functional>\n#include <string>\n#include <vector>\n\nstd::vector<std::pair<int, int>> free_slots(int limit, std::vector<std::pair<int, int>> busy) {\n    std::sort(busy.begin(), busy.end());\n    std::vector<std::pair<int, int>> result;\n    int start = 0;\n    int end = 0;\n\n    while (start < busy.size()) {\n        if (end == busy.size() || busy[end].first > limit) {\n            if (start != end) {\n                result.push_back({start, end});\n            }\n            break;\n        }\n\n        if (busy[start].second <= limit) {\n            end = busy[start].second;\n        } else {\n            start++;\n        }\n    }\n\n    return result;\n}\n"
+    },
+    {
+      "id": "shortest_span",
+      "passed": false,
+      "stopped": true,
+      "inference_ms": 2898,
+      "answer": "#include <algorithm>\n#include <functional>\n#include <string>\n#include <vector>\n\nint shortest_span(const std::vector<int>& values, long long threshold) {\n    int n = values.size();\n    std::vector<int> dp(n + 1, INT_MAX);\n    dp[0] = 0;\n    for (int i = 1; i <= n; ++i) {\n        for (int j = 0; j < i; ++j) {\n            if (values[j] + values[i] <= threshold) {\n                dp[i] = std::min(dp[i], dp[j] + 1);\n            }\n        }\n    }\n    return dp[n];\n}\n"
+    },
+    {
+      "id": "build_layers",
+      "passed": false,
+      "stopped": true,
+      "inference_ms": 5064,
+      "answer": "#include <algorithm>\n#include <functional>\n#include <string>\n#include <vector>\n#include <unordered_map>\n\nstd::vector<std::vector<int>> build_layers(int n, const std::vector<std::pair<int,int>>& prerequisites) {\n    std::vector<std::vector<int>> layers;\n    std::unordered_map<int, std::vector<int>> graph;\n    std::unordered_map<int, int> indegree;\n\n    // Build the graph\n    for (const auto& pair : prerequisites) {\n        int a = pair.first;\n        int b = pair.second;\n        graph[a].push_back(b);\n        indegree[b]++;\n    }\n\n    // Topological sort\n    std::queue<int> q;\n    for (int i = 0; i < n; ++i) {\n        if (indegree[i] == 0) {\n            q.push(i);\n        }\n    }\n\n    while (!q.empty()) {\n        int current = q.front();\n        q.pop();\n\n        layers.push_back({current});\n        for (const auto& neighbor : graph[current]) {\n            indegree[neighbor]--;\n            if (indegree[neighbor] == 0) {\n                q.push(neighbor);\n            }\n        }\n    }\n\n    return layers;\n}\n"
+    },
+    {
+      "id": "top_words",
+      "passed": false,
+      "stopped": true,
+      "inference_ms": 24398,
+      "answer": "#include <algorithm>\n#include <functional>\n#include <string>\n#include <vector>\n\nstd::vector<std::string> top_words(const std::vector<std::string>& words, int k) {\n    std::sort(words.begin(), words.end());\n    std::vector<std::string> result;\n    std::unordered_map<std::string, int> word_count;\n\n    for (const auto& word : words) {\n        word_count[word]++;\n        if (word_count[word] > k) {\n            break;\n        }\n        result.push_back(word);\n    }\n\n    return result;\n}\n"
+    },
+    {
+      "id": "stock_cli",
+      "passed": false,
+      "stopped": true,
+      "inference_ms": 9522,
+      "answer": "#include <string>\n#include <vector>\n#include <algorithm>\n#include <functional>\n\nint main() {\n    std::string command;\n    while (std::getline(std::cin, command)) {\n        if (command == \"PUT\") {\n            std::string name;\n            std::cin >> name;\n            std::cout << name << \" units added\\n\";\n        } else if (command == \"TAKE\") {\n            std::string name;\n            std::cin >> name;\n            if (!name.empty()) {\n                std::cout << name << \" units removed\\n\";\n            }\n        } else if (command == \"QUERY\") {\n            std::string name;\n            std::cin >> name;\n            if (!name.empty()) {\n                int quantity = std::stoi(name);\n                std::cout << quantity << \"\\n\";\n            }\n        }\n    }\n    return 0;\n}\n"
+    },
+    {
+      "id": "finite_sum",
+      "passed": false,
+      "stopped": false,
+      "inference_ms": 31402,
+      "answer": "#include <cmath>\n#include <vector>\n#include <functional>\n#include <numeric>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n"
+    }
+  ]
+}

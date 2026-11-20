@@ -9,6 +9,7 @@ export const dashboardId = "tessera.dashboard";
 
 export interface DashboardState {
   trusted: boolean;
+  advanced: boolean;
   language?: string;
   active?: InstalledModel;
   lastInline?: InlineRoute;
@@ -24,24 +25,23 @@ const editorActions = [
   { id: "test", label: "Write Tests", command: "tessera.writeTests" },
 ];
 
-function actions({ trusted, language, models }: DashboardState) {
+function actions({ trusted, language, advanced }: DashboardState) {
   return {
     routing: !trusted
       ? [{ id: "trust", label: "Manage Workspace Trust…", command: "workbench.trust.manage" }]
-      : language ? [{ id: "route", label: "Choose Routing Model…", command: "tessera.pickModel" }] : [],
-    editor: trusted && language ? editorActions : [],
+      : language ? [{ id: "route", label: "Choose Model…", command: "tessera.pickModel" }] : [],
+    editor: trusted ? (advanced && language ? editorActions : editorActions.slice(0, 2)) : [],
     models: trusted ? [
+      { id: "install", label: "Download Models…", command: "tessera.installModel" },
+      { id: "manage", label: "Manage Models…", command: "tessera.manageModels" },
       { id: "add", label: "Add Local GGUF…", command: "tessera.addLocalModel" },
-      { id: "install", label: "Install From Registry…", command: "tessera.installModel" },
-      ...(models.some(model => model.manifest.quant !== "local")
-        ? [{ id: "version", label: "Switch Version…", command: "tessera.switchVersion" }] : []),
     ] : [],
-    tools: [
+    tools: advanced ? [
       { id: "settings", label: "Settings", command: "workbench.action.openSettings",
         args: ["@ext:tessera.tessera"] },
       { id: "output", label: "Show Output", command: "tessera.showOutput" },
       { id: "metrics", label: "Export Local Metrics…", command: "tessera.exportMetrics" },
-    ],
+    ] : [],
   };
 }
 
@@ -55,6 +55,7 @@ export class Dashboard implements vscode.WebviewViewProvider, vscode.Disposable 
   constructor(
     private readonly state: () => DashboardState,
     private readonly reportError: (error: unknown) => void,
+    private readonly setAdvanced: (advanced: boolean) => PromiseLike<void>,
   ) {}
 
   resolveWebviewView(view: vscode.WebviewView): void {
@@ -76,7 +77,11 @@ export class Dashboard implements vscode.WebviewViewProvider, vscode.Disposable 
           if (view.visible) this.monitor(view);
           return;
         }
-        if (message === "resource-limits") {
+        if (message === "simple" || message === "advanced") {
+          void this.setAdvanced(message === "advanced").then(() => this.refresh(), this.reportError);
+          return;
+        }
+        if (message === "resource-limits" && this.state().advanced) {
           void vscode.commands.executeCommand("tessera.resourceLimits").then(undefined, this.reportError);
           return;
         }
@@ -96,13 +101,15 @@ export class Dashboard implements vscode.WebviewViewProvider, vscode.Disposable 
     if (!this.view) return;
     const state = this.state();
     const markup = renderDashboard(state, actions(state));
+    if (!state.advanced) this.stopMonitoring();
+    else if (this.view.visible) this.monitor(this.view);
     if (markup === this.markup) return;
     this.markup = markup;
     void this.view.webview.postMessage(markup);
   }
 
   private monitor(view: vscode.WebviewView): void {
-    if (this.polling) return;
+    if (this.polling || !this.state().advanced) return;
     const controller = new AbortController();
     const { signal } = controller;
     this.polling = controller;

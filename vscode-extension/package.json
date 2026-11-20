@@ -84,6 +84,18 @@
           "default": 0,
           "description": "Number of model layers to offload to the GPU per server. Zero runs inference on the CPU."
         },
+        "tessera.cppAutocompleteModelPath": {
+          "type": "string",
+          "scope": "machine",
+          "default": "",
+          "description": "Path to the small C++ autocomplete GGUF. Preferred for inline suggestions."
+        },
+        "tessera.cppModelPath": {
+          "type": "string",
+          "scope": "machine",
+          "default": "",
+          "description": "Path to a local C++ GGUF for code generation and chat."
+        },
         "tessera.typescriptModelPath": {
           "type": "string",
           "scope": "machine",
@@ -151,7 +163,13 @@
       },
       {
         "command": "tessera.installModel",
-        "title": "Tessera: Install Model"
+        "title": "Tessera: Download Models",
+        "enablement": "isWorkspaceTrusted"
+      },
+      {
+        "command": "tessera.manageModels",
+        "title": "Tessera: Manage Models",
+        "enablement": "isWorkspaceTrusted"
       },
       {
         "command": "tessera.switchVersion",

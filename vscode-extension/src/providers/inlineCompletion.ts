@@ -7,6 +7,7 @@ import { IncompleteCodeError, type InferenceHost } from "../host/client";
 import { fitMessages, type ChatModel } from "./chat";
 import type { InstalledModel } from "../registry/download";
 import { isPythonProject, projectMessages } from "./projectPrompt";
+import { cppAnswerKind, cppCommentRequest, cppFinishedCode, cppGenerationProblem, cppShouldContinue, cppSystemPrompt, foreignCppSnippet } from "./cppSnippet";
 
 export interface InlineRoute {
   mode: "Autocomplete" | "Comment parsing" | "Inline generation";
@@ -32,6 +33,8 @@ function isCommentTrigger(document: vscode.TextDocument, position: vscode.Positi
   switch (document.languageId) {
     case "python":
       return /^\s*#\s*[^#!\s]/.test(previous);
+    case "cpp":
+      return /^\s*\/\/\s*\S/.test(previous);
     case "ruby": case "shellscript": case "yaml":
       return /^\s*#\s*tessera:\s*\S/.test(previous);
     case "sql":
@@ -49,6 +52,7 @@ function inlineInstruction(document: vscode.TextDocument, position: vscode.Posit
   const comment = document.lineAt(position.line - 1).text.trim();
   const instruction = comment.replace(/^(?:#|\/\/|--|\/\*|<!--)\s*(?:tessera:\s*)?/i, "")
     .replace(/\s*(?:\*\/|-->)$/, "").trim();
+  if (document.languageId === "cpp") return undefined;
   if (document.languageId === "python" ||
       /^(?:make|build|create|implement|write|generate)\s+\S/i.test(instruction)) return instruction;
 }
@@ -66,6 +70,17 @@ function pythonProjectComment(document: vscode.TextDocument, position: vscode.Po
   if (start === -1) return;
   const instruction = lines.slice(start).join("\n").replace(/^tessera:\s*/i, "");
   return { instruction, line: position.line - lines.length + start };
+}
+
+function cppProjectComment(document: vscode.TextDocument, position: vscode.Position) {
+  const lines: string[] = [];
+  for (let line = position.line - 1; line >= 0; line--) {
+    const match = /^\s*\/\/\s*(.*)$/.exec(document.lineAt(line).text);
+    if (!match) break;
+    lines.unshift(match[1]);
+  }
+  const request = cppCommentRequest(lines);
+  return request && { instruction: request.instruction, line: position.line - lines.length + request.start };
 }
 
 async function condenseInstruction(model: CompletionModel, instruction: string, signal: AbortSignal): Promise<string> {
@@ -109,10 +124,12 @@ async function generateCode(
 ): Promise<string> {
   const offset = document.offsetAt(position);
   const source = document.getText();
-  const project = projectLine !== undefined;
+  const cpp = document.languageId === "cpp";
+  const project = !cpp && projectLine !== undefined;
   const commentOffset = document.offsetAt(document.lineAt(projectLine ?? position.line - 1).range.start);
-  const before = source.slice(Math.max(0, commentOffset - 240), commentOffset).trimEnd();
-  const after = source.slice(offset, offset + 160).trim();
+  const before = source.slice(Math.max(0, commentOffset - (cpp ? 1200 : 240)), commentOffset).trimEnd();
+  const tail = source.slice(offset, offset + (cpp ? 600 : 160));
+  const after = cpp ? tail.replace(/^(?:[ \t]*\r?\n)+/, "").trimEnd() : tail.trim();
   const terminal = document.languageId === "python" && /\b(?:tui|terminal ui|text user interface)\b/i.test(instruction);
   const guidance = terminal
     ? "\nUse Python curses. Define main(stdscr) with initialization and the entire timed event loop. " +
@@ -121,35 +138,45 @@ async function generateCode(
       "For grid movement, represent positions and direction as (row, column) pairs, with a key-to-direction map. " +
       "For games, implement the core mechanics, collisions, score, and game over."
     : "";
+  const contextual = Boolean(before.trim() || after.trim());
+  const cppKind = cppAnswerKind(instruction, contextual);
   const messages = project ? projectMessages(instruction, before, after, model.contextLength) : [
-    { role: "system" as const, content: "Return only complete, runnable code for insertion at the cursor. " +
+    { role: "system" as const, content: cpp ? cppSystemPrompt(cppKind) : "Return only complete, runnable code for insertion at the cursor. " +
       "Use the file language and honor the request. Do not include explanations, placeholders, or repeat existing code. " +
       "Prefer standard library APIs unless the request requires a dependency. Indent relative to column zero. " +
       "Define everything the code uses and include a runnable entry point for a standalone program. " +
       "For interactive programs, implement input handling, state updates, rendering, and a clean exit." },
-    { role: "user" as const, content: `Language: ${document.languageId}\nRequest: ${instruction}\n` +
-      `Before cursor:\n${before}\nAfter cursor:\n${after}${guidance}` },
+    { role: "user" as const, content: `Language: ${document.languageId}\nRequest: ${instruction}` +
+      (cpp && !contextual ? "" : `\nBefore cursor:\n${before}\nAfter cursor:\n${after}${guidance}`) },
   ];
   const promptBytes = messages.reduce((bytes, message) => bytes + Buffer.byteLength(message.content) + 24, 0);
-  const tokens = project ? Math.min(2304, Math.floor(model.contextLength * 0.625), model.contextLength - promptBytes - 64)
+  const tokens = cpp ? 768 : project ? Math.min(2304, Math.floor(model.contextLength * 0.625), model.contextLength - promptBytes - 64)
     : Math.min(3072, Math.floor(model.contextLength * 0.75),
       Math.max(Math.floor(model.contextLength / 2), model.contextLength - promptBytes));
   if (project && tokens < 384) throw new Error("The full request needs a larger model context.");
   return model.use(async host => {
     let problem: string | undefined;
-    for (let attempt = 0; attempt < (project ? 2 : 1); attempt++) {
+    for (let attempt = 0; attempt < (project || cpp ? 2 : 1); attempt++) {
       signal.throwIfAborted();
-      const prompt = project ? messages.map(message => message.role === "user" && problem
-        ? { ...message, content: message.content + `\n${problem} Generate a shorter complete program from scratch.` }
-        : message) : fitMessages(messages, model.contextLength, tokens);
+      const retry = cpp ? "Return complete C++ code for the original request."
+        : "Generate a shorter complete program from scratch.";
+      const retryMessages = problem ? messages.map(message => message.role === "user"
+        ? { ...message, content: message.content + `\n${problem} ${retry}` }
+        : message) : messages;
+      const prompt = project ? retryMessages : fitMessages(retryMessages, model.contextLength, tokens);
       let result = "";
       try {
         for await (const chunk of host.chat(prompt, signal, tokens)) {
           if (!result) onFirstToken();
           result += chunk;
+          const finished = cpp ? cppFinishedCode(result, cppKind) : undefined;
+          if (finished !== undefined) {
+            result = finished;
+            break;
+          }
         }
       } catch (error) {
-        if (!project || !(error instanceof IncompleteCodeError)) throw error;
+        if (!(project || cpp) || !(error instanceof IncompleteCodeError)) throw error;
         problem = "The previous answer was cut off.";
         continue;
       }
@@ -160,13 +187,13 @@ async function generateCode(
       const snippet = block ?? code;
       problem = !snippet.trim() || (!block && /^\x60{3}/m.test(code))
         ? "The previous answer did not contain a complete code block."
-        : project ? validateProject?.(snippet, !before && !after) : undefined;
+        : cpp ? cppGenerationProblem(snippet, code, cppKind) : project ? validateProject?.(snippet, !before && !after) : undefined;
       if (problem) continue;
       const indent = document.lineAt(position.line).text;
       const newline = document.eol === vscode.EndOfLine.CRLF ? "\r\n" : "\n";
       return snippet.split(/\r?\n/).map((line, index) => index && line ? indent + line : line).join(newline);
     }
-    if (project && problem) throw new Error(problem);
+    if ((project || cpp) && problem) throw new Error(problem);
     return "";
   });
 }
@@ -204,7 +231,12 @@ export class InlineCompletion implements vscode.InlineCompletionItemProvider, vs
       // blocks and explicit continuations still need their first line.
       if (!previous || previous.trimStart().startsWith("#") || !/[:([{\\]$/.test(previous)) return [];
     }
-    const project = afterComment ? pythonProjectComment(document, position) : undefined;
+    const cpp = document.languageId === "cpp";
+    const line = document.lineAt(position.line).text;
+    if (cpp && automaticRequest && !afterComment && !line.trim() &&
+        (!position.line || !cppShouldContinue(document.lineAt(position.line - 1).text))) return [];
+    const project = !afterComment ? undefined : !cpp ? pythonProjectComment(document, position)
+      : position.character === line.length ? cppProjectComment(document, position) : undefined;
     const instruction = project?.instruction ?? (afterComment && position.character === document.lineAt(position.line).text.length
       ? inlineInstruction(document, position) : undefined);
     const pythonComment = instruction !== undefined && document.languageId === "python";
@@ -257,7 +289,7 @@ export class InlineCompletion implements vscode.InlineCompletionItemProvider, vs
       const prompt = model.documentation ? buildDocumentation(source, offset)
         : buildFim(source, offset, model.contextLength, model.tokens, context, lineComment);
       const stop = [...Object.values(model.tokens), "<|endoftext|>"];
-      if (model.documentation) stop.push("<|im_end|>");
+      if (model.documentation || cpp) stop.push("<|im_end|>");
       if (model.short) stop.push("\n", "\r");
       const requested = performance.now();
       let firstToken: number | undefined;
@@ -283,7 +315,8 @@ export class InlineCompletion implements vscode.InlineCompletionItemProvider, vs
     document: vscode.TextDocument, position: vscode.Position, version: number, signal: AbortSignal,
     result: string, firstToken: number | undefined, requested: number,
   ): vscode.InlineCompletionItem[] {
-    if (signal.aborted || document.version !== version || !result.trim()) return [];
+    if (signal.aborted || document.version !== version || !result.trim() ||
+        (document.languageId === "cpp" && foreignCppSnippet(result))) return [];
     const item = new vscode.InlineCompletionItem(result, new vscode.Range(position, position));
     item.command = {
       title: "Record accepted Tessera suggestion", command: "tessera.acceptCompletion",

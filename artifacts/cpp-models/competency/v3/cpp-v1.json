@@ -1,0 +1,54 @@
+{
+  "benchmark_sha256": "9ecebfa93fc1fa2bdab2025a4d875446364a10ce1bf56b42503c32160efdb7c0",
+  "model_sha256": "0a1936b6da90dd402929d2cf6f2ca1e0fd32e58bd2f4a23061a03d6ba02801e0",
+  "model": "artifacts/cpp-models/chat/cpp-generation.Q4_K_M.gguf",
+  "size_bytes": 397807584,
+  "language": "cpp",
+  "passed": 0,
+  "total": 6,
+  "stopped": 5,
+  "cases": [
+    {
+      "id": "free_slots",
+      "passed": false,
+      "stopped": true,
+      "inference_ms": 7366,
+      "answer": "#include <algorithm>\n#include <functional>\n#include <string>\n#include <vector>\n\nstd::vector<std::pair<int,int>> free_slots(int limit, std::vector<std::pair<int,int>> busy) {\n    if (limit <= 0) return {};\n\n    std::sort(busy.begin(), busy.end(), [](const auto& a, const auto& b) {\n        return a.first < b.first;\n    });\n\n    std::vector<std::pair<int,int>> result;\n    int start = 0;\n    int end = 0;\n\n    while (start < busy.size()) {\n        if (end == busy[start].first) {\n            end++;\n        } else {\n            result.push_back({start, end});\n            start = end;\n        }\n    }\n\n    if (start < busy.size()) {\n        result.push_back({start, busy.size()});\n    }\n\n    return result;\n}\n"
+    },
+    {
+      "id": "shortest_span",
+      "passed": false,
+      "stopped": true,
+      "inference_ms": 5014,
+      "answer": "#include <algorithm>\n#include <functional>\n#include <string>\n#include <vector>\n\nint shortest_span(const std::vector<int>& values, long long threshold) {\n    int n = values.size();\n    std::vector<int> dp(n, 1);\n    std::vector<bool> visited(n, false);\n\n    for (int i = 1; i < n; ++i) {\n        for (int j = 0; j < i; ++j) {\n            if (values[i] > values[j]) {\n                int sum = values[i] + values[j];\n                if (sum >= threshold) {\n                    dp[i] = std::min(dp[i], dp[j] + 1);\n                }\n            }\n        }\n    }\n\n    return dp[n - 1];\n}\n"
+    },
+    {
+      "id": "build_layers",
+      "passed": false,
+      "stopped": true,
+      "inference_ms": 5835,
+      "answer": "#include <algorithm>\n#include <functional>\n#include <string>\n#include <vector>\n\nstd::vector<std::vector<int>> build_layers(int n, const std::vector<std::pair<int,int>>& prerequisites) {\n    std::vector<std::vector<int>> layers;\n    std::unordered_map<int, std::vector<int>> graph;\n    std::vector<bool> visited(n, false);\n\n    for (const auto& pair : prerequisites) {\n        int a = pair.first;\n        int b = pair.second;\n        graph[a].push_back(b);\n        graph[b].push_back(a);\n    }\n\n    for (int i = 0; i < n; ++i) {\n        if (!visited[i]) {\n            std::vector<int> layer;\n            std::function<void(int)> dfs = [&](int node) {\n                visited[node] = true;\n                layer.push_back(node);\n                for (const auto& neighbor : graph[node]) {\n                    if (!visited[neighbor]) {\n                        dfs(neighbor);\n                    }\n                }\n            };\n            dfs(i);\n            layers.push_back(layer);\n        }\n    }\n\n    return layers;\n}\n"
+    },
+    {
+      "id": "top_words",
+      "passed": false,
+      "stopped": true,
+      "inference_ms": 2945,
+      "answer": "#include <algorithm>\n#include <functional>\n#include <string>\n#include <vector>\n\nstd::vector<std::string> top_words(const std::vector<std::string>& words, int k) {\n    std::sort(words.begin(), words.end());\n    std::vector<std::string> result;\n    const int n = words.size();\n    \n    for (int i = 0; i < k && i < n; ++i) {\n        result.push_back(words[i]);\n    }\n    \n    return result;\n}\n"
+    },
+    {
+      "id": "stock_cli",
+      "passed": false,
+      "stopped": true,
+      "inference_ms": 13694,
+      "answer": "#include <algorithm>\n#include <functional>\n#include <string>\n#include <vector>\n\nint main() {\n    std::string command;\n    while (std::getline(std::cin, command)) {\n        if (command == \"PUT\") {\n            std::string name;\n            int quantity;\n            std::cin >> name >> quantity;\n            std::vector<int> stock;\n            for (int i = 0; i < quantity; ++i) {\n                stock.push_back(name);\n            }\n            std::sort(stock.begin(), stock.end());\n            std::cout << stock.size() << std::endl;\n        } else if (command == \"TAKE\") {\n            std::string name;\n            int quantity;\n            std::cin >> name >> quantity;\n            auto it = std::find(stock.begin(), stock.end(), name);\n            if (it != stock.end()) {\n                stock.erase(it);\n                std::cout << stock.size() << std::endl;\n            } else {\n                std::cout << \"Not enough in stock.\" << std::endl;\n            }\n        } else if (command == \"QUERY\") {\n            std::string name;\n            std::cin >> name;\n            int quantity;\n            auto it = std::find(stock.begin(), stock.end(), name);\n            if (it != stock.end()) {\n                quantity = stock.size();\n                std::cout << quantity << std::endl;\n            } else {\n                std::cout << \"Not in stock.\" << std::endl;\n            }\n        } else {\n            std::cout << \"Unknown command.\" << std::endl;\n        }\n    }\n    return 0;\n}\n"
+    },
+    {
+      "id": "finite_sum",
+      "passed": false,
+      "stopped": false,
+      "inference_ms": 26302,
+      "answer": "#include <cmath>\n#include <vector>\n#include <functional>\n#include <numeric>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n#include <functional>\n#include <string>\n#include <algorithm>\n"
+    }
+  ]
+}

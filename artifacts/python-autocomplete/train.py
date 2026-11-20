@@ -86,18 +86,25 @@ def main():
     parser.add_argument("output", type=Path)
     parser.add_argument("--revision", required=True)
     args = parser.parse_args()
+    fit(args.base, args.output, args.revision, examples())
+
+
+def fit(base, output, revision, samples, *, base_id="Qwen/Qwen2.5-Coder-0.5B",
+        end_token=None, audit=None, cpu_float32=False, layers=8, epochs=2, batch_size=4, learning_rate=1e-4):
+    """Train the final Qwen layers on completion-only supervision."""
     torch.manual_seed(42)
     rng = random.Random(42)
     device = "mps" if torch.backends.mps.is_available() else "cpu"
     torch.set_num_threads(4)
-    tokenizer = AutoTokenizer.from_pretrained(args.base, local_files_only=True)
+    tokenizer = AutoTokenizer.from_pretrained(base, local_files_only=True)
     model = AutoModelForCausalLM.from_pretrained(
-        args.base, local_files_only=True, dtype=torch.bfloat16,
+        base, local_files_only=True,
+        dtype=torch.float32 if device == "cpu" and cpu_float32 else torch.bfloat16,
     ).requires_grad_(False).to(device)
     model.train()
     model.config.use_cache = False
     adapters = []
-    for block in model.model.layers[-8:]:
+    for block in model.model.layers[-layers:]:
         for parent, names in ((block.self_attn, ("q_proj", "v_proj", "o_proj")),
                               (block.mlp, ("down_proj",))):
             for name in names:
@@ -106,25 +113,29 @@ def main():
                 adapters.append((parent, name, adapter))
 
     optimizer = torch.optim.AdamW(
-        (parameter for parameter in model.parameters() if parameter.requires_grad), lr=1e-4,
+        (parameter for parameter in model.parameters() if parameter.requires_grad), lr=learning_rate,
     )
     batches = []
-    for prompt, completion in examples():
+    eos = tokenizer.eos_token_id if end_token is None else tokenizer.convert_tokens_to_ids(end_token)
+    for prompt, completion in samples:
         prefix = tokenizer.encode(prompt, add_special_tokens=False)
-        target = tokenizer.encode(completion, add_special_tokens=False) + [tokenizer.eos_token_id]
+        target = tokenizer.encode(completion, add_special_tokens=False) + [eos]
         batches.append((prefix, target))
 
+    if not batches:
+        raise ValueError("No training examples")
+    print(f"Training {len(batches)} examples on {device}", flush=True)
     average_losses = []
-    for epoch in range(2):
+    for epoch in range(epochs):
         rng.shuffle(batches)
         losses = []
-        for start in range(0, len(batches), 4):
-            batch = batches[start:start + 4]
+        for start in range(0, len(batches), batch_size):
+            batch = batches[start:start + batch_size]
             width = max(len(prefix) + len(target) for prefix, target in batch)
             inputs, labels = [], []
             for prefix, target in batch:
                 padding = width - len(prefix) - len(target)
-                inputs.append(prefix + target + [tokenizer.eos_token_id] * padding)
+                inputs.append(prefix + target + [eos] * padding)
                 labels.append([-100] * len(prefix) + target + [-100] * padding)
             optimizer.zero_grad(set_to_none=True)
             expected = torch.tensor(labels, device=device)[:, 1:]
@@ -148,14 +159,15 @@ def main():
         for parent, name, adapter in adapters:
             setattr(parent, name, adapter.merge())
     model.config.use_cache = True
-    model.save_pretrained(args.output / "checkpoint")
-    tokenizer.save_pretrained(args.output / "checkpoint")
-    with (args.base / "model.safetensors").open("rb") as weights:
+    model.save_pretrained(output / "checkpoint")
+    tokenizer.save_pretrained(output / "checkpoint")
+    with (base / "model.safetensors").open("rb") as weights:
         digest = hashlib.file_digest(weights, "sha256").hexdigest()
-    (args.output / "training.json").write_text(json.dumps({
-        "base": "Qwen/Qwen2.5-Coder-0.5B", "revision": args.revision,
+    (output / "training.json").write_text(json.dumps({
+        "base": base_id, "revision": revision,
         "base_sha256": digest, "data_license": "CC0-1.0", "seed": 42,
         "device": device, "examples": len(batches), "epoch_losses": average_losses,
+        **({"corpus_audit": audit} if audit is not None else {}),
     }, indent=2) + "\n")
 
 
