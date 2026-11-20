@@ -10,7 +10,7 @@ import { LlamaServer } from "./host/llamaServer";
 import { modelMemoryBytes } from "./host/memory";
 import { registerChat, registerPrompt } from "./providers/chat";
 import { registerCodeActions } from "./providers/codeActions";
-import { InlineCompletion } from "./providers/inlineCompletion";
+import { InlineCompletion, type InlineRoute } from "./providers/inlineCompletion";
 import { fetchIndex, ModelStore, type InstalledModel } from "./registry/download";
 import { embeddedLanguage, projectLanguage } from "./router/detector";
 import { Lifecycle } from "./router/lifecycle";
@@ -18,15 +18,17 @@ import { selectModel } from "./router/policy";
 import { PythonRegions } from "./router/pythonRegions";
 import { LocalMetrics } from "./telemetry";
 import { Dashboard, dashboardId } from "./views/dashboard";
+import { inlineRouteName } from "./views/dashboardHtml";
 
 export function activate(context: vscode.ExtensionContext): InlineCompletion {
   const metrics = new LocalMetrics();
-  const log = vscode.window.createOutputChannel("TinyCoders");
+  const log = vscode.window.createOutputChannel("Tessera");
   const status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 25);
-  const config = () => vscode.workspace.getConfiguration("tinycoders");
+  const config = () => vscode.workspace.getConfiguration("tessera");
   const repository = new WorkspaceContext();
   const python = new PythonRegions();
   const pins = new Map<string, string>();
+  const inlineRoutes = new Map<string, InlineRoute>();
   const store = new ModelStore(join(context.globalStorageUri.fsPath, "models"));
   let localModels: InstalledModel[] = [];
   let installedModels: InstalledModel[] = [];
@@ -64,7 +66,7 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
       try {
         const file = statSync(path);
         if (!file.isFile() || file.size === 0 || file.size >= 1_000_000_000) throw new Error("Invalid GGUF file size");
-        const contextLength = inlineOnly ? 768 : 2048;
+        const contextLength = inlineOnly ? 768 : id === "python-local" ? 4096 : 2048;
         localModels.push({
           path, memoryBytes: modelMemoryBytes(file.size, contextLength),
           manifest: {
@@ -111,6 +113,7 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
   const endpoint = (model: InstalledModel) => {
     const active = lifecycle;
     return {
+      installed: model,
       contextLength: model.manifest.context_length,
       tokens: model.manifest.prompt_formats.fim,
       short: model.manifest.capabilities.length === 1 && model.manifest.id.endsWith("-autocomplete-local"),
@@ -126,20 +129,27 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
     };
   };
   const completionSettings = (document: vscode.TextDocument) => {
-    const settings = vscode.workspace.getConfiguration("tinycoders", document);
+    const settings = vscode.workspace.getConfiguration("tessera", document);
     return {
       automatic: settings.get("autocomplete", true),
       comments: settings.get("commentCompletions", true),
     };
   };
-  const provider = new InlineCompletion((document, position) => {
-    const model = candidate(document, position);
+  const provider = new InlineCompletion((document, position, role) => {
+    const localId = role === "comment-parser" ? "parsing-autocomplete-local"
+      : role === "python-comment" ? "python-local" : undefined;
+    const model = localModels.find(entry => entry.manifest.id === localId) ?? (role !== "comment-parser"
+      ? candidate(document, position, role ? "chat" : "fim") : undefined);
     return model && endpoint(model);
   }, log, metrics, completionSettings, (document, position) => config().get("repositoryContext", true)
-    ? repository.retrieve(document, position) : Promise.resolve([]), (document, position) => {
-    const model = candidate(document, position, "chat");
-    return model && endpoint(model);
-  });
+    ? repository.retrieve(document, position) : Promise.resolve([]), (document, route) => {
+    const key = document.uri.toString();
+    const previous = inlineRoutes.get(key);
+    if (previous?.mode === route.mode && previous.model === route.model && previous.parser === route.parser) return;
+    inlineRoutes.set(key, route);
+    log.appendLine(`${route.mode} → ${route.model?.path ?? inlineRouteName(route)}`);
+    if (vscode.window.activeTextEditor?.document === document) updateStatus();
+  }, (code, newFile) => python.projectProblem(code, newFile));
 
   const chatModel = (editor: vscode.TextEditor, capability: "chat" | "edit") => {
     const model = candidate(editor.document, editor.selection.active, capability);
@@ -159,7 +169,7 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
 
   const showError = (error: unknown) => {
     log.appendLine(String(error));
-    void vscode.window.showErrorMessage(`TinyCoders: ${String(error)}`);
+    void vscode.window.showErrorMessage(`Tessera: ${String(error)}`);
   };
   const dashboard = new Dashboard(() => {
     const editor = vscode.window.activeTextEditor;
@@ -167,15 +177,20 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
       trusted: vscode.workspace.isTrusted,
       language: editor?.document.languageId,
       active: editor && candidate(editor.document, editor.selection.active),
+      lastInline: editor && inlineRoutes.get(editor.document.uri.toString()),
       models: models(),
     };
   }, showError);
 
   const updateStatus = () => {
     const editor = vscode.window.activeTextEditor;
-    const model = editor && candidate(editor.document, editor.selection.active);
-    status.text = model ? `$(chip) ${model.manifest.id}` : "$(chip) TinyCoders";
-    status.tooltip = "Open the TinyCoders sidebar";
+    const lastInline = editor && vscode.workspace.isTrusted && inlineRoutes.get(editor.document.uri.toString());
+    const model = lastInline ? lastInline.model : editor && candidate(editor.document, editor.selection.active);
+    status.text = `$(chip) ${lastInline ? inlineRouteName(lastInline) : model?.manifest.id ?? "Tessera"}`;
+    status.tooltip = lastInline
+      ? [`Last inline request · ${lastInline.mode}`, model?.manifest.id, model?.path,
+        lastInline.parser && `Parsed by ${lastInline.parser.path}`].filter(Boolean).join("\n")
+      : "Open the Tessera sidebar";
     dashboard.refresh();
   };
   const prewarm = () => {
@@ -234,7 +249,7 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
   };
 
   refresh();
-  status.command = "tinycoders.openDashboard";
+  status.command = "tessera.openDashboard";
   status.show();
   updateStatus();
   context.subscriptions.push(
@@ -244,12 +259,12 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
       updateStatus();
       void scan().catch(showError);
     }),
-    vscode.commands.registerCommand("tinycoders.openDashboard",
+    vscode.commands.registerCommand("tessera.openDashboard",
       () => vscode.commands.executeCommand(`${dashboardId}.focus`)),
-    vscode.commands.registerCommand("tinycoders.showOutput", () => log.show()),
-    vscode.commands.registerCommand("tinycoders.openChat", () =>
-      vscode.commands.executeCommand("workbench.action.chat.open", { query: "@tinycoders ", isPartialQuery: true })),
-    vscode.commands.registerCommand("tinycoders.addLocalModel", async () => {
+    vscode.commands.registerCommand("tessera.showOutput", () => log.show()),
+    vscode.commands.registerCommand("tessera.openChat", () =>
+      vscode.commands.executeCommand("workbench.action.chat.open", { query: "@tessera ", isPartialQuery: true })),
+    vscode.commands.registerCommand("tessera.addLocalModel", async () => {
       if (!vscode.workspace.isTrusted) return;
       const language = await vscode.window.showQuickPick([
         { label: "Python (fast autocomplete)", setting: "pythonAutocompleteModelPath" },
@@ -276,12 +291,13 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
     }),
     registerChat(selectChat, log), registerPrompt(selectChat, showError),
     { dispose: () => { void lifecycle.dispose(); } },
-    vscode.commands.registerCommand("tinycoders.triggerCompletion", () =>
+    vscode.commands.registerCommand("tessera.triggerCompletion", () =>
       vscode.commands.executeCommand("editor.action.inlineSuggest.trigger")),
     vscode.languages.registerInlineCompletionItemProvider({ pattern: "**" }, provider),
     vscode.workspace.onDidChangeTextDocument(event => provider.cancel(event.document)),
     vscode.workspace.onDidCloseTextDocument(document => {
       provider.cancel(document);
+      inlineRoutes.delete(document.uri.toString());
       python.close(document.uri.toString());
     }),
     vscode.window.onDidChangeActiveTextEditor(() => {
@@ -293,13 +309,13 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
     vscode.workspace.onDidChangeConfiguration(event => {
       if (["memoryMiB", "maxModels", "idleMinutes", "serverPath", "gpuLayers", "cpuThreads", "pythonModelPath",
         "pythonAutocompleteModelPath", "parsingAutocompleteModelPath",
-        "documentationAutocompleteModelPath", "typescriptModelPath"].some(setting => event.affectsConfiguration(`tinycoders.${setting}`))) {
+        "documentationAutocompleteModelPath", "typescriptModelPath"].some(setting => event.affectsConfiguration(`tessera.${setting}`))) {
         refresh();
         prewarm();
       }
-      if (event.affectsConfiguration("tinycoders")) updateStatus();
+      if (event.affectsConfiguration("tessera")) updateStatus();
     }),
-    vscode.commands.registerCommand("tinycoders.resourceLimits", async () => {
+    vscode.commands.registerCommand("tessera.resourceLimits", async () => {
       const settings = config();
       const memory = settings.get("memoryMiB", 0);
       const threads = settings.get("cpuThreads", 0);
@@ -313,15 +329,15 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
           detail: "Layers to offload per model server", setting: "gpuLayers" },
         { label: "Resident models", description: String(settings.get("maxModels", 2)),
           detail: "Maximum number of loaded models", setting: "maxModels" },
-      ], { placeHolder: "Choose a TinyCoders resource limit to edit" });
+      ], { placeHolder: "Choose a Tessera resource limit to edit" });
       if (selection) {
-        await vscode.commands.executeCommand("workbench.action.openSettings", `@id:tinycoders.${selection.setting}`);
+        await vscode.commands.executeCommand("workbench.action.openSettings", `@id:tessera.${selection.setting}`);
       }
     }),
-    vscode.commands.registerCommand("tinycoders.acceptCompletion", (id: string) => metrics.accept(id)),
-    vscode.commands.registerCommand("tinycoders.exportMetrics", async () => {
+    vscode.commands.registerCommand("tessera.acceptCompletion", (id: string) => metrics.accept(id)),
+    vscode.commands.registerCommand("tessera.exportMetrics", async () => {
       const uri = await vscode.window.showSaveDialog({
-        filters: { JSON: ["json"] }, saveLabel: "Export TinyCoders Metrics",
+        filters: { JSON: ["json"] }, saveLabel: "Export Tessera Metrics",
       });
       if (uri?.scheme !== "file") return;
       try {
@@ -330,13 +346,13 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
         showError(error);
       }
     }),
-    vscode.commands.registerCommand("tinycoders.installModel", async () => {
+    vscode.commands.registerCommand("tessera.installModel", async () => {
       if (!vscode.workspace.isTrusted) return;
       const settings = config();
       const url = settings.get("registryUrl", "");
       const key = settings.get("registryPublicKey", "");
       if (!url || !key) {
-        await vscode.commands.executeCommand("workbench.action.openSettings", "tinycoders.registry");
+        await vscode.commands.executeCommand("workbench.action.openSettings", "tessera.registry");
         return;
       }
       try {
@@ -365,7 +381,7 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
         showError(error);
       }
     }),
-    vscode.commands.registerCommand("tinycoders.switchVersion", async () => {
+    vscode.commands.registerCommand("tessera.switchVersion", async () => {
       if (!vscode.workspace.isTrusted) return;
       try {
         const id = await vscode.window.showQuickPick(installedModels.map(model => model.manifest.id));
@@ -379,7 +395,7 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
         showError(error);
       }
     }),
-    vscode.commands.registerCommand("tinycoders.pickModel", async () => {
+    vscode.commands.registerCommand("tessera.pickModel", async () => {
       const editor = vscode.window.activeTextEditor;
       if (!editor) return;
       const options = [
@@ -390,7 +406,7 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
       const choice = await vscode.window.showQuickPick(options, { placeHolder: "Select a model" });
       if (!choice) return;
       if (choice.id === "@install") {
-        await vscode.commands.executeCommand("tinycoders.installModel");
+        await vscode.commands.executeCommand("tessera.installModel");
         return;
       }
       const folder = vscode.workspace.getWorkspaceFolder(editor.document.uri);

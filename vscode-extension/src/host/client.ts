@@ -8,7 +8,12 @@ export interface InferenceHost {
   chat(messages: Message[], signal: AbortSignal, codeTokens?: number): AsyncIterable<string>;
 }
 
-type ResponseChunk = { choices: Array<{ text?: string; delta?: { content?: string }; finish_reason?: string }> };
+export class IncompleteCodeError extends Error {}
+
+type ResponseChunk = {
+  choices?: Array<{ text?: string; delta?: { content?: string }; finish_reason?: string }>;
+  error?: { message?: string };
+};
 
 async function* events(response: Response): AsyncIterable<ResponseChunk> {
   if (!response.body) throw new Error("llama-server returned an empty response");
@@ -26,7 +31,9 @@ async function* events(response: Response): AsyncIterable<ResponseChunk> {
         if (!line.startsWith("data:")) continue;
         const data = line.slice(5).trim();
         if (data === "[DONE]") return;
-        yield JSON.parse(data) as ResponseChunk;
+        const event = JSON.parse(data) as ResponseChunk;
+        if (event.error) throw new Error(event.error.message ?? "llama-server returned an inference error");
+        yield event;
       }
       if (done) return;
     }
@@ -59,13 +66,13 @@ export class LlamaClient implements InferenceHost {
       prompt, stop, max_tokens: maxTokens, temperature: 0, stream: true,
     }, signal);
     if (response.headers.get("Content-Type")?.includes("application/json")) {
-      const text = ((await response.json()) as ResponseChunk).choices[0]?.text ?? "";
+      const text = ((await response.json()) as ResponseChunk).choices?.[0]?.text ?? "";
       if (text) onFirstToken?.();
       return text;
     }
     let text = "";
     for await (const event of events(response)) {
-      const chunk = event.choices[0]?.text;
+      const chunk = event.choices?.[0]?.text;
       if (chunk && !text) onFirstToken?.();
       text += chunk ?? "";
     }
@@ -79,13 +86,13 @@ export class LlamaClient implements InferenceHost {
     }, signal);
     let finished = false;
     for await (const event of events(response)) {
-      const choice = event.choices[0];
+      const choice = event.choices?.[0];
       const content = choice?.delta?.content;
       if (content) yield content;
       if (choice?.finish_reason === "stop") finished = true;
     }
     if (codeTokens !== undefined && !finished) {
-      throw new Error("The local model did not finish generating the inline code.");
+      throw new IncompleteCodeError("The local model did not finish generating the inline code.");
     }
   }
 }

@@ -40,10 +40,10 @@ class EvaluationTests(unittest.TestCase):
         self.assertEqual(example["suffix"], "\n")
         self.assertEqual(len(example["source_sha256"]), 64)
 
-    @unittest.skipUnless(os.environ.get("TINYCODERS_DOCKER"), "Docker integration is opt-in")
+    @unittest.skipUnless(os.environ.get("TESSERA_DOCKER"), "Docker integration is opt-in")
     def test_python_isolated_verifier(self) -> None:
-        docker = os.environ["TINYCODERS_DOCKER"]
+        docker = os.environ["TESSERA_DOCKER"]
         self.assertTrue(verify("def f(): return 42", "assert f() == 42", docker=docker).passed)
         self.assertFalse(verify("def f(): return 0", "assert f() == 42", docker=docker).passed)
-        self.assertFalse(verify("open('/etc/tinycoders', 'w')", "assert True", docker=docker).passed)
+        self.assertFalse(verify("open('/etc/tessera', 'w')", "assert True", docker=docker).passed)
         self.assertTrue(verify("while True: pass", "assert True", timeout=3, docker=docker).timed_out)

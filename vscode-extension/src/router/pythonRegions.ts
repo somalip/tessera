@@ -74,6 +74,29 @@ export class PythonRegions {
     return entry.regions.find(region => region.first <= offset && offset <= region.last)?.language;
   }
 
+  projectProblem(source: string, newFile: boolean): string | undefined {
+    const tree = this.parser?.parse(source);
+    if (!tree) return;
+    try {
+      const root = tree.rootNode;
+      if (root.hasError) return "The previous answer contained invalid Python syntax.";
+      if (!newFile) return;
+      const statements = root.namedChildren.filter(node => node !== null);
+      const entryPoint = statements.find(node => node.type === "function_definition" &&
+        node.childForFieldName("name")?.text === "main");
+      const body = entryPoint?.childForFieldName("body");
+      if (body && body.namedChildren.every(node => !node || node.type === "comment" ||
+        node.type === "pass_statement" || (node.type === "expression_statement" &&
+        ["string", "ellipsis"].includes(node.firstNamedChild?.type ?? "")))) {
+        return "The previous answer left main unimplemented.";
+      }
+      if (statements.every(node => ["comment", "import_statement", "import_from_statement", "pass_statement"]
+        .includes(node.type))) return "The previous answer did not implement the program.";
+    } finally {
+      tree.delete();
+    }
+  }
+
   close(key: string): void {
     this.cache.delete(key);
   }

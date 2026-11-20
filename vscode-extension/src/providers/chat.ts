@@ -28,23 +28,23 @@ function editorContext(): Message {
   const selected = editor?.document.getText(editor.selection).slice(0, 400) ?? "";
   return {
     role: "system",
-    content: "You are the TinyCoders coding assistant. Give concise answers. " +
+    content: "You are the Tessera coding assistant. Give concise answers. " +
       (selected ? `Current ${editor?.document.languageId} selection:\n${selected}` : ""),
   };
 }
 
 export function registerPrompt(select: () => ChatModel | undefined, showError: (error: unknown) => void) {
-  return vscode.commands.registerCommand("tinycoders.ask", async () => {
+  return vscode.commands.registerCommand("tessera.ask", async () => {
     const model = select();
     if (!model) {
-      await vscode.window.showInformationMessage("Open a supported file or install a TinyCoders chat model.");
+      await vscode.window.showInformationMessage("Open a supported file or install a Tessera chat model.");
       return;
     }
     const system = editorContext();
-    const prompt = (await vscode.window.showInputBox({ title: "Ask TinyCoders", prompt: "Enter a local coding prompt" }))?.trim();
+    const prompt = (await vscode.window.showInputBox({ title: "Ask Tessera", prompt: "Enter a local coding prompt" }))?.trim();
     if (!prompt) return;
     await vscode.window.withProgress({
-      location: vscode.ProgressLocation.Notification, title: "TinyCoders is responding", cancellable: true,
+      location: vscode.ProgressLocation.Notification, title: "Tessera is responding", cancellable: true,
     }, async (_progress, token) => {
       const cancellation = bindCancellation(token);
       try {
@@ -65,10 +65,10 @@ export function registerPrompt(select: () => ChatModel | undefined, showError: (
 }
 
 export function registerChat(select: () => ChatModel | undefined, log: vscode.OutputChannel) {
-  return vscode.chat.createChatParticipant("tinycoders.local", async (request, context, stream, token) => {
+  return vscode.chat.createChatParticipant("tessera.local", async (request, context, stream, token) => {
     const model = select();
     if (!model) {
-      stream.markdown("Select or install a TinyCoders chat model from the status bar.");
+      stream.markdown("Select or install a Tessera chat model from the status bar.");
       return;
     }
     const cancellation = bindCancellation(token);
@@ -88,7 +88,7 @@ export function registerChat(select: () => ChatModel | undefined, log: vscode.Ou
     } catch (error) {
       if (!cancellation.signal.aborted) {
         log.appendLine(String(error));
-        stream.markdown("TinyCoders could not complete the local inference request.");
+        stream.markdown("Tessera could not complete the local inference request.");
       }
     } finally {
       cancellation.dispose();

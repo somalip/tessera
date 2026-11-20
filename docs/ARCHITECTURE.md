@@ -1,4 +1,4 @@
-# TinyCoders architecture
+# Tessera architecture
 
 The offline build plane produces size-bounded GGUF packages. The local VS Code
 runtime consumes the versioned model manifest and registry schemas, and sends

@@ -1,7 +1,7 @@
 # AGENTS.md
 
 ## Project
-TinyCoders: per-language coding LLMs (each shipped package < 1 GB) plus a VS Code router extension.
+Tessera: per-language coding LLMs (each shipped package < 1 GB) plus a VS Code router extension.
 Read docs/ARCHITECTURE.md before starting any task.
 
 ## Rules

@@ -32,10 +32,10 @@ class VerifierMatrix(unittest.TestCase):
                 self.assertFalse(parser_for(language).parse(POSITIVES[language].encode()).root_node.has_error)
                 self.assertEqual(load(Path(f"train/configs/{language}.yaml"))["language"], language)
 
-    @unittest.skipUnless(os.environ.get("TINYCODERS_DOCKER_MATRIX"), "Docker matrix is opt-in")
+    @unittest.skipUnless(os.environ.get("TESSERA_DOCKER_MATRIX"), "Docker matrix is opt-in")
     def test_sandboxes_enforce_compilation_and_timeouts(self) -> None:
-        docker = os.environ["TINYCODERS_DOCKER_MATRIX"]
-        target = os.environ.get("TINYCODERS_VERIFIER_LANG")
+        docker = os.environ["TESSERA_DOCKER_MATRIX"]
+        target = os.environ.get("TESSERA_VERIFIER_LANG")
         for language in COMPILERS:
             if target and target != language:
                 continue

@@ -60,9 +60,9 @@ def main() -> None:
             fetch(starter["url"], unpacked / "python-starter.gguf",
                   starter["sha256"], starter["size_bytes"])
         unpacked.rename(output)
-    print(f"tinycoders.serverPath = {output / relative_server}")
+    print(f"tessera.serverPath = {output / relative_server}")
     if args.starter:
-        print(f"tinycoders.pythonModelPath = {output / 'python-starter.gguf'}")
+        print(f"tessera.pythonModelPath = {output / 'python-starter.gguf'}")
 
 
 if __name__ == "__main__":

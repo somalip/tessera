@@ -44,6 +44,6 @@ jobs:
       - run: python -m pip install -r requirements-dev.txt
       - run: python -m verifiers.prepare "$LANGUAGE"
       - if: matrix.language == 'python'
-        run: TINYCODERS_DOCKER=docker python -m unittest discover -s tests -p test_evaluation.py
+        run: TESSERA_DOCKER=docker python -m unittest discover -s tests -p test_evaluation.py
       - if: matrix.language != 'python'
-        run: TINYCODERS_DOCKER_MATRIX=docker TINYCODERS_VERIFIER_LANG="$LANGUAGE" python -m unittest discover -s tests -p test_verifier_matrix.py
+        run: TESSERA_DOCKER_MATRIX=docker TESSERA_VERIFIER_LANG="$LANGUAGE" python -m unittest discover -s tests -p test_verifier_matrix.py

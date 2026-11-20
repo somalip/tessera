@@ -1,4 +1,6 @@
+import { basename } from "node:path";
 import type { ResourceSample } from "../host/resources";
+import type { InlineRoute } from "../providers/inlineCompletion";
 import type { DashboardState } from "./dashboard";
 
 interface Action {
@@ -25,11 +27,18 @@ function buttons(actions: readonly Action[], primary?: string): string {
   ).join("")}</div>`;
 }
 
-export function renderDashboard({ trusted, language, active, models }: DashboardState, groups: Groups): string {
-  const routing = !trusted ? "Workspace trust required" : active?.manifest.id ??
+export function inlineRouteName(route: InlineRoute): string {
+  if (route.model) return basename(route.model.path);
+  return "No matching model";
+}
+
+export function renderDashboard({ trusted, language, active, lastInline, models }: DashboardState, groups: Groups): string {
+  const routed = lastInline ? lastInline.model : active;
+  const routing = !trusted ? "Workspace trust required" : lastInline ? inlineRouteName(lastInline) : active?.manifest.id ??
     (language ? "No matching model" : "Open a source file");
   const routingDetail = !trusted ? "Trust this workspace to use local models and code actions."
-    : active ? "Selected for inline completion."
+    : lastInline ? `Last inline request · ${lastInline.mode}`
+    : active ? "Default autocomplete route."
     : language ? "Choose a routing model or add one below."
     : "Routing follows the language at your cursor.";
   const modelRows = models.map(model => {
@@ -39,7 +48,7 @@ export function renderDashboard({ trusted, language, active, models }: Dashboard
       manifest.quant === "local" ? "Local GGUF" : manifest.version,
       `${Math.ceil(manifest.size_bytes / 1_000_000)} MB`,
     ].filter(Boolean).join(" · ");
-    const selected = trusted && active?.manifest.id === manifest.id && active.manifest.version === manifest.version;
+    const selected = trusted && routed?.manifest.id === manifest.id && routed.manifest.version === manifest.version;
     return `<li title="${escapeHtml(manifest.capabilities.join(", "))}">
       <div class="model-heading"><strong>${escapeHtml(manifest.id)}</strong>${selected ? '<span class="model-status">Routed</span>' : ""}</div>
       <div class="muted">${escapeHtml(details)}</div>
@@ -53,7 +62,9 @@ export function renderDashboard({ trusted, language, active, models }: Dashboard
         <strong>${escapeHtml(routing)}</strong>
         ${trusted && language ? `<span class="language">${escapeHtml(language)}</span>` : ""}
       </div>
-      <p class="muted">${routingDetail}</p>
+      <p class="muted">${escapeHtml(routingDetail)}</p>
+      ${trusted && lastInline?.model ? `<p class="muted" title="${escapeHtml(lastInline.model.path)}">${escapeHtml(lastInline.model.manifest.id)}</p>` : ""}
+      ${trusted && lastInline?.parser ? `<p class="muted" title="${escapeHtml(lastInline.parser.path)}">Parsed by ${escapeHtml(basename(lastInline.parser.path))}</p>` : ""}
       ${buttons(groups.routing)}
     </div>
   </section>
@@ -96,7 +107,7 @@ export function dashboardHtml(markup: string, nonce: string): string {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}'; script-src 'nonce-${nonce}';">
-  <title>TinyCoders Dashboard</title>
+  <title>Tessera Dashboard</title>
   <style nonce="${nonce}">
     * { box-sizing: border-box; }
     body {
@@ -196,7 +207,7 @@ export function dashboardHtml(markup: string, nonce: string): string {
   </style>
 </head>
 <body>
-  <main aria-label="TinyCoders dashboard">
+  <main aria-label="Tessera dashboard">
     <div id="dashboard-content">${markup}</div>
     <section aria-labelledby="resources-heading">
       <h2 id="resources-heading">System resources</h2>

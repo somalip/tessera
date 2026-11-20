@@ -45,7 +45,7 @@ sys.stdout.buffer.write(buffer.getvalue())
 }
 
 test("installer fails closed on tampering, installs upgrades, and switches offline", async t => {
-  const root = await mkdtemp(path.join(os.tmpdir(), "tinycoders-store-"));
+  const root = await mkdtemp(path.join(os.tmpdir(), "tessera-store-"));
   t.after(() => rm(root, { force: true, recursive: true }));
   const store = new ModelStore(root);
   let payload;

@@ -16,7 +16,7 @@ jobs:
       matrix:
         language: [python, typescript, rust, go, java, c, cpp]
     env:
-      TINYCODERS_CONFIGS: ${{ inputs.config_directory }}
+      TESSERA_CONFIGS: ${{ inputs.config_directory }}
       LANGUAGE: ${{ matrix.language }}
     steps:
       - uses: actions/checkout@v4
@@ -25,7 +25,7 @@ jobs:
           python-version: "3.12"
       - run: python -m pip install -r train/requirements.txt
       - run: python -m verifiers.prepare "$LANGUAGE"
-      - run: python -m ci.build_candidate "$TINYCODERS_CONFIGS/$LANGUAGE.yaml" "$LANGUAGE"
+      - run: python -m ci.build_candidate "$TESSERA_CONFIGS/$LANGUAGE.yaml" "$LANGUAGE"
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.language }}-candidate

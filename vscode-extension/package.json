@@ -1,8 +1,8 @@
 {
-  "name": "tinycoders",
-  "displayName": "TinyCoders",
-  "version": "0.1.5",
-  "publisher": "tinycoders",
+  "name": "tessera",
+  "displayName": "Tessera",
+  "version": "0.1.8",
+  "publisher": "tessera",
   "private": true,
   "engines": {
     "vscode": "^1.96.0"
@@ -11,7 +11,7 @@
     "check": "eslint src && tsc --noEmit",
     "build": "tsc",
     "vscode:prepublish": "npm run build",
-    "package": "vsce package --skip-license --out ../artifacts/tinycoders.vsix"
+    "package": "vsce package --skip-license --out ../artifacts/tessera.vsix"
   },
   "devDependencies": {
     "@types/node": "22.15.30",
@@ -38,106 +38,106 @@
   ],
   "contributes": {
     "configuration": {
-      "title": "TinyCoders",
+      "title": "Tessera",
       "properties": {
-        "tinycoders.serverPath": {
+        "tessera.serverPath": {
           "type": "string",
           "scope": "machine",
           "default": "llama-server",
           "description": "Path to the local llama.cpp server executable."
         },
-        "tinycoders.pythonAutocompleteModelPath": {
+        "tessera.pythonAutocompleteModelPath": {
           "type": "string",
           "scope": "machine",
           "default": "",
           "description": "Path to the small Python autocomplete GGUF. Preferred for inline suggestions."
         },
-        "tinycoders.parsingAutocompleteModelPath": {
+        "tessera.parsingAutocompleteModelPath": {
           "type": "string",
           "scope": "machine",
           "default": "",
-          "description": "Path to the local Qwen2.5-Coder GGUF for structured data, regex, and SQL autocomplete."
+          "description": "Path to the local Qwen2.5-Coder GGUF for structured-data autocomplete and condensing Python comment requests."
         },
-        "tinycoders.documentationAutocompleteModelPath": {
+        "tessera.documentationAutocompleteModelPath": {
           "type": "string",
           "scope": "machine",
           "default": "",
           "description": "Path to the local Qwen3.5 documentation GGUF for prose and Python docstring autocomplete."
         },
-        "tinycoders.pythonModelPath": {
+        "tessera.pythonModelPath": {
           "type": "string",
           "scope": "machine",
           "default": "",
-          "description": "Path to a local Qwen2.5-Coder GGUF for Python FIM."
+          "description": "Path to the local Python GGUF for comment-to-code generation and Python chat."
         },
-        "tinycoders.cpuThreads": {
+        "tessera.cpuThreads": {
           "type": "integer",
           "minimum": 0,
           "scope": "machine",
           "default": 0,
           "description": "Maximum inference and prompt-processing threads per model server. Zero uses llama.cpp defaults."
         },
-        "tinycoders.gpuLayers": {
+        "tessera.gpuLayers": {
           "type": "integer",
           "minimum": 0,
           "scope": "machine",
           "default": 0,
           "description": "Number of model layers to offload to the GPU per server. Zero runs inference on the CPU."
         },
-        "tinycoders.typescriptModelPath": {
+        "tessera.typescriptModelPath": {
           "type": "string",
           "scope": "machine",
           "default": "",
           "description": "Path to a local Qwen2.5-Coder GGUF for TypeScript FIM."
         },
-        "tinycoders.generalist": {
+        "tessera.generalist": {
           "type": "string",
           "default": "",
           "description": "Model ID to use as a last resort."
         },
-        "tinycoders.memoryMiB": {
+        "tessera.memoryMiB": {
           "type": "integer",
           "minimum": 0,
           "default": 0,
           "description": "Estimated model memory limit in MiB. Zero uses 60% of free RAM as a target and allows one disk-backed CPU model to exceed it."
         },
-        "tinycoders.autocomplete": {
+        "tessera.autocomplete": {
           "type": "boolean",
           "scope": "language-overridable",
           "default": true,
-          "description": "Show TinyCoders inline suggestions automatically as you type."
+          "description": "Show Tessera inline suggestions automatically as you type."
         },
-        "tinycoders.commentCompletions": {
+        "tessera.commentCompletions": {
           "type": "boolean",
           "scope": "language-overridable",
           "default": true,
-          "description": "Let a Python comment or a tinycoders: comment in other languages trigger a suggestion on the next blank line when automatic suggestions are off."
+          "description": "Let a Python comment or a tessera: comment in other languages trigger a suggestion on the next blank line when automatic suggestions are off."
         },
-        "tinycoders.maxModels": {
+        "tessera.maxModels": {
           "type": "integer",
           "minimum": 1,
           "default": 2,
           "description": "Maximum number of resident models."
         },
-        "tinycoders.idleMinutes": {
+        "tessera.idleMinutes": {
           "type": "number",
           "minimum": 0.01,
           "default": 5,
           "description": "Minutes before an idle model is unloaded."
         },
-        "tinycoders.registryUrl": {
+        "tessera.registryUrl": {
           "type": "string",
           "scope": "machine",
           "default": "",
-          "description": "HTTPS URL of the signed TinyCoders registry JSON."
+          "description": "HTTPS URL of the signed Tessera registry JSON."
         },
-        "tinycoders.registryPublicKey": {
+        "tessera.registryPublicKey": {
           "type": "string",
           "scope": "machine",
           "default": "",
           "description": "PEM-encoded trusted Ed25519 public key for the registry."
         },
-        "tinycoders.repositoryContext": {
+        "tessera.repositoryContext": {
           "type": "boolean",
           "default": true,
           "description": "Include nearby workspace snippets and local language service definitions in inline completions."
@@ -146,86 +146,86 @@
     },
     "commands": [
       {
-        "command": "tinycoders.pickModel",
-        "title": "TinyCoders: Pick Model"
+        "command": "tessera.pickModel",
+        "title": "Tessera: Pick Model"
       },
       {
-        "command": "tinycoders.installModel",
-        "title": "TinyCoders: Install Model"
+        "command": "tessera.installModel",
+        "title": "Tessera: Install Model"
       },
       {
-        "command": "tinycoders.switchVersion",
-        "title": "TinyCoders: Switch Installed Model Version"
+        "command": "tessera.switchVersion",
+        "title": "Tessera: Switch Installed Model Version"
       },
       {
-        "command": "tinycoders.explain",
-        "title": "TinyCoders: Explain Code"
+        "command": "tessera.explain",
+        "title": "Tessera: Explain Code"
       },
       {
-        "command": "tinycoders.refactor",
-        "title": "TinyCoders: Refactor Code"
+        "command": "tessera.refactor",
+        "title": "Tessera: Refactor Code"
       },
       {
-        "command": "tinycoders.writeTests",
-        "title": "TinyCoders: Write Tests"
+        "command": "tessera.writeTests",
+        "title": "Tessera: Write Tests"
       },
       {
-        "command": "tinycoders.exportMetrics",
-        "title": "TinyCoders: Export Local Metrics"
+        "command": "tessera.exportMetrics",
+        "title": "Tessera: Export Local Metrics"
       },
       {
-        "command": "tinycoders.resourceLimits",
-        "title": "TinyCoders: Resource Limits"
+        "command": "tessera.resourceLimits",
+        "title": "Tessera: Resource Limits"
       },
       {
-        "command": "tinycoders.openDashboard",
-        "title": "TinyCoders: Open Dashboard"
+        "command": "tessera.openDashboard",
+        "title": "Tessera: Open Dashboard"
       },
       {
-        "command": "tinycoders.addLocalModel",
-        "title": "TinyCoders: Add Local GGUF",
+        "command": "tessera.addLocalModel",
+        "title": "Tessera: Add Local GGUF",
         "enablement": "isWorkspaceTrusted"
       },
       {
-        "command": "tinycoders.ask",
-        "title": "TinyCoders: Ask",
+        "command": "tessera.ask",
+        "title": "Tessera: Ask",
         "enablement": "isWorkspaceTrusted"
       },
       {
-        "command": "tinycoders.triggerCompletion",
-        "title": "TinyCoders: Trigger Inline Completion",
+        "command": "tessera.triggerCompletion",
+        "title": "Tessera: Trigger Inline Completion",
         "enablement": "isWorkspaceTrusted && editorIsOpen"
       },
       {
-        "command": "tinycoders.openChat",
-        "title": "TinyCoders: Open Chat"
+        "command": "tessera.openChat",
+        "title": "Tessera: Open Chat"
       },
       {
-        "command": "tinycoders.showOutput",
-        "title": "TinyCoders: Show Output"
+        "command": "tessera.showOutput",
+        "title": "Tessera: Show Output"
       }
     ],
     "chatParticipants": [
       {
-        "id": "tinycoders.local",
-        "name": "tinycoders",
-        "fullName": "TinyCoders",
-        "description": "Chat with the active local TinyCoders model"
+        "id": "tessera.local",
+        "name": "tessera",
+        "fullName": "Tessera",
+        "description": "Chat with the active local Tessera model"
       }
     ],
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "tinycoders",
-          "title": "TinyCoders",
+          "id": "tessera",
+          "title": "Tessera",
           "icon": "$(chip)"
         }
       ]
     },
     "views": {
-      "tinycoders": [
+      "tessera": [
         {
-          "id": "tinycoders.dashboard",
+          "id": "tessera.dashboard",
           "type": "webview",
           "name": "Dashboard",
           "icon": "$(chip)"

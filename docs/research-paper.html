@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="An AI-written systems paper about Tessera's local coding model router and the trade-offs of compact checkpoints.">
+  <title>Tessera: Task-Aware Routing for Local Code Generation</title>
+  <link rel="stylesheet" href="../site.css">
+</head>
+<body>
+  <header class="wrap masthead"><a class="brand" href="../index.html"><span class="mark" aria-hidden="true"></span>Tessera</a><nav aria-label="Paper navigation"><a href="../index.html#weights">Model downloads</a><a href="#references">References</a></nav></header>
+  <main class="wrap paper">
+    <article>
+      <header>
+        <p class="eyebrow">Systems research paper · November 2026</p>
+        <h1>Task-Aware Routing for Local Code Generation in Tessera</h1>
+        <p><strong>AI authorship disclosure.</strong> This paper was written by OpenAI Codex, an AI system. It synthesizes the implementation and recorded repository experiments for the TinyCoders 0.1.8 release. The author conducted a source review and did not run new model benchmarks for this paper.</p>
+      </header>
+
+      <h2>Abstract</h2>
+      <p>Tessera is a VS Code extension that uses local editor context to select compact language models and shape inference requests. It distinguishes short fill-in-the-middle completions, comment-driven generation, and chat, and manages the llama.cpp processes that serve those models. Its design lets users configure a small model for routine editing while reserving a separate checkpoint for larger Python requests. A repository smoke test recorded nine AST matches in twelve fast-completion prompts. In a separate eight-program evaluation, the configured Python model passed one task and a 7B reference passed three under different serving configurations. These observations describe two specific workloads and motivate measuring model size, model quality, and editor overhead separately.</p>
+
+      <h2>1. Problem and scope</h2>
+      <p>Inline completion must respond during an edit and fit the surrounding code. A standalone program request must preserve requirements and produce enough text to implement them. Chat needs conversation history and may use a selection from the editor. Tessera treats these as separate request types and chooses models and prompt budgets accordingly. This paper examines the 0.1.8 VSIX, its runtime implementation, and the repository reports for Python autocomplete and standalone generation. [1–4]</p>
+
+      <h2>2. Request routing</h2>
+      <p>The extension uses VS Code language IDs, cursor regions, and project clues to determine the relevant language when a route calls for language detection. File and workspace pins can affect selection. Examples of cursor regions include a Markdown code fence and SQL embedded in a Python string. Inference is sent to a local llama.cpp process. [1, 2, 5]</p>
+      <ol>
+        <li><strong>Fast autocomplete.</strong> The provider formats a bounded prefix and suffix around the cursor using the model’s fill-in-the-middle tokens. The fast Python profile uses a 768-token context, caps output at 32 tokens, and stops at the first newline. It skips repository retrieval on this route. [2, 3]</li>
+        <li><strong>Short Python comments.</strong> A configured structured-data model can turn the comment into a brief. The extension accepts a shorter single line only when checks preserve quoted literals and recognized interface markers and retain a negation marker when the source has one. Otherwise it falls back to the cleaned request. The Python generation model uses the resulting text with code context. These checks cover specific features of the request. Semantic equivalence remains unmeasured. [2]</li>
+        <li><strong>Standalone Python programs.</strong> A recognized top-level program comment takes a direct path to the Python generator. The provider preserves adjacent requirements and can retry once for incomplete output or invalid Python syntax. Syntax validity checks whether Python can parse the response. Functional correctness requires separate tests. [2, 4]</li>
+        <li><strong>Chat and editor actions.</strong> The chat path uses a chat-capable local model. Explain, refactor, and test-generation actions use editor context. Refactors and generated tests are presented in a diff for review. [2]</li>
+      </ol>
+
+      <h2>3. Weights and runtime</h2>
+      <p>Users can assign raw GGUF weights to model roles. The extension can also consume signed registry entries and versioned model packages when configured with a registry URL and trusted key. A package manifest hashes the GGUF, and the registry entry hashes the whole package. The size gate is one billion bytes per package. The downloadable fast Python checkpoint applies a merged LoRA update to Qwen2.5-Coder-0.5B before IQ4_NL quantization. The structured-data checkpoint uses the stock 0.5B base in Q4_K_M. The experimental documentation, English, diagram, and summary variants share Qwen3.5-0.8B tensors and specialize the chat template with system instructions. Their specialization applies when the runtime renders that template. [1–3, 7, 8]</p>
+      <p>The extension starts llama.cpp servers on loopback and manages resident models under an estimated memory budget. Inference leases protect active models during eviction, and a replacement waits for the evicted process to exit. Under the automatic budget, an oversized model can run alone with unlocked memory-mapped weights on CPU. The operating system can reclaim mapped pages, so disk activity may rise under memory pressure. GGUF file size measures storage. Working memory also depends on context, runtime buffers and, when enabled, GPU offload. Keeping more than one model resident can add memory demand, while loading or switching models can increase time to the first suggestion. [1, 2, 5]</p>
+
+      <h2>4. Comparison with a single large local model</h2>
+      <p>Consider a setup in which an editor client sends every request to a single 7B model through a local Ollama server. The client selects a model and passes chat messages to Ollama’s local API. Ollama also exposes a keep-alive control for model residency. Tessera couples its model and prompt choices to events in VS Code and manages its own llama.cpp processes. Integration code can reproduce the same routing policy with other runtimes. Local inference is shared by both configurations. [1, 2, 5, 6]</p>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th scope="col">Dimension</th><th scope="col">Tessera configuration</th><th scope="col">Single 7B model configuration</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Model choice</th><td>Different checkpoints serve routine suggestions and Python generation.</td><td>One checkpoint handles each task.</td></tr>
+            <tr><th scope="row">Prompt construction</th><td>The extension supplies cursor prefix and suffix or a chat prompt suited to the request.</td><td>The calling application determines which editor context and prompt format to supply.</td></tr>
+            <tr><th scope="row">Residency</th><td>Editor activity can cause model loads, reuse, and eviction.</td><td>Requests can reuse a single resident model subject to the runtime’s retention policy.</td></tr>
+            <tr><th scope="row">Weight storage in this comparison</th><td>354 MB for fast completion and 935 MB for the configured Python generator.</td><td>4.68 GB for the evaluated Qwen2.5-Coder-7B-Instruct Q4_K_M reference.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>The storage figures are decimal, rounded, and refer to individual files. They do not measure peak RAM, throughput, or editor responsiveness. Model capacity and integration are separate variables. A larger model can also use fill-in-the-middle when supported by the checkpoint and client, and a general local runner can serve small models. [3–6]</p>
+
+      <h2>5. Recorded evaluations</h2>
+      <p>The autocomplete report measured twelve held-out prompts on CPU using llama.cpp b12244. It recorded 9/12 AST matches for the 354 MB fast checkpoint and 7/12 for a stock 398 MB Q4_K_M checkpoint. Their median first-token latencies were 75 ms and 167 ms respectively. These timings exclude VS Code debounce, router waits, and rendering. AST matching can miss equivalent solutions, and the comparison varies quantization as well as tuning. [3]</p>
+      <p>The standalone-program report used eight requests and job-specific assertions in a pinned, network-disabled Python container. The configured 934,954,496-byte Python checkpoint passed 1/8 on CPU. The 4,683,073,536-byte 7B reference passed 3/8. The reference had a 2,048-token slot and a 1,250-token output cap, while the compact checkpoint ran through the inline provider with a 4,096-token context and its own output budget. The scores reflect the full configurations, including prompts and inference settings. This experiment cannot isolate model size as the cause of the difference or establish an Ollama performance baseline. [4]</p>
+
+      <h2>6. Limitations and future evaluation</h2>
+      <p>Both test suites are small. The evidence covers selected Python tasks and has limited implications for other languages, long editing sessions, or hardware. A controlled comparison should fix the model, quantization, context length, sampling settings, and hardware while varying the routing and serving layer. A separate crossover should fix the serving stack while varying model size. Measuring cold and warm first-suggestion latency, peak memory, suggestion acceptance, and sandbox test pass rate would expose trade-offs across the entire editing workflow.</p>
+
+      <h2>7. Conclusion</h2>
+      <p>Tessera integrates local inference with editor events and gives each coding task a model and prompt budget. Its compact autocomplete route and separate generator provide a concrete way to allocate storage, memory, and generation time by task. The available evaluations describe where this approach works and where standalone program generation still trails the tested larger checkpoint.</p>
+
+      <h2 id="references">References</h2>
+      <ol>
+        <li>Tessera. <a href="ARCHITECTURE.md">Architecture and package contracts</a>.</li>
+        <li>Tessera. <a href="../vscode-extension/README.md">Extension documentation</a> and <a href="../vscode-extension/src/providers/inlineCompletion.ts">inline completion provider</a>.</li>
+        <li>Tessera. <a href="../../artifacts/python-autocomplete/README.md">Python autocomplete experimental report</a> and <a href="../../artifacts/python-autocomplete/evaluation.json">raw results</a>.</li>
+        <li>Tessera. <a href="../../artifacts/python-projects/RESULTS.txt">Standalone Python generation report</a> and <a href="../../artifacts/python-projects/release-cpu-holdout.json">release CPU holdout results</a>.</li>
+        <li>ggml-org. <a href="https://github.com/ggml-org/llama.cpp">llama.cpp documentation</a>.</li>
+        <li>Ollama. <a href="https://docs.ollama.com/api/chat">Chat API reference</a>.</li>
+        <li>Tessera. <a href="../../artifacts/structured-autocomplete/README.md">Structured-data autocomplete model notes</a>.</li>
+        <li>Tessera. <a href="../../artifacts/general-models/README.md">General-purpose model notes</a>.</li>
+      </ol>
+    </article>
+  </main>
+</body>
+</html>

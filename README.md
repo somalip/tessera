@@ -1,4 +1,4 @@
-# TinyCoders: Sub-1GB Per-Language Coding LLMs + VS Code Router
+# Tessera: Sub-1GB Per-Language Coding LLMs + VS Code Router
 
 Hand this file to Codex as the repo's source of truth (copy section 9 into `AGENTS.md`).
 
@@ -17,7 +17,7 @@ make vsix
 .venv/bin/python -m tools.fetch_runtime --starter
 ```
 
-Install `artifacts/tinycoders.vsix` from VS Code and set the two paths printed
+Install `artifacts/tessera.vsix` from VS Code and set the two paths printed
 by the runtime installer. Use `make test-ext` to run the mock-server
 integration test. The [runtime guide](runtime-bin/README.md) covers local
 configuration, and the [registry guide](registry/README.md) covers signed models.
@@ -207,7 +207,7 @@ Decontaminate training data against all of these before reporting. Track per-lan
 ## 7. Repo layout (monorepo)
 
 ```
-tinycoders/
+tessera/
   AGENTS.md                      # Codex instructions (section 9)
   docs/ARCHITECTURE.md
   data/
@@ -283,7 +283,7 @@ tinycoders/
 # AGENTS.md
 
 ## Project
-TinyCoders: per-language coding LLMs (each shipped package < 1 GB) plus a VS Code router extension.
+Tessera: per-language coding LLMs (each shipped package < 1 GB) plus a VS Code router extension.
 Read docs/ARCHITECTURE.md before starting any task.
 
 ## Rules

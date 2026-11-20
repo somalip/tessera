@@ -17,7 +17,7 @@ class VerifierError(RuntimeError):
 
 def run_container(image: str, command: list[str], source: str,
                   timeout: float = 15, docker: str = "docker", *, executable_scratch: bool = False) -> Outcome:
-    name = f"tinycoders-{uuid.uuid4().hex}"
+    name = f"tessera-{uuid.uuid4().hex}"
     mode = "exec" if executable_scratch else "noexec"
     args = [
         docker, "run", "--rm", "--pull=never", "--name", name, "--interactive",

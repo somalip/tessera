@@ -19,7 +19,7 @@ export function registerCodeActions(
   select: (editor: vscode.TextEditor, action: Action) => ChatModel | undefined,
   log: vscode.OutputChannel,
 ): void {
-  const scheme = "tinycoders-preview";
+  const scheme = "tessera-preview";
   const previews = new Map<string, string>();
   const preview = (content: string) => {
     const uri = vscode.Uri.from({ scheme, path: `/${randomUUID()}` });
@@ -37,7 +37,7 @@ export function registerCodeActions(
     if (!editor || !vscode.workspace.isTrusted) return;
     const model = select(editor, action);
     if (!model) {
-      void vscode.window.showInformationMessage("Select or install a model from the TinyCoders status bar.");
+      void vscode.window.showInformationMessage("Select or install a model from the Tessera status bar.");
       return;
     }
     const { document, selection } = editor;
@@ -47,7 +47,7 @@ export function registerCodeActions(
     const version = document.version;
     try {
       const completion = await vscode.window.withProgress({
-        location: vscode.ProgressLocation.Notification, cancellable: true, title: `TinyCoders: ${actions[action]}`,
+        location: vscode.ProgressLocation.Notification, cancellable: true, title: `Tessera: ${actions[action]}`,
       }, async (_progress, token) => {
         const cancellation = bindCancellation(token);
         let response = "";
@@ -85,8 +85,8 @@ export function registerCodeActions(
         ? originalText.slice(0, document.offsetAt(range.start)) + replacement + originalText.slice(document.offsetAt(range.end))
         : replacement;
       await vscode.commands.executeCommand("vscode.diff", preview(before), preview(after),
-        `TinyCoders: ${actions[action]}`, { preview: true });
-      if (await vscode.window.showInformationMessage(`Apply TinyCoders ${action === "refactor" ? "edit" : "tests"}?`,
+        `Tessera: ${actions[action]}`, { preview: true });
+      if (await vscode.window.showInformationMessage(`Apply Tessera ${action === "refactor" ? "edit" : "tests"}?`,
         "Apply") !== "Apply") return;
       if (document.isClosed || document.version !== version) {
         void vscode.window.showWarningMessage("The source changed while the preview was open. Run the command again.");
@@ -103,7 +103,7 @@ export function registerCodeActions(
       }
     } catch (error) {
       log.appendLine(String(error));
-      void vscode.window.showErrorMessage(`TinyCoders: ${String(error)}`);
+      void vscode.window.showErrorMessage(`Tessera: ${String(error)}`);
     }
   }
 
@@ -117,9 +117,9 @@ export function registerCodeActions(
     }),
     vscode.languages.registerCodeActionsProvider({ scheme: "file" }, {
       provideCodeActions: (_document, range) => range.isEmpty ? [] : commands.map(action => ({
-        title: `TinyCoders: ${actions[action]}`, command: `tinycoders.${action}`,
+        title: `Tessera: ${actions[action]}`, command: `tessera.${action}`,
       })),
     }),
-    ...commands.map(action => vscode.commands.registerCommand(`tinycoders.${action}`, () => invoke(action))),
+    ...commands.map(action => vscode.commands.registerCommand(`tessera.${action}`, () => invoke(action))),
   );
 }

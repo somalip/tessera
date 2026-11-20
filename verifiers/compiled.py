@@ -7,7 +7,7 @@ from verifiers.sandbox import Outcome, run_container
 
 COMPILERS = {
     "typescript": (
-        "tinycoders-verifier-typescript:5.9.3",
+        "tessera-verifier-typescript:5.9.3",
         "cat > main.ts; tsc --strict --target ES2022 --module commonjs main.ts; node main.js",
     ),
     "rust": (
