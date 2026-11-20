@@ -1,0 +1,49 @@
+{
+  "model_sha256": "1d9614638d18024d0fbb36575a15f1302a3adf044df10345688ec4f6e1c4ff32",
+  "dataset_sha256": "26e0a6f5a4d9e0f7c31563d59f44ad0af6ca231f5f01a3aa9a10f54098eb8f62",
+  "summary": {
+    "control": {
+      "exact_match": 0.0,
+      "edit_similarity": 0.12643152326412962
+    },
+    "treatment": {
+      "exact_match": 0.0,
+      "edit_similarity": 0.19424657105317353
+    }
+  },
+  "tasks": [
+    {
+      "id": "invoice",
+      "control": {
+        "exact_match": false,
+        "edit_similarity": 0.12903225806451613
+      },
+      "treatment": {
+        "exact_match": false,
+        "edit_similarity": 0.21316614420062696
+      }
+    },
+    {
+      "id": "labels",
+      "control": {
+        "exact_match": false,
+        "edit_similarity": 0.14736842105263157
+      },
+      "treatment": {
+        "exact_match": false,
+        "edit_similarity": 0.15789473684210525
+      }
+    },
+    {
+      "id": "clock",
+      "control": {
+        "exact_match": false,
+        "edit_similarity": 0.10289389067524116
+      },
+      "treatment": {
+        "exact_match": false,
+        "edit_similarity": 0.2116788321167883
+      }
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "language": "documentation",
+  "model_sha256": "0ff6e361501b2c0d7f31836b2e2111e070dc1e244560f9ca14a6783043bdf7e4",
+  "gate_passed": false,
+  "smoke": true,
+  "fixture_license": "CC0-1.0",
+  "training_examples": 0,
+  "base_revision": "004fd086eccea9f7cf867aa07ba328773beef81d",
+  "base_gguf_sha256": "37ae482d336108d23516fa35e8e0c4126688d81018b87178a18d752a1357814f",
+  "template_sha256": "412ad6cb63808a25fde98c7391a40939affdf0806d0ab11f55af0b96da09ed54",
+  "prompt": "Write a Markdown Quick Start section for a tool named Brisk. Installation: brisk setup. Verification: brisk status. Use a fenced shell block.",
+  "completion": "# Brisk Quick Start\n\n## Installation\n\nTo install Brisk, run the following command in your terminal:\n\n```bash\nbrisk install\n```\n\nThis command will download and install the Brisk tool on your system.\n\n## Verification\n\nAfter installation, verify that Brisk is properly configured by running the following command:\n\n```bash\nbrisk status\n```\n\nThis command will display the current status of your Brisk installation, including version information and available features.",
+  "checks": {
+    "(?im)^#+ Quick Start": false,
+    "```": true,
+    "brisk setup": false,
+    "brisk status": true
+  }
+}

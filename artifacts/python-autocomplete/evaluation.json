@@ -1,0 +1,1129 @@
+[
+  {
+    "sha256": "aad824c1f8dcdfa6f468e6e14174e8a6e63c2965084de7b7e8e36504f9037c3f",
+    "model": "python-autocomplete.IQ4_NL.gguf",
+    "size_bytes": 354304640,
+    "startup_ms": 1052.1,
+    "median_first_ms": 74.8,
+    "median_complete_ms": 121.3,
+    "exact_ast_matches": 9,
+    "valid_completions": 11,
+    "results": [
+      {
+        "prefix": "def greeting(name):\n    # Return Hello, followed by the name\n    ",
+        "suffix": "",
+        "completion": "print('Hello, ' + name)",
+        "expected": [
+          "return f\"Hello, {name}\"",
+          "return \"Hello, \" + name"
+        ],
+        "valid": true,
+        "match": false,
+        "first_ms": 65.4,
+        "complete_ms": 153.7
+      },
+      {
+        "prefix": "def average(samples):\n    # Calculate the arithmetic mean of the samples\n    mean = ",
+        "suffix": "\n    return mean\n",
+        "completion": "sum(samples) / len(samples)",
+        "expected": [
+          "sum(samples) / len(samples)"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 99.5,
+        "complete_ms": 202.2
+      },
+      {
+        "prefix": "def indexes(names):\n    # Map each name to its position, starting at zero\n    ",
+        "suffix": "\n    return by_name\n",
+        "completion": "by_name = {name: i for i, name in enumerate(names)}",
+        "expected": [
+          "by_name = {name: index for index, name in enumerate(names)}",
+          "by_name = {name: i for i, name in enumerate(names)}"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 122.8,
+        "complete_ms": 281.8
+      },
+      {
+        "prefix": "def is_even(number):\n    # Return whether the number is divisible by two\n    ",
+        "suffix": "",
+        "completion": "return number % 2 == 0",
+        "expected": [
+          "return number % 2 == 0",
+          "return not number % 2"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 88.7,
+        "complete_ms": 171.9
+      },
+      {
+        "prefix": "def extend_all(groups):\n    # Flatten one level of nested lists\n    flat = ",
+        "suffix": "\n    return flat\n",
+        "completion": "all(groups)",
+        "expected": [
+          "[item for group in groups for item in group]"
+        ],
+        "valid": true,
+        "match": false,
+        "first_ms": 74.8,
+        "complete_ms": 104.0
+      },
+      {
+        "prefix": "def domain(address):\n    # Return the part after the last @\n    ",
+        "suffix": "",
+        "completion": "",
+        "expected": [
+          "return address.rsplit(\"@\", 1)[-1]",
+          "return address.split(\"@\")[-1]"
+        ],
+        "valid": false,
+        "match": false,
+        "first_ms": null,
+        "complete_ms": 49.7
+      },
+      {
+        "prefix": "def factorials(n):\n    import math\n    # Compute n factorial\n    answer = ",
+        "suffix": "\n    return answer\n",
+        "completion": "math.factorial(n)",
+        "expected": [
+          "math.factorial(n)"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 75.9,
+        "complete_ms": 138.6
+      },
+      {
+        "prefix": "def categorize(count):\n    # Use the label 'item' for one, otherwise 'items'\n    word = ",
+        "suffix": "\n    return word\n",
+        "completion": "'item' if count == 1 else 'items'",
+        "expected": [
+          "\"item\" if count == 1 else \"items\""
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 111.1,
+        "complete_ms": 241.5
+      },
+      {
+        "prefix": "def character_counts(text):\n    from collections import Counter\n    counts = ",
+        "suffix": "\n    return counts\n",
+        "completion": "Counter(text)",
+        "expected": [
+          "Counter(text)"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 55.1,
+        "complete_ms": 77.7
+      },
+      {
+        "prefix": "def combinations(left, right):\n    result = list(zip(",
+        "suffix": "))\n    return result\n",
+        "completion": "left, right",
+        "expected": [
+          "left, right"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 49.9,
+        "complete_ms": 72.2
+      },
+      {
+        "prefix": "def with_index(rows):\n    for index, row in ",
+        "suffix": ":\n        yield index, row\n",
+        "completion": "enumerate(rows)",
+        "expected": [
+          "enumerate(rows)"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 48.6,
+        "complete_ms": 71.1
+      },
+      {
+        "prefix": "def powers(values):\n    return [",
+        "suffix": " for v in values]\n",
+        "completion": "v**2",
+        "expected": [
+          "v ** 2",
+          "v * v"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 39.4,
+        "complete_ms": 61.8
+      }
+    ]
+  },
+  {
+    "sha256": "7cd1e22bfa3149660c908842a6fb6c4cfd6c924339cfce3b7339c066da1c2509",
+    "model": "tessera-autocomplete-base.Q4_K_M.gguf",
+    "size_bytes": 397807232,
+    "startup_ms": 774.0,
+    "median_first_ms": 167.45,
+    "median_complete_ms": 259.95,
+    "exact_ast_matches": 7,
+    "valid_completions": 10,
+    "results": [
+      {
+        "prefix": "def greeting(name):\n    # Return Hello, followed by the name\n    ",
+        "suffix": "",
+        "completion": "return \"Hello, \" + name",
+        "expected": [
+          "return f\"Hello, {name}\"",
+          "return \"Hello, \" + name"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 155.0,
+        "complete_ms": 251.2
+      },
+      {
+        "prefix": "def average(samples):\n    # Calculate the arithmetic mean of the samples\n    mean = ",
+        "suffix": "\n    return mean\n",
+        "completion": "sum(samples) / len(samples)",
+        "expected": [
+          "sum(samples) / len(samples)"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 166.7,
+        "complete_ms": 268.7
+      },
+      {
+        "prefix": "def indexes(names):\n    # Map each name to its position, starting at zero\n    ",
+        "suffix": "\n    return by_name\n",
+        "completion": "by_name = {name: i for i, name in enumerate(names)}",
+        "expected": [
+          "by_name = {name: index for index, name in enumerate(names)}",
+          "by_name = {name: i for i, name in enumerate(names)}"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 278.2,
+        "complete_ms": 502.6
+      },
+      {
+        "prefix": "def is_even(number):\n    # Return whether the number is divisible by two\n    ",
+        "suffix": "",
+        "completion": "if number % 2 == 0:",
+        "expected": [
+          "return number % 2 == 0",
+          "return not number % 2"
+        ],
+        "valid": false,
+        "match": false,
+        "first_ms": 179.3,
+        "complete_ms": 337.1
+      },
+      {
+        "prefix": "def extend_all(groups):\n    # Flatten one level of nested lists\n    flat = ",
+        "suffix": "\n    return flat\n",
+        "completion": "[extend_all(g) for g in groups]",
+        "expected": [
+          "[item for group in groups for item in group]"
+        ],
+        "valid": true,
+        "match": false,
+        "first_ms": 239.4,
+        "complete_ms": 383.1
+      },
+      {
+        "prefix": "def domain(address):\n    # Return the part after the last @\n    ",
+        "suffix": "",
+        "completion": "return address.split('@')[1]",
+        "expected": [
+          "return address.rsplit(\"@\", 1)[-1]",
+          "return address.split(\"@\")[-1]"
+        ],
+        "valid": true,
+        "match": false,
+        "first_ms": 135.5,
+        "complete_ms": 208.3
+      },
+      {
+        "prefix": "def factorials(n):\n    import math\n    # Compute n factorial\n    answer = ",
+        "suffix": "\n    return answer\n",
+        "completion": "math.factorial(n)",
+        "expected": [
+          "math.factorial(n)"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 192.0,
+        "complete_ms": 242.9
+      },
+      {
+        "prefix": "def categorize(count):\n    # Use the label 'item' for one, otherwise 'items'\n    word = ",
+        "suffix": "\n    return word\n",
+        "completion": "'item' if count == 1 else 'items'",
+        "expected": [
+          "\"item\" if count == 1 else \"items\""
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 230.2,
+        "complete_ms": 385.8
+      },
+      {
+        "prefix": "def character_counts(text):\n    from collections import Counter\n    counts = ",
+        "suffix": "\n    return counts\n",
+        "completion": "Counter(text.lower())",
+        "expected": [
+          "Counter(text)"
+        ],
+        "valid": true,
+        "match": false,
+        "first_ms": 168.2,
+        "complete_ms": 206.6
+      },
+      {
+        "prefix": "def combinations(left, right):\n    result = list(zip(",
+        "suffix": "))\n    return result\n",
+        "completion": "range(left, right+1), range(left, right+1",
+        "expected": [
+          "left, right"
+        ],
+        "valid": false,
+        "match": false,
+        "first_ms": 145.2,
+        "complete_ms": 304.3
+      },
+      {
+        "prefix": "def with_index(rows):\n    for index, row in ",
+        "suffix": ":\n        yield index, row\n",
+        "completion": "enumerate(rows)",
+        "expected": [
+          "enumerate(rows)"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 155.7,
+        "complete_ms": 191.5
+      },
+      {
+        "prefix": "def powers(values):\n    return [",
+        "suffix": " for v in values]\n",
+        "completion": "v**2",
+        "expected": [
+          "v ** 2",
+          "v * v"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 102.5,
+        "complete_ms": 138.5
+      }
+    ]
+  },
+  {
+    "sha256": "b85b2c428a7822c89b3ae0a185d190b18ab1fd8e00b98deed2bce37c4c059b24",
+    "model": "tessera-autocomplete-tuned.Q4_0.gguf",
+    "size_bytes": 352154240,
+    "startup_ms": 731.1,
+    "median_first_ms": 50.35,
+    "median_complete_ms": 110.2,
+    "exact_ast_matches": 7,
+    "valid_completions": 12,
+    "results": [
+      {
+        "prefix": "def greeting(name):\n    # Return Hello, followed by the name\n    ",
+        "suffix": "",
+        "completion": "print('Hello, ' + name)",
+        "expected": [
+          "return f\"Hello, {name}\"",
+          "return \"Hello, \" + name"
+        ],
+        "valid": true,
+        "match": false,
+        "first_ms": 41.7,
+        "complete_ms": 112.5
+      },
+      {
+        "prefix": "def average(samples):\n    # Calculate the arithmetic mean of the samples\n    mean = ",
+        "suffix": "\n    return mean\n",
+        "completion": "sum(samples) / len(samples)",
+        "expected": [
+          "sum(samples) / len(samples)"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 49.6,
+        "complete_ms": 113.3
+      },
+      {
+        "prefix": "def indexes(names):\n    # Map each name to its position, starting at zero\n    ",
+        "suffix": "\n    return by_name\n",
+        "completion": "by_name = dict(zip(names, range(len(names))))",
+        "expected": [
+          "by_name = {name: index for index, name in enumerate(names)}",
+          "by_name = {name: i for i, name in enumerate(names)}"
+        ],
+        "valid": true,
+        "match": false,
+        "first_ms": 54.7,
+        "complete_ms": 141.5
+      },
+      {
+        "prefix": "def is_even(number):\n    # Return whether the number is divisible by two\n    ",
+        "suffix": "",
+        "completion": "return number % 2 == 0",
+        "expected": [
+          "return number % 2 == 0",
+          "return not number % 2"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 63.2,
+        "complete_ms": 134.3
+      },
+      {
+        "prefix": "def extend_all(groups):\n    # Flatten one level of nested lists\n    flat = ",
+        "suffix": "\n    return flat\n",
+        "completion": "list(chain.from_iterable(groups))",
+        "expected": [
+          "[item for group in groups for item in group]"
+        ],
+        "valid": true,
+        "match": false,
+        "first_ms": 57.2,
+        "complete_ms": 111.4
+      },
+      {
+        "prefix": "def domain(address):\n    # Return the part after the last @\n    ",
+        "suffix": "",
+        "completion": "clean_address = address.split('@')",
+        "expected": [
+          "return address.rsplit(\"@\", 1)[-1]",
+          "return address.split(\"@\")[-1]"
+        ],
+        "valid": true,
+        "match": false,
+        "first_ms": 37.6,
+        "complete_ms": 102.9
+      },
+      {
+        "prefix": "def factorials(n):\n    import math\n    # Compute n factorial\n    answer = ",
+        "suffix": "\n    return answer\n",
+        "completion": "math.factorial(n)",
+        "expected": [
+          "math.factorial(n)"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 62.5,
+        "complete_ms": 109.0
+      },
+      {
+        "prefix": "def categorize(count):\n    # Use the label 'item' for one, otherwise 'items'\n    word = ",
+        "suffix": "\n    return word\n",
+        "completion": "count if count < 100 else 'items'",
+        "expected": [
+          "\"item\" if count == 1 else \"items\""
+        ],
+        "valid": true,
+        "match": false,
+        "first_ms": 87.0,
+        "complete_ms": 192.5
+      },
+      {
+        "prefix": "def character_counts(text):\n    from collections import Counter\n    counts = ",
+        "suffix": "\n    return counts\n",
+        "completion": "Counter(text)",
+        "expected": [
+          "Counter(text)"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 51.1,
+        "complete_ms": 78.0
+      },
+      {
+        "prefix": "def combinations(left, right):\n    result = list(zip(",
+        "suffix": "))\n    return result\n",
+        "completion": "left, right",
+        "expected": [
+          "left, right"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 45.9,
+        "complete_ms": 74.1
+      },
+      {
+        "prefix": "def with_index(rows):\n    for index, row in ",
+        "suffix": ":\n        yield index, row\n",
+        "completion": "enumerate(rows)",
+        "expected": [
+          "enumerate(rows)"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 48.9,
+        "complete_ms": 75.6
+      },
+      {
+        "prefix": "def powers(values):\n    return [",
+        "suffix": " for v in values]\n",
+        "completion": "v**2",
+        "expected": [
+          "v ** 2",
+          "v * v"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 34.4,
+        "complete_ms": 58.1
+      }
+    ]
+  },
+  {
+    "sha256": "4eabbd11aa32d9d0ed37d206ff15e1549b92cb7f23ef8654cc31b28a39e3f0ab",
+    "model": "scaled.Q4_0.gguf",
+    "size_bytes": 934954496,
+    "startup_ms": 1944.9,
+    "median_first_ms": 195.45,
+    "median_complete_ms": 361.9,
+    "exact_ast_matches": 8,
+    "valid_completions": 10,
+    "results": [
+      {
+        "prefix": "def greeting(name):\n    # Return Hello, followed by the name\n    ",
+        "suffix": "",
+        "completion": "return f\"Hello, {name}!\"",
+        "expected": [
+          "return f\"Hello, {name}\"",
+          "return \"Hello, \" + name"
+        ],
+        "valid": true,
+        "match": false,
+        "first_ms": 151.9,
+        "complete_ms": 369.2
+      },
+      {
+        "prefix": "def average(samples):\n    # Calculate the arithmetic mean of the samples\n    mean = ",
+        "suffix": "\n    return mean\n",
+        "completion": "sum(samples) / len(samples)",
+        "expected": [
+          "sum(samples) / len(samples)"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 194.7,
+        "complete_ms": 361.6
+      },
+      {
+        "prefix": "def indexes(names):\n    # Map each name to its position, starting at zero\n    ",
+        "suffix": "\n    return by_name\n",
+        "completion": "by_name = {name: index for index, name in enumerate(names)}",
+        "expected": [
+          "by_name = {name: index for index, name in enumerate(names)}",
+          "by_name = {name: i for i, name in enumerate(names)}"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 190.7,
+        "complete_ms": 592.4
+      },
+      {
+        "prefix": "def is_even(number):\n    # Return whether the number is divisible by two\n    ",
+        "suffix": "",
+        "completion": "return number % 2 == 0",
+        "expected": [
+          "return number % 2 == 0",
+          "return not number % 2"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 194.0,
+        "complete_ms": 424.7
+      },
+      {
+        "prefix": "def extend_all(groups):\n    # Flatten one level of nested lists\n    flat = ",
+        "suffix": "\n    return flat\n",
+        "completion": "[]",
+        "expected": [
+          "[item for group in groups for item in group]"
+        ],
+        "valid": true,
+        "match": false,
+        "first_ms": 259.5,
+        "complete_ms": 259.6
+      },
+      {
+        "prefix": "def domain(address):\n    # Return the part after the last @\n    ",
+        "suffix": "",
+        "completion": "return address.split('@')[-1]",
+        "expected": [
+          "return address.rsplit(\"@\", 1)[-1]",
+          "return address.split(\"@\")[-1]"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 196.2,
+        "complete_ms": 451.7
+      },
+      {
+        "prefix": "def factorials(n):\n    import math\n    # Compute n factorial\n    answer = ",
+        "suffix": "\n    return answer\n",
+        "completion": "math.factorial(n)",
+        "expected": [
+          "math.factorial(n)"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 227.3,
+        "complete_ms": 362.2
+      },
+      {
+        "prefix": "def categorize(count):\n    # Use the label 'item' for one, otherwise 'items'\n    word = ",
+        "suffix": "\n    return word\n",
+        "completion": "'item' if count == 1 else 'items'",
+        "expected": [
+          "\"item\" if count == 1 else \"items\""
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 388.4,
+        "complete_ms": 726.8
+      },
+      {
+        "prefix": "def character_counts(text):\n    from collections import Counter\n    counts = ",
+        "suffix": "\n    return counts\n",
+        "completion": "Counter(text)",
+        "expected": [
+          "Counter(text)"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 209.4,
+        "complete_ms": 291.0
+      },
+      {
+        "prefix": "def combinations(left, right):\n    result = list(zip(",
+        "suffix": "))\n    return result\n",
+        "completion": "left, right))",
+        "expected": [
+          "left, right"
+        ],
+        "valid": false,
+        "match": false,
+        "first_ms": 213.0,
+        "complete_ms": 309.8
+      },
+      {
+        "prefix": "def with_index(rows):\n    for index, row in ",
+        "suffix": ":\n        yield index, row\n",
+        "completion": "enumerate(rows)",
+        "expected": [
+          "enumerate(rows)"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 182.9,
+        "complete_ms": 278.6
+      },
+      {
+        "prefix": "def powers(values):\n    return [",
+        "suffix": " for v in values]\n",
+        "completion": "v**2 for v in values]",
+        "expected": [
+          "v ** 2",
+          "v * v"
+        ],
+        "valid": false,
+        "match": false,
+        "first_ms": 137.8,
+        "complete_ms": 313.0
+      }
+    ]
+  },
+  {
+    "sha256": "78891bc716c842d08134abfa97192efd084f15e22157b6616364670cf12922e7",
+    "model": "tessera-autocomplete-tuned.Q3_K_M.gguf",
+    "size_bytes": 355465856,
+    "startup_ms": 1561.2,
+    "median_first_ms": 80.55,
+    "median_complete_ms": 161.0,
+    "exact_ast_matches": 8,
+    "valid_completions": 11,
+    "results": [
+      {
+        "prefix": "def greeting(name):\n    # Return Hello, followed by the name\n    ",
+        "suffix": "",
+        "completion": "print(f'Hello, {name}')",
+        "expected": [
+          "return f\"Hello, {name}\"",
+          "return \"Hello, \" + name"
+        ],
+        "valid": true,
+        "match": false,
+        "first_ms": 70.9,
+        "complete_ms": 154.3
+      },
+      {
+        "prefix": "def average(samples):\n    # Calculate the arithmetic mean of the samples\n    mean = ",
+        "suffix": "\n    return mean\n",
+        "completion": "sum(samples) / len(samples)",
+        "expected": [
+          "sum(samples) / len(samples)"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 99.0,
+        "complete_ms": 184.9
+      },
+      {
+        "prefix": "def indexes(names):\n    # Map each name to its position, starting at zero\n    ",
+        "suffix": "\n    return by_name\n",
+        "completion": "by_name = {name: i for i, name in enumerate(names)}",
+        "expected": [
+          "by_name = {name: index for index, name in enumerate(names)}",
+          "by_name = {name: i for i, name in enumerate(names)}"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 103.4,
+        "complete_ms": 255.1
+      },
+      {
+        "prefix": "def is_even(number):\n    # Return whether the number is divisible by two\n    ",
+        "suffix": "",
+        "completion": "if number % 2 == 0:",
+        "expected": [
+          "return number % 2 == 0",
+          "return not number % 2"
+        ],
+        "valid": false,
+        "match": false,
+        "first_ms": 69.3,
+        "complete_ms": 146.2
+      },
+      {
+        "prefix": "def extend_all(groups):\n    # Flatten one level of nested lists\n    flat = ",
+        "suffix": "\n    return flat\n",
+        "completion": "list(itertools.chain.from_iterable(groups))",
+        "expected": [
+          "[item for group in groups for item in group]"
+        ],
+        "valid": true,
+        "match": false,
+        "first_ms": 92.5,
+        "complete_ms": 188.0
+      },
+      {
+        "prefix": "def domain(address):\n    # Return the part after the last @\n    ",
+        "suffix": "",
+        "completion": "return address.split('@')[-1]",
+        "expected": [
+          "return address.rsplit(\"@\", 1)[-1]",
+          "return address.split(\"@\")[-1]"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 67.0,
+        "complete_ms": 167.7
+      },
+      {
+        "prefix": "def factorials(n):\n    import math\n    # Compute n factorial\n    answer = ",
+        "suffix": "\n    return answer\n",
+        "completion": "math.factorial(n)",
+        "expected": [
+          "math.factorial(n)"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 130.7,
+        "complete_ms": 188.0
+      },
+      {
+        "prefix": "def categorize(count):\n    # Use the label 'item' for one, otherwise 'items'\n    word = ",
+        "suffix": "\n    return word\n",
+        "completion": "count.label if count.label else count.items",
+        "expected": [
+          "\"item\" if count == 1 else \"items\""
+        ],
+        "valid": true,
+        "match": false,
+        "first_ms": 123.9,
+        "complete_ms": 207.6
+      },
+      {
+        "prefix": "def character_counts(text):\n    from collections import Counter\n    counts = ",
+        "suffix": "\n    return counts\n",
+        "completion": "Counter(text)",
+        "expected": [
+          "Counter(text)"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 82.8,
+        "complete_ms": 112.0
+      },
+      {
+        "prefix": "def combinations(left, right):\n    result = list(zip(",
+        "suffix": "))\n    return result\n",
+        "completion": "left, right",
+        "expected": [
+          "left, right"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 69.8,
+        "complete_ms": 95.8
+      },
+      {
+        "prefix": "def with_index(rows):\n    for index, row in ",
+        "suffix": ":\n        yield index, row\n",
+        "completion": "enumerate(rows)",
+        "expected": [
+          "enumerate(rows)"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 78.3,
+        "complete_ms": 107.1
+      },
+      {
+        "prefix": "def powers(values):\n    return [",
+        "suffix": " for v in values]\n",
+        "completion": "v**2",
+        "expected": [
+          "v ** 2",
+          "v * v"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 57.6,
+        "complete_ms": 86.6
+      }
+    ]
+  },
+  {
+    "sha256": "be98fdde1720acf847b0c1238e5c954a7e8fc3be4eb4a70b114e2760fe1a5eac",
+    "model": "tessera-autocomplete-tuned.Q4_K_M.gguf",
+    "size_bytes": 397807232,
+    "startup_ms": 809.6,
+    "median_first_ms": 202.8,
+    "median_complete_ms": 326.9,
+    "exact_ast_matches": 9,
+    "valid_completions": 12,
+    "results": [
+      {
+        "prefix": "def greeting(name):\n    # Return Hello, followed by the name\n    ",
+        "suffix": "",
+        "completion": "return 'Hello, ' + name",
+        "expected": [
+          "return f\"Hello, {name}\"",
+          "return \"Hello, \" + name"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 161.7,
+        "complete_ms": 274.9
+      },
+      {
+        "prefix": "def average(samples):\n    # Calculate the arithmetic mean of the samples\n    mean = ",
+        "suffix": "\n    return mean\n",
+        "completion": "sum(samples) / len(samples)",
+        "expected": [
+          "sum(samples) / len(samples)"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 239.4,
+        "complete_ms": 352.8
+      },
+      {
+        "prefix": "def indexes(names):\n    # Map each name to its position, starting at zero\n    ",
+        "suffix": "\n    return by_name\n",
+        "completion": "by_name = {name: i for i, name in enumerate(names)}",
+        "expected": [
+          "by_name = {name: index for index, name in enumerate(names)}",
+          "by_name = {name: i for i, name in enumerate(names)}"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 232.7,
+        "complete_ms": 455.6
+      },
+      {
+        "prefix": "def is_even(number):\n    # Return whether the number is divisible by two\n    ",
+        "suffix": "",
+        "completion": "return number % 2 == 0",
+        "expected": [
+          "return number % 2 == 0",
+          "return not number % 2"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 201.2,
+        "complete_ms": 348.8
+      },
+      {
+        "prefix": "def extend_all(groups):\n    # Flatten one level of nested lists\n    flat = ",
+        "suffix": "\n    return flat\n",
+        "completion": "all(list(group) for group in groups)",
+        "expected": [
+          "[item for group in groups for item in group]"
+        ],
+        "valid": true,
+        "match": false,
+        "first_ms": 261.5,
+        "complete_ms": 466.2
+      },
+      {
+        "prefix": "def domain(address):\n    # Return the part after the last @\n    ",
+        "suffix": "",
+        "completion": "return address.split('@')[1]",
+        "expected": [
+          "return address.rsplit(\"@\", 1)[-1]",
+          "return address.split(\"@\")[-1]"
+        ],
+        "valid": true,
+        "match": false,
+        "first_ms": 193.5,
+        "complete_ms": 305.1
+      },
+      {
+        "prefix": "def factorials(n):\n    import math\n    # Compute n factorial\n    answer = ",
+        "suffix": "\n    return answer\n",
+        "completion": "math.factorial(n)",
+        "expected": [
+          "math.factorial(n)"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 257.3,
+        "complete_ms": 348.7
+      },
+      {
+        "prefix": "def categorize(count):\n    # Use the label 'item' for one, otherwise 'items'\n    word = ",
+        "suffix": "\n    return word\n",
+        "completion": "count.label if count.label else 'items'",
+        "expected": [
+          "\"item\" if count == 1 else \"items\""
+        ],
+        "valid": true,
+        "match": false,
+        "first_ms": 302.9,
+        "complete_ms": 432.4
+      },
+      {
+        "prefix": "def character_counts(text):\n    from collections import Counter\n    counts = ",
+        "suffix": "\n    return counts\n",
+        "completion": "Counter(text)",
+        "expected": [
+          "Counter(text)"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 204.4,
+        "complete_ms": 248.5
+      },
+      {
+        "prefix": "def combinations(left, right):\n    result = list(zip(",
+        "suffix": "))\n    return result\n",
+        "completion": "left, right",
+        "expected": [
+          "left, right"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 178.7,
+        "complete_ms": 226.0
+      },
+      {
+        "prefix": "def with_index(rows):\n    for index, row in ",
+        "suffix": ":\n        yield index, row\n",
+        "completion": "enumerate(rows)",
+        "expected": [
+          "enumerate(rows)"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 190.5,
+        "complete_ms": 231.5
+      },
+      {
+        "prefix": "def powers(values):\n    return [",
+        "suffix": " for v in values]\n",
+        "completion": "v**2",
+        "expected": [
+          "v ** 2",
+          "v * v"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 127.2,
+        "complete_ms": 168.8
+      }
+    ]
+  },
+  {
+    "sha256": "9ce92989dcbffff5bd054ba2b7fd05f719c23f542c309528cc94b4698107d14e",
+    "model": "tessera-autocomplete-tuned.Q2_K.gguf",
+    "size_bytes": 338606720,
+    "startup_ms": 703.9,
+    "median_first_ms": 105.25,
+    "median_complete_ms": 169.85,
+    "exact_ast_matches": 9,
+    "valid_completions": 12,
+    "results": [
+      {
+        "prefix": "def greeting(name):\n    # Return Hello, followed by the name\n    ",
+        "suffix": "",
+        "completion": "return 'Hello, ' + name",
+        "expected": [
+          "return f\"Hello, {name}\"",
+          "return \"Hello, \" + name"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 108.6,
+        "complete_ms": 180.9
+      },
+      {
+        "prefix": "def average(samples):\n    # Calculate the arithmetic mean of the samples\n    mean = ",
+        "suffix": "\n    return mean\n",
+        "completion": "sum(samples) / len(samples)",
+        "expected": [
+          "sum(samples) / len(samples)"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 149.7,
+        "complete_ms": 249.8
+      },
+      {
+        "prefix": "def indexes(names):\n    # Map each name to its position, starting at zero\n    ",
+        "suffix": "\n    return by_name\n",
+        "completion": "by_name = dict(zip(names, range(len(names))))",
+        "expected": [
+          "by_name = {name: index for index, name in enumerate(names)}",
+          "by_name = {name: i for i, name in enumerate(names)}"
+        ],
+        "valid": true,
+        "match": false,
+        "first_ms": 181.2,
+        "complete_ms": 292.6
+      },
+      {
+        "prefix": "def is_even(number):\n    # Return whether the number is divisible by two\n    ",
+        "suffix": "",
+        "completion": "return number % 2 == 0",
+        "expected": [
+          "return number % 2 == 0",
+          "return not number % 2"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 101.9,
+        "complete_ms": 184.2
+      },
+      {
+        "prefix": "def extend_all(groups):\n    # Flatten one level of nested lists\n    flat = ",
+        "suffix": "\n    return flat\n",
+        "completion": "list(groups)",
+        "expected": [
+          "[item for group in groups for item in group]"
+        ],
+        "valid": true,
+        "match": false,
+        "first_ms": 125.3,
+        "complete_ms": 158.7
+      },
+      {
+        "prefix": "def domain(address):\n    # Return the part after the last @\n    ",
+        "suffix": "",
+        "completion": "return address.split('@')[-1]",
+        "expected": [
+          "return address.rsplit(\"@\", 1)[-1]",
+          "return address.split(\"@\")[-1]"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 93.4,
+        "complete_ms": 175.6
+      },
+      {
+        "prefix": "def factorials(n):\n    import math\n    # Compute n factorial\n    answer = ",
+        "suffix": "\n    return answer\n",
+        "completion": "math.factorial(n)",
+        "expected": [
+          "math.factorial(n)"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 119.2,
+        "complete_ms": 164.1
+      },
+      {
+        "prefix": "def categorize(count):\n    # Use the label 'item' for one, otherwise 'items'\n    word = ",
+        "suffix": "\n    return word\n",
+        "completion": "count.label if count.label else count.items",
+        "expected": [
+          "\"item\" if count == 1 else \"items\""
+        ],
+        "valid": true,
+        "match": false,
+        "first_ms": 140.8,
+        "complete_ms": 212.5
+      },
+      {
+        "prefix": "def character_counts(text):\n    from collections import Counter\n    counts = ",
+        "suffix": "\n    return counts\n",
+        "completion": "Counter(text)",
+        "expected": [
+          "Counter(text)"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 97.8,
+        "complete_ms": 124.1
+      },
+      {
+        "prefix": "def combinations(left, right):\n    result = list(zip(",
+        "suffix": "))\n    return result\n",
+        "completion": "left, right",
+        "expected": [
+          "left, right"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 87.3,
+        "complete_ms": 114.2
+      },
+      {
+        "prefix": "def with_index(rows):\n    for index, row in ",
+        "suffix": ":\n        yield index, row\n",
+        "completion": "enumerate(rows)",
+        "expected": [
+          "enumerate(rows)"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 101.9,
+        "complete_ms": 130.3
+      },
+      {
+        "prefix": "def powers(values):\n    return [",
+        "suffix": " for v in values]\n",
+        "completion": "v**2",
+        "expected": [
+          "v ** 2",
+          "v * v"
+        ],
+        "valid": true,
+        "match": true,
+        "first_ms": 71.6,
+        "complete_ms": 98.1
+      }
+    ]
+  }
+]

@@ -1,0 +1,66 @@
+{
+  "model_size_bytes": 491400064,
+  "model_sha256": "1d9614638d18024d0fbb36575a15f1302a3adf044df10345688ec4f6e1c4ff32",
+  "dataset_sha256": "a21a15d4297f9fe3dcbb78b4a99071fed3bb57f344344ebc72e530a19fb110ba",
+  "passed": 0,
+  "total": 8,
+  "pass_at_1": 0.0,
+  "results": [
+    {
+      "id": "sqlite_query",
+      "seconds": 3.982,
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false
+    },
+    {
+      "id": "snapshot",
+      "seconds": 4.698,
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false
+    },
+    {
+      "id": "async_limit",
+      "seconds": 8.966,
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false
+    },
+    {
+      "id": "path_parts",
+      "seconds": 9.217,
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false
+    },
+    {
+      "id": "log_summary",
+      "seconds": 9.111,
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false
+    },
+    {
+      "id": "duration",
+      "seconds": 10.605,
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false
+    },
+    {
+      "id": "decode",
+      "seconds": 9.476,
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false
+    },
+    {
+      "id": "one_shot",
+      "seconds": 16.11,
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false
+    }
+  ]
+}

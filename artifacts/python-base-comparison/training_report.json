@@ -1,0 +1,27 @@
+{
+  "base": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+  "base_revision": "2e1fd397ee46e1388853d2af2c993145b0f1098a",
+  "base_weights_sha256": "c1b9b30e907950516ba3c646bdf570d8084c25a6410a0cdca80cf04b11bc13a8",
+  "seed": 42,
+  "license": "CC0-1.0",
+  "examples": 74,
+  "formats": {
+    "chat": 36,
+    "raw": 20,
+    "fim": 18
+  },
+  "accepted_overlap": 0,
+  "benchmarks": [
+    "12f9c0c9408696773da6fcc58de92f124ec145958d3e5ca1f5490dd283808432",
+    "a21a15d4297f9fe3dcbb78b4a99071fed3bb57f344344ebc72e530a19fb110ba",
+    "b796127e635a67f93fb35c04f4cb03cf06f38c8072ee7cee8833d7bee06979ef",
+    "e049fcc892662272cb9a1622308cc910a8fc18460ba9d72d297545c4cc469cd1"
+  ],
+  "supervised_sha256": "232455766b31cce5bb95e15098904ec39a04af63cddfb65ade735f3bbbf31c03",
+  "trainable_parameters": 589824,
+  "rank": 8,
+  "epochs": 1,
+  "loss": [
+    0.38552761354760545
+  ]
+}

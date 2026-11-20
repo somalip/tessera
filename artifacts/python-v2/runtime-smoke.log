@@ -1,0 +1,56 @@
+0.13.195.670 I srv  llama_server: initializing ...
+0.13.195.685 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.13.229.533 I srv    load_model: loading model '/Users/somalip/Documents/GitHub/tessera/artifacts/python-v2/Qwen3.5-0.8B-Q8_0.gguf'
+0.14.389.966 W model has unused tensor blk.24.attn_norm.weight (size = 4096 bytes) -- ignoring
+0.14.389.977 W model has unused tensor blk.24.post_attention_norm.weight (size = 4096 bytes) -- ignoring
+0.14.389.988 W model has unused tensor blk.24.attn_q.weight (size = 4456448 bytes) -- ignoring
+0.14.389.992 W model has unused tensor blk.24.attn_k.weight (size = 557056 bytes) -- ignoring
+0.14.389.996 W model has unused tensor blk.24.attn_v.weight (size = 557056 bytes) -- ignoring
+0.14.390.010 W model has unused tensor blk.24.attn_output.weight (size = 2228224 bytes) -- ignoring
+0.14.390.014 W model has unused tensor blk.24.attn_q_norm.weight (size = 1024 bytes) -- ignoring
+0.14.390.018 W model has unused tensor blk.24.attn_k_norm.weight (size = 1024 bytes) -- ignoring
+0.14.390.023 W model has unused tensor blk.24.ffn_gate.weight (size = 3899392 bytes) -- ignoring
+0.14.390.027 W model has unused tensor blk.24.ffn_down.weight (size = 3899392 bytes) -- ignoring
+0.14.390.031 W model has unused tensor blk.24.ffn_up.weight (size = 3899392 bytes) -- ignoring
+0.14.390.036 W model has unused tensor blk.24.nextn.eh_proj.weight (size = 2228224 bytes) -- ignoring
+0.14.390.041 W model has unused tensor blk.24.nextn.enorm.weight (size = 4096 bytes) -- ignoring
+0.14.390.046 W model has unused tensor blk.24.nextn.hnorm.weight (size = 4096 bytes) -- ignoring
+0.14.390.059 W model has unused tensor blk.24.nextn.shared_head_norm.weight (size = 4096 bytes) -- ignoring
+0.22.214.243 I cmn          init: llama threadpool init, n_threads = 2
+0.27.438.961 I srv    load_model: initializing, n_slots = 1, n_ctx_slot = 2048, kv_unified = 'false'
+0.27.441.152 W srv          init: --cache-idle-slots requires --cache-ram, disabling
+0.27.474.404 I srv  server_run_i: model loaded
+0.27.475.557 I srv  server_on_li: listening on http://127.0.0.1:49189
+0.27.629.053 I slot get_availabl: id  0 | task -1 | selected slot by LRU, n_tokens = 0, t_last = -1
+0.27.632.854 I slot launch_slot_: id  0 | task 0 | processing task, is_child = 0
+Traceback (most recent call last):
+  File "<stdin>", line 9, in <module>
+  File "/Users/somalip/Documents/GitHub/tessera/eval/inference.py", line 40, in request
+    with self.open(path, body, timeout) as response:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/somalip/Documents/GitHub/tessera/eval/inference.py", line 36, in open
+    return cast(IO[bytes], opener.open(request, timeout=timeout))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/tessera-python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/urllib/request.py", line 515, in open
+    response = self._open(req, data)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/tessera-python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/urllib/request.py", line 532, in _open
+    result = self._call_chain(self.handle_open, protocol, protocol +
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/tessera-python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/urllib/request.py", line 492, in _call_chain
+    result = func(*args)
+             ^^^^^^^^^^^
+  File "/private/tmp/tessera-python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/urllib/request.py", line 1386, in http_open
+    return self.do_open(http.client.HTTPConnection, req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/tessera-python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/urllib/request.py", line 1361, in do_open
+    r = h.getresponse()
+        ^^^^^^^^^^^^^^^
+  File "/private/tmp/tessera-python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/http/client.py", line 1478, in getresponse
+    response.begin()
+  File "/private/tmp/tessera-python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/http/client.py", line 343, in begin
+    version, status, reason = self._read_status()
+                              ^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/tessera-python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/http/client.py", line 312, in _read_status
+    raise RemoteDisconnected("Remote end closed connection without"
+http.client.RemoteDisconnected: Remote end closed connection without response

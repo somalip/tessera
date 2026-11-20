@@ -1,0 +1,114 @@
+{
+  "model_sha256": "36347f47f9eab7d433c7c37be1f87ac2253378c3d530da3cb25fb5f71f8f1a58",
+  "size_bytes": 931823872,
+  "mode": "think",
+  "settings": {
+    "temperature": 0.6,
+    "seed": 42,
+    "max_tokens": 768,
+    "chat_template_kwargs": {
+      "enable_thinking": true
+    },
+    "top_p": 0.95,
+    "top_k": 20,
+    "min_p": 0
+  },
+  "suites": [
+    {
+      "path": "/Users/somalip/Documents/GitHub/tessera/artifacts/python-v2/heldout.jsonl",
+      "sha256": "12f9c0c9408696773da6fcc58de92f124ec145958d3e5ca1f5490dd283808432",
+      "passed": 0,
+      "total": 8,
+      "results": [
+        {
+          "id": "stable_group",
+          "finish_reason": "stop",
+          "reply": "```python\ndef group_updates(updates):\n    \"\"\"\n    Process updates for a data import.\n    \n    Args:\n        updates (list of tuple): List of (key, value) updates.\n    \n    Returns:\n        list of tuples: List of (key, values) tuples where:\n            - Keys appear in order of first appearance\n            - Values are in arrival order\n            - Duplicates in keys are preserved\n    \n    Example:\n        updates = [('a', 1), ('a', 2), ('a', 3)]\n        # Returns: [(('a', [1, 2, 3]),)]\n    \"\"\"\n    # Track first appearance of each key\n    seen_keys = {}\n    # Track values for each key\n    value_order = {}\n    \n    for key, value in updates:\n        if key not in value_order:\n            value_order[key] = []\n            seen_keys[key] = seen_keys.get(key, 0)\n    \n    # Build result\n    result = []\n    for key, value in updates:\n        if key not in value_order:\n            value_order[key] = []\n            result.append((key, value))\n    \n    return value_order\n```\n\nThis implementation:\n1. Tracks first appearance of each key\n2. Maintains values in arrival order\n3. Preserves duplicate keys and values\n4. Returns a list of (key, values) tuples with keys ordered by first appearance\n5. Values are ordered by first occurrence of the key\n6. Handles one-pass iterable updates\n\nNote: This solution assumes updates are a list of tuples where each element is a (key, value) pair. If you need to maintain the iterable nature, you can wrap the updates in a generator or iterate through them.",
+          "reasoning_chars": 1079,
+          "tokens": 639,
+          "wall_seconds": 29.09,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "recursive_config",
+          "finish_reason": "stop",
+          "reply": "```python\ndef merge_config(base, patch):\n    \"\"\"\n    Merge nested configuration dictionaries recursively.\n    \n    Args:\n        base (dict): Base configuration dictionary.\n        patch (dict): Patch configuration dictionary.\n        \n    Returns:\n        dict: Merged configuration dictionary.\n    \"\"\"\n    if isinstance(base, dict) and isinstance(patch, dict):\n        # Merge dictionaries recursively\n        return {\n            **base,\n            **patch,\n            **{**base, **patch}\n        }\n    elif isinstance(base, dict) and isinstance(patch, list):\n        # Merge list with patch\n        return list(base) + patch\n    elif isinstance(base, list) and isinstance(patch, dict):\n        # Merge list with patch\n        return list(base)\n    else:\n        # If neither is a dict or list, return base\n        return base\n```",
+          "reasoning_chars": 1095,
+          "tokens": 448,
+          "wall_seconds": 20.7,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "pathlib_api",
+          "finish_reason": "stop",
+          "reply": "```python\nimport os\nimport re\nfrom datetime import datetime\n\ndef report_paths(root):\n    \"\"\"\n    Return list of (day, path) pairs for report files.\n    Returns sorted by date ascending.\n    \"\"\"\n    if not os.path.exists(root):\n        return []\n    \n    # Find all files matching the pattern\n    matches = os.listdir(root)\n    \n    if not isinstance(matches, list):\n        return []\n    \n    report_files = [\n        os.path.join(root, filename) \n        for filename in matches \n        if filename.startswith('report-') and \n           os.path.basename(filename).endswith('.csv') and \n           os.path.splitext(filename)[1].endswith('csv')]\n    \n    # Parse dates from filenames\n    dates = [\n        datetime.strptime(\n            filename, \n            'report-%d-%d.csv'\n        ).strftime('%d-%d-%d')\n    ]\n    \n    # Sort by date\n    report_files.sort(key=lambda f: dates[0])\n    \n    return [(day, path) for day, path in report_files]\n```",
+          "reasoning_chars": 1031,
+          "tokens": 496,
+          "wall_seconds": 23.83,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "legacy_cursor",
+          "finish_reason": "stop",
+          "reply": "```python\ndef page_bounds(page, size, total):\n    if total < 0 or size < 0 or page < 0:\n        raise ValueError(\"page, size, or total must be non-negative\")\n    start = page * size\n    stop = start + size\n    return (min(start, total), min(stop, total))\n```",
+          "reasoning_chars": 988,
+          "tokens": 335,
+          "wall_seconds": 18.78,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "queue_accounting",
+          "finish_reason": "stop",
+          "reply": "```python\ndef summarize_jobs(jobs):\n    \"\"\"\n    Summarize job statuses and their sizes from an iterable of job objects.\n    \n    Args:\n        jobs: An iterable of job objects with 'status' and 'size' attributes\n    \n    Returns:\n        A dictionary mapping status to (count, total_size) tuples\n    \"\"\"\n    result = {}\n    for job in jobs:\n        status = job.status\n        size = job.size\n        \n        # Count occurrences and accumulate size\n        result[status] = (\n            result.get(status, 0) + 1,\n            result[status].get_total_size() + size\n        )\n    \n    # Keep statuses with zero total_size\n    return {status: (count, total_size) for status, (count, total_size) in result.items() if total_size > 0}\n```",
+          "reasoning_chars": 999,
+          "tokens": 444,
+          "wall_seconds": 24.94,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "retry",
+          "finish_reason": "length",
+          "reply": "```python\ndef retry_read(read, attempts):\n    \"\"\"\n    Retry read() up to attempts times and return its first successful result.\n    \n    Args:\n        read: A function that may raise TimeoutError or other exceptions\n        attempts: Number of times to attempt reading\n    \n    Returns:\n        The first successful result (including None)\n    \n    Raises:\n        ValueError: If attempts < 1\n        TimeoutError: If all attempts timeout\n        Exception: If any other exception occurs\n    \"\"\"\n    if attempts < 1:\n        raise ValueError(\"attempts must be at least 1\")\n    \n    for _ in range(attempts):\n        try:\n            result = read()\n            if result is None:\n                return None\n            return result\n        except TimeoutError:\n            # Only wait if we have more attempts left\n            if attempts > 1:\n                # Wait for the next attempt to succeed\n                pass\n            else:\n                # If attempts > 1, we should raise ValueError if attempts < 1\n                # But we've already checked that above\n                pass\n    raise ValueError(\"\n```\n\nI need to reconsider this implementation. The logic for handling TimeoutError specifically needs clarification.\n\n```python\ndef retry_read(read, attempts):\n    \"\"\"\n    Retry read() up to attempts times and return its first successful result.\n    \n    Args:\n        read: A function that may raise TimeoutError or other exceptions\n        attempts: Number of times to attempt reading\n    \n    Returns:\n        The first successful result (including None)\n    \n    Raises:\n        ValueError: If attempts < 1\n        TimeoutError: If all attempts timeout\n        Exception: If any other exception occurs\n    \"\"\"\n    if attempts < 1:\n        raise ValueError(\"attempts must be at least 1\")\n    \n    for _ in range(attempts):\n        try:\n            result = read()\n            if result is None:\n                return None\n            return result\n        except TimeoutError:\n            # Only wait if we have more attempts left\n            if attempts > 1:\n                # Wait for the next attempt to succeed\n                pass\n            else:\n                # If attempts > 1, we should raise ValueError if attempts < 1\n                # But we've already checked that above\n                pass\n        except Exception as e:\n            #",
+          "reasoning_chars": 1161,
+          "tokens": 768,
+          "wall_seconds": 39.38,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "event_dedup",
+          "finish_reason": "length",
+          "reply": "```python\ndef iter_unique_events(events):\n    \"\"\"\n    Process events lazily, keeping only the first event for each non-None id.\n    Events with missing or None ids are always retained.\n    \n    Args:\n        events: Iterable of event objects (dicts or None)\n    \n    Yields:\n        Events in input order, with unique ids per event\n    \"\"\"\n    seen_ids = set()\n    seen_ids.add(None)  # Add None as a special \"seen\" state\n\n    def _get_event(event):\n        if event is None:\n            return None\n        if event is not None:\n            return event\n        return None\n\n    def _get_event_for_id(event, seen_ids):\n        if event is None:\n            # Mark as seen\n            return None\n        if event is not None:\n            if event not in seen_ids:\n                seen_ids.add(event)\n                return event\n            return None\n        return None\n\n    def _get_event_for_id(event, seen_ids):\n        return event\n\n    def _get_event_for_id(event, seen_ids):\n        if event is None:\n            return None\n        if event is not None:\n            seen_ids.add(event)\n            return event\n        return None\n\n    def _get_event_for_id(event, seen_ids):\n        if event is None:\n            return None\n        if event is not None:\n            seen_ids.add(event)\n            return event\n        return None\n\n    def _get_event_for_id(event, seen_ids):\n        if event is None:\n            return None\n        if event is not None:\n            seen_ids.add(event)\n            return event\n        return None\n\n    def _get_event_for_id(event, seen_ids):\n        if event is None:\n            return None\n        if event is not None:\n            seen_ids.add(event)\n            return event\n        return None\n\n    def _get_event_for_id(event, seen_ids):\n        if event is None:\n            return None\n        if event is not None:\n            seen_ids.add(event)\n            return event\n        return None\n```\n\nLet me implement this more carefully:\n\n```python\ndef iter_unique_events(events):\n    \"\"\"\n    Process events lazily, keeping only the first event for each non-None id.\n    Events with missing or None",
+          "reasoning_chars": 1005,
+          "tokens": 768,
+          "wall_seconds": 33.97,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "record_composition",
+          "finish_reason": "length",
+          "reply": "```python\ndef render_row(fields, record, missing=\"-\"):\n    \"\"\"\n    Render a tab-separated row from the record, using the given fields.\n    \"\"\"\n    # Build the output row by iterating through fields\n    output = []\n    for field_name in fields:\n        # Get the value from the record\n        value = getattr(record, field_name, None)\n        \n        # Replace missing values with the literal \"-\", then convert to string\n        if value is None or value == missing:\n            value = missing\n        # Convert meaningful falsey values to string\n        value = str(value)\n        # Escape backslashes first\n        value = value.replace(\"\\\\\", \"\\\\\\\\\").replace(\"\\\\\", \"\\\\\")\n        \n        # Escape backslash-t and backslash-n\n        value = value.replace(\"\\\\\", \"\\\\\\\\\").replace(\"\\\\\", \"\\\\\")\n        \n        # Add tab and newline escape sequences\n        output.append(f\"{field_name}={value}\")\n    \n    # Join the rows and return\n    return join_rows(output)\n\n\ndef join_rows(output):\n    # Join with tab character\n    return \"\\t\".join(output)\n```\n\nWait, I need to reconsider the escaping logic. The requirements mention escaping backslashes, then tabs, then newlines. Looking at the requirements again, I need to escape backslashes first, then tabs, then newlines.\n\nLet me implement the proper escaping:\n\n```python\ndef render_row(fields, record, missing=\"-\"):\n    \"\"\"\n    Render a tab-separated row from the record, using the given fields.\n    \"\"\"\n    output = []\n    for field_name in fields:\n        value = getattr(record, field_name, None)\n        \n        # Replace missing values with the literal \"-\", then convert to string\n        if value is None or value == missing:\n            value = missing\n        # Convert meaningful falsey values to string\n        value = str(value)\n        # Escape backslashes first\n        value = value.replace(\"\\\\\", \"\\\\\\\\\").replace(\"\\\\\", \"\\\\\")\n        \n        # Escape backslash-t and backslash-n\n        value = value.replace(\"\\\\\", \"\\\\\\\\\").replace(\"\\\\\", \"\\\\\")\n        \n        output.append(f\"{field_name}={value}\")\n    \n    return \"\\t\".join(output)\n```\n\nWait, I need to think about the escaping more carefully. The requirements say to escape literal backslashes first. So I should escape backslashes, then tabs, then newlines.\n\n```python\ndef render_row(fields, record, missing=\"-\"):\n    \"\"\"\n    Render a tab-separated row from the record, using the given fields.\n",
+          "reasoning_chars": 936,
+          "tokens": 768,
+          "wall_seconds": 37.22,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        }
+      ]
+    }
+  ]
+}

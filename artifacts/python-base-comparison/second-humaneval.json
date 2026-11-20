@@ -1,0 +1,356 @@
+{
+  "language": "python",
+  "model_sha256": "3f8f327526283bbe271af4e11ba342dec720a87c7bf0a40250ac4705f3a8512e",
+  "system_profiles": [],
+  "model_size_bytes": 934954496,
+  "suites": {
+    "humaneval": {
+      "dataset_sha256": "6b59a16ef5618387a9de3d83050a5458b886610b2aad969522709eb8f8911f40",
+      "metrics": {
+        "pass_at_1": 0.5416666666666666
+      },
+      "tasks": [
+        {
+          "id": "HumanEval/33",
+          "latency_seconds": 1.3572301660024095,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/11",
+          "latency_seconds": 0.8828225420002127,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/75",
+          "latency_seconds": 2.6159733750100713,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/67",
+          "latency_seconds": 1.0092165410023881,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/62",
+          "latency_seconds": 0.7492193749931175,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/40",
+          "latency_seconds": 1.2686395420023473,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/31",
+          "latency_seconds": 2.7374422089924337,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/144",
+          "latency_seconds": 2.811251416991581,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/27",
+          "latency_seconds": 0.5471429580065887,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/113",
+          "latency_seconds": 2.0765574160031974,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/13",
+          "latency_seconds": 0.7933104580006329,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/12",
+          "latency_seconds": 0.7018738749902695,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/28",
+          "latency_seconds": 0.33870570799626876,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/60",
+          "latency_seconds": 0.6464014579978539,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/64",
+          "latency_seconds": 1.5567021660099272,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/134",
+          "latency_seconds": 1.2849392909993185,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/162",
+          "latency_seconds": 0.7333808330004103,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/55",
+          "latency_seconds": 1.8702938329952303,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/156",
+          "latency_seconds": 5.120127040994703,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/112",
+          "latency_seconds": 0.7827526250039227,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/61",
+          "latency_seconds": 1.998754749991349,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/119",
+          "latency_seconds": 3.555053834003047,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/76",
+          "latency_seconds": 0.7155559999955585,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/6",
+          "latency_seconds": 2.8119025000050897,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/45",
+          "latency_seconds": 0.44448637499590404,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/154",
+          "latency_seconds": 1.889622041999246,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/92",
+          "latency_seconds": 1.5819637079985114,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/141",
+          "latency_seconds": 3.1266070829879027,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/44",
+          "latency_seconds": 2.762778417003574,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/150",
+          "latency_seconds": 0.7143942499969853,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/91",
+          "latency_seconds": 1.13406995900732,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/157",
+          "latency_seconds": 0.772129250006401,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/16",
+          "latency_seconds": 0.44233170899678953,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/53",
+          "latency_seconds": 0.34673816700524185,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/17",
+          "latency_seconds": 2.904312665996258,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/50",
+          "latency_seconds": 1.6953254169930005,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/138",
+          "latency_seconds": 0.8610466249956517,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/49",
+          "latency_seconds": 0.6373163749958621,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/82",
+          "latency_seconds": 0.8167328749987064,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/38",
+          "latency_seconds": 3.361849124994478,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/108",
+          "latency_seconds": 2.0959456670098007,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/10",
+          "latency_seconds": 1.4429804579995107,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/98",
+          "latency_seconds": 1.5881906660069944,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/63",
+          "latency_seconds": 2.5429665830015438,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/73",
+          "latency_seconds": 2.5610445000056643,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/20",
+          "latency_seconds": 1.0912089170014951,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/130",
+          "latency_seconds": 4.995565542005352,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/15",
+          "latency_seconds": 0.6506729999964591,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        }
+      ]
+    }
+  },
+  "gate_passed": false,
+  "gate_failures": [
+    "Baseline and competitor reports are required for release"
+  ]
+}

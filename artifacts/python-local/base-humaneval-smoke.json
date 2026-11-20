@@ -1,0 +1,55 @@
+{
+  "language": "python",
+  "model_sha256": "069e25eded20e56b9d05acf269e3851e9d579a8fb51996e1c4814888c08bad9a",
+  "system_profiles": [],
+  "model_size_bytes": 934954496,
+  "suites": {
+    "humaneval": {
+      "dataset_sha256": "14ec6fcee014cc17755bbaae9f32eff8f4f468ee6a4a05a75397b30a3f7bafad",
+      "metrics": {
+        "pass_at_1": 0.8
+      },
+      "tasks": [
+        {
+          "id": "HumanEval/0",
+          "latency_seconds": 18.505414250001195,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/1",
+          "latency_seconds": 9.51083329199173,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/2",
+          "latency_seconds": 1.5865477500046836,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/3",
+          "latency_seconds": 2.215772500014282,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/4",
+          "latency_seconds": 1.873151499996311,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        }
+      ]
+    }
+  },
+  "gate_passed": false,
+  "gate_failures": [
+    "Baseline and competitor reports are required for release"
+  ]
+}

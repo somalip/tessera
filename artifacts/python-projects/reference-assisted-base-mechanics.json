@@ -1,0 +1,38 @@
+{
+  "generation_report_sha256": "fdc2412e2f77df567cd8647a62e118bb16875d5960d28d62db0303ba3d4cfd7e",
+  "model_sha256": "4eabbd11aa32d9d0ed37d206ff15e1549b92cb7f23ef8654cc31b28a39e3f0ab",
+  "passed": 3,
+  "total": 3,
+  "results": [
+    {
+      "id": "snake-vague",
+      "passed": true,
+      "terminal_smoke": true,
+      "mechanics": {
+        "passed": true,
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": "snake-terminal",
+      "passed": true,
+      "terminal_smoke": true,
+      "mechanics": {
+        "passed": true,
+        "returncode": 0,
+        "timed_out": false
+      }
+    },
+    {
+      "id": "snake-detailed",
+      "passed": true,
+      "terminal_smoke": true,
+      "mechanics": {
+        "passed": true,
+        "returncode": 0,
+        "timed_out": false
+      }
+    }
+  ]
+}

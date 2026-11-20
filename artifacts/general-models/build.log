@@ -1,0 +1,152 @@
+0.00.678.703 I srv  llama_server: initializing ...
+0.00.678.750 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.695.863 I srv    load_model: loading model '/Users/somalip/Documents/GitHub/tessera/artifacts/general-models/documentation/documentation-tiny.Q8_0.gguf'
+0.01.591.573 W model has unused tensor blk.24.attn_norm.weight (size = 4096 bytes) -- ignoring
+0.01.591.583 W model has unused tensor blk.24.post_attention_norm.weight (size = 4096 bytes) -- ignoring
+0.01.591.601 W model has unused tensor blk.24.attn_q.weight (size = 4456448 bytes) -- ignoring
+0.01.591.604 W model has unused tensor blk.24.attn_k.weight (size = 557056 bytes) -- ignoring
+0.01.591.607 W model has unused tensor blk.24.attn_v.weight (size = 557056 bytes) -- ignoring
+0.01.591.617 W model has unused tensor blk.24.attn_output.weight (size = 2228224 bytes) -- ignoring
+0.01.591.621 W model has unused tensor blk.24.attn_q_norm.weight (size = 1024 bytes) -- ignoring
+0.01.591.624 W model has unused tensor blk.24.attn_k_norm.weight (size = 1024 bytes) -- ignoring
+0.01.591.627 W model has unused tensor blk.24.ffn_gate.weight (size = 3899392 bytes) -- ignoring
+0.01.591.630 W model has unused tensor blk.24.ffn_down.weight (size = 3899392 bytes) -- ignoring
+0.01.591.633 W model has unused tensor blk.24.ffn_up.weight (size = 3899392 bytes) -- ignoring
+0.01.591.637 W model has unused tensor blk.24.nextn.eh_proj.weight (size = 2228224 bytes) -- ignoring
+0.01.591.641 W model has unused tensor blk.24.nextn.enorm.weight (size = 4096 bytes) -- ignoring
+0.01.591.645 W model has unused tensor blk.24.nextn.hnorm.weight (size = 4096 bytes) -- ignoring
+0.01.591.655 W model has unused tensor blk.24.nextn.shared_head_norm.weight (size = 4096 bytes) -- ignoring
+0.06.011.437 I cmn          init: llama threadpool init, n_threads = 2
+0.06.300.876 I srv    load_model: initializing, n_slots = 1, n_ctx_slot = 2048, kv_unified = 'false'
+0.06.302.559 W srv          init: --cache-idle-slots requires --cache-ram, disabling
+0.06.319.362 I srv  server_run_i: model loaded
+0.06.319.591 I srv  server_on_li: listening on http://127.0.0.1:53966
+0.06.368.149 I slot get_availabl: id  0 | task -1 | selected slot by LRU, n_tokens = 0, t_last = -1
+0.06.368.183 I slot launch_slot_: id  0 | task 0 | processing task, is_child = 0
+0.10.639.617 I slot print_timing: id  0 | task 0 | prompt eval time =     568.55 ms /    77 tokens (    7.38 ms per token,   135.43 tokens per second)
+0.10.639.622 I slot print_timing: id  0 | task 0 |        eval time =    3702.49 ms /    97 tokens (   38.57 ms per token,    25.93 tokens per second)
+0.10.639.623 I slot print_timing: id  0 | task 0 |       total time =    4271.04 ms /   174 tokens
+0.10.639.624 I slot print_timing: id  0 | task 0 |    graphs reused =         96
+0.10.639.624 I slot print_timing: id  0 | task 0 |   graph reallocs =          0    /     0        (same size) / (changed size)
+0.10.639.848 I slot      release: id  0 | task 0 | stop processing: n_tokens = 173, truncated = 0
+0.10.645.532 I srv    operator(): operator(): cleaning up before exit...
+documentation {'bytes': 833606681, 'passed': 2, 'checks': 4}
+INFO:gguf-new-metadata:* Loading: artifacts/python-v2/Qwen3.5-0.8B-Q8_0.gguf
+INFO:gguf-new-metadata:* Writing: /Users/somalip/Documents/GitHub/tessera/artifacts/general-models/english/english-tiny.Q8_0.partial
+INFO:gguf.gguf_writer:gguf: This GGUF file is for Little Endian only
+Writing:   0%|          | 0.00/823M [00:00<?, ?byte/s]INFO:gguf.gguf_writer:Writing the following files:
+INFO:gguf.gguf_writer:/Users/somalip/Documents/GitHub/tessera/artifacts/general-models/english/english-tiny.Q8_0.partial: n_tensors = 335, total_size = 822.6M
+Writing:   0%|          | 4.10k/823M [00:00<32:40:39, 6.99kbyte/s]Writing:  33%|███▎      | 270M/823M [00:01<00:02, 202Mbyte/s]     Writing:  37%|███▋      | 302M/823M [00:01<00:02, 209Mbyte/s]Writing:  40%|███▉      | 329M/823M [00:01<00:02, 216Mbyte/s]Writing:  43%|████▎     | 355M/823M [00:01<00:02, 222Mbyte/s]Writing:  46%|████▋     | 382M/823M [00:01<00:01, 229Mbyte/s]Writing:  50%|█████     | 414M/823M [00:02<00:01, 242Mbyte/s]Writing:  54%|█████▍    | 443M/823M [00:02<00:01, 250Mbyte/s]Writing:  57%|█████▋    | 472M/823M [00:02<00:01, 257Mbyte/s]Writing:  61%|██████▏   | 506M/823M [00:02<00:01, 268Mbyte/s]Writing:  65%|██████▌   | 536M/823M [00:02<00:01, 267Mbyte/s]Writing:  69%|██████▉   | 567M/823M [00:02<00:00, 259Mbyte/s]Writing:  72%|███████▏  | 594M/823M [00:02<00:00, 243Mbyte/s]Writing:  75%|███████▌  | 620M/823M [00:02<00:00, 245Mbyte/s]Writing:  79%|███████▊  | 647M/823M [00:02<00:00, 248Mbyte/s]Writing:  83%|████████▎ | 679M/823M [00:03<00:00, 267Mbyte/s]Writing:  87%|████████▋ | 712M/823M [00:03<00:00, 282Mbyte/s]Writing:  90%|█████████ | 744M/823M [00:03<00:00, 285Mbyte/s]Writing:  94%|█████████▍| 775M/823M [00:03<00:00, 289Mbyte/s]Writing:  98%|█████████▊| 808M/823M [00:03<00:00, 298Mbyte/s]Writing: 100%|██████████| 823M/823M [00:03<00:00, 234Mbyte/s]
+0.00.228.527 I srv  llama_server: initializing ...
+0.00.228.534 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.232.862 I srv    load_model: loading model '/Users/somalip/Documents/GitHub/tessera/artifacts/general-models/english/english-tiny.Q8_0.gguf'
+0.00.545.990 W model has unused tensor blk.24.attn_norm.weight (size = 4096 bytes) -- ignoring
+0.00.545.996 W model has unused tensor blk.24.post_attention_norm.weight (size = 4096 bytes) -- ignoring
+0.00.546.007 W model has unused tensor blk.24.attn_q.weight (size = 4456448 bytes) -- ignoring
+0.00.546.011 W model has unused tensor blk.24.attn_k.weight (size = 557056 bytes) -- ignoring
+0.00.546.014 W model has unused tensor blk.24.attn_v.weight (size = 557056 bytes) -- ignoring
+0.00.546.021 W model has unused tensor blk.24.attn_output.weight (size = 2228224 bytes) -- ignoring
+0.00.546.024 W model has unused tensor blk.24.attn_q_norm.weight (size = 1024 bytes) -- ignoring
+0.00.546.026 W model has unused tensor blk.24.attn_k_norm.weight (size = 1024 bytes) -- ignoring
+0.00.546.028 W model has unused tensor blk.24.ffn_gate.weight (size = 3899392 bytes) -- ignoring
+0.00.546.030 W model has unused tensor blk.24.ffn_down.weight (size = 3899392 bytes) -- ignoring
+0.00.546.032 W model has unused tensor blk.24.ffn_up.weight (size = 3899392 bytes) -- ignoring
+0.00.546.035 W model has unused tensor blk.24.nextn.eh_proj.weight (size = 2228224 bytes) -- ignoring
+0.00.546.038 W model has unused tensor blk.24.nextn.enorm.weight (size = 4096 bytes) -- ignoring
+0.00.546.040 W model has unused tensor blk.24.nextn.hnorm.weight (size = 4096 bytes) -- ignoring
+0.00.546.048 W model has unused tensor blk.24.nextn.shared_head_norm.weight (size = 4096 bytes) -- ignoring
+0.01.956.388 I cmn          init: llama threadpool init, n_threads = 2
+0.02.204.235 I srv    load_model: initializing, n_slots = 1, n_ctx_slot = 2048, kv_unified = 'false'
+0.02.204.489 W srv          init: --cache-idle-slots requires --cache-ram, disabling
+0.02.219.056 I srv  server_run_i: model loaded
+0.02.219.064 I srv  server_on_li: listening on http://127.0.0.1:54042
+0.02.275.781 I slot get_availabl: id  0 | task -1 | selected slot by LRU, n_tokens = 0, t_last = -1
+0.02.275.946 I slot launch_slot_: id  0 | task 0 | processing task, is_child = 0
+0.03.044.565 I slot print_timing: id  0 | task 0 | prompt eval time =     483.21 ms /    74 tokens (    6.53 ms per token,   153.14 tokens per second)
+0.03.044.569 I slot print_timing: id  0 | task 0 |        eval time =     284.97 ms /    10 tokens (   31.66 ms per token,    31.58 tokens per second)
+0.03.044.570 I slot print_timing: id  0 | task 0 |       total time =     768.18 ms /    84 tokens
+0.03.044.570 I slot print_timing: id  0 | task 0 |    graphs reused =          9
+0.03.044.571 I slot print_timing: id  0 | task 0 |   graph reallocs =          0    /     0        (same size) / (changed size)
+0.03.044.810 I slot      release: id  0 | task 0 | stop processing: n_tokens = 83, truncated = 0
+0.03.048.479 I srv    operator(): operator(): cleaning up before exit...
+english {'bytes': 833606154, 'passed': 1, 'checks': 1}
+INFO:gguf-new-metadata:* Loading: artifacts/python-v2/Qwen3.5-0.8B-Q8_0.gguf
+INFO:gguf-new-metadata:* Writing: /Users/somalip/Documents/GitHub/tessera/artifacts/general-models/diagrams/diagrams-tiny.Q8_0.partial
+INFO:gguf.gguf_writer:gguf: This GGUF file is for Little Endian only
+Writing:   0%|          | 0.00/823M [00:00<?, ?byte/s]INFO:gguf.gguf_writer:Writing the following files:
+INFO:gguf.gguf_writer:/Users/somalip/Documents/GitHub/tessera/artifacts/general-models/diagrams/diagrams-tiny.Q8_0.partial: n_tensors = 335, total_size = 822.6M
+Writing:   0%|          | 4.10k/823M [00:00<19:52:46, 11.5kbyte/s]Writing:  33%|███▎      | 270M/823M [00:01<00:03, 144Mbyte/s]     Writing:  35%|███▍      | 287M/823M [00:02<00:03, 145Mbyte/s]Writing:  37%|███▋      | 306M/823M [00:02<00:03, 148Mbyte/s]Writing:  40%|███▉      | 325M/823M [00:02<00:03, 148Mbyte/s]Writing:  42%|████▏     | 342M/823M [00:02<00:03, 149Mbyte/s]Writing:  44%|████▎     | 359M/823M [00:02<00:03, 150Mbyte/s]Writing:  46%|████▌     | 375M/823M [00:02<00:03, 138Mbyte/s]Writing:  48%|████▊     | 394M/823M [00:02<00:02, 144Mbyte/s]Writing:  50%|█████     | 414M/823M [00:02<00:03, 136Mbyte/s]Writing:  52%|█████▏    | 428M/823M [00:03<00:03, 120Mbyte/s]Writing:  54%|█████▍    | 443M/823M [00:03<00:03, 123Mbyte/s]Writing:  56%|█████▌    | 460M/823M [00:03<00:02, 131Mbyte/s]Writing:  59%|█████▊    | 483M/823M [00:03<00:02, 149Mbyte/s]Writing:  61%|██████    | 502M/823M [00:03<00:02, 149Mbyte/s]Writing:  63%|██████▎   | 519M/823M [00:03<00:02, 132Mbyte/s]Writing:  65%|██████▌   | 536M/823M [00:03<00:02, 135Mbyte/s]Writing:  67%|██████▋   | 552M/823M [00:04<00:01, 140Mbyte/s]Writing:  69%|██████▉   | 567M/823M [00:04<00:02, 121Mbyte/s]Writing:  71%|███████   | 581M/823M [00:04<00:02, 116Mbyte/s]Writing:  72%|███████▏  | 594M/823M [00:04<00:01, 117Mbyte/s]Writing:  74%|███████▍  | 612M/823M [00:04<00:01, 125Mbyte/s]Writing:  76%|███████▌  | 626M/823M [00:04<00:01, 102Mbyte/s]Writing:  78%|███████▊  | 641M/823M [00:04<00:01, 94.0Mbyte/s]Writing:  80%|███████▉  | 656M/823M [00:05<00:01, 106Mbyte/s] Writing:  81%|████████  | 668M/823M [00:05<00:01, 107Mbyte/s]Writing:  83%|████████▎ | 683M/823M [00:05<00:01, 112Mbyte/s]Writing:  85%|████████▍ | 696M/823M [00:05<00:01, 107Mbyte/s]Writing:  87%|████████▋ | 712M/823M [00:05<00:00, 118Mbyte/s]Writing:  89%|████████▊ | 729M/823M [00:05<00:00, 122Mbyte/s]Writing:  90%|█████████ | 744M/823M [00:05<00:00, 115Mbyte/s]Writing:  92%|█████████▏| 761M/823M [00:05<00:00, 124Mbyte/s]Writing:  95%|█████████▍| 779M/823M [00:06<00:00, 125Mbyte/s]Writing:  96%|█████████▋| 793M/823M [00:06<00:00, 125Mbyte/s]Writing:  98%|█████████▊| 808M/823M [00:06<00:00, 124Mbyte/s]Writing: 100%|██████████| 823M/823M [00:06<00:00, 129Mbyte/s]
+0.00.300.559 I srv  llama_server: initializing ...
+0.00.300.565 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.308.249 I srv    load_model: loading model '/Users/somalip/Documents/GitHub/tessera/artifacts/general-models/diagrams/diagrams-tiny.Q8_0.gguf'
+0.00.636.784 W model has unused tensor blk.24.attn_norm.weight (size = 4096 bytes) -- ignoring
+0.00.636.790 W model has unused tensor blk.24.post_attention_norm.weight (size = 4096 bytes) -- ignoring
+0.00.636.795 W model has unused tensor blk.24.attn_q.weight (size = 4456448 bytes) -- ignoring
+0.00.636.798 W model has unused tensor blk.24.attn_k.weight (size = 557056 bytes) -- ignoring
+0.00.636.800 W model has unused tensor blk.24.attn_v.weight (size = 557056 bytes) -- ignoring
+0.00.636.807 W model has unused tensor blk.24.attn_output.weight (size = 2228224 bytes) -- ignoring
+0.00.636.809 W model has unused tensor blk.24.attn_q_norm.weight (size = 1024 bytes) -- ignoring
+0.00.636.811 W model has unused tensor blk.24.attn_k_norm.weight (size = 1024 bytes) -- ignoring
+0.00.636.813 W model has unused tensor blk.24.ffn_gate.weight (size = 3899392 bytes) -- ignoring
+0.00.636.815 W model has unused tensor blk.24.ffn_down.weight (size = 3899392 bytes) -- ignoring
+0.00.636.817 W model has unused tensor blk.24.ffn_up.weight (size = 3899392 bytes) -- ignoring
+0.00.636.820 W model has unused tensor blk.24.nextn.eh_proj.weight (size = 2228224 bytes) -- ignoring
+0.00.636.822 W model has unused tensor blk.24.nextn.enorm.weight (size = 4096 bytes) -- ignoring
+0.00.636.825 W model has unused tensor blk.24.nextn.hnorm.weight (size = 4096 bytes) -- ignoring
+0.00.636.832 W model has unused tensor blk.24.nextn.shared_head_norm.weight (size = 4096 bytes) -- ignoring
+0.08.114.857 I cmn          init: llama threadpool init, n_threads = 2
+0.08.427.225 I srv    load_model: initializing, n_slots = 1, n_ctx_slot = 2048, kv_unified = 'false'
+0.08.429.989 W srv          init: --cache-idle-slots requires --cache-ram, disabling
+0.08.441.643 I srv  server_run_i: model loaded
+0.08.441.673 I srv  server_on_li: listening on http://127.0.0.1:54077
+0.08.485.045 I slot get_availabl: id  0 | task -1 | selected slot by LRU, n_tokens = 0, t_last = -1
+0.08.485.067 I slot launch_slot_: id  0 | task 0 | processing task, is_child = 0
+0.10.550.099 I slot print_timing: id  0 | task 0 | prompt eval time =     449.50 ms /    86 tokens (    5.23 ms per token,   191.33 tokens per second)
+0.10.550.104 I slot print_timing: id  0 | task 0 |        eval time =    1615.47 ms /    48 tokens (   34.37 ms per token,    29.09 tokens per second)
+0.10.550.104 I slot print_timing: id  0 | task 0 |       total time =    2064.97 ms /   134 tokens
+0.10.550.105 I slot print_timing: id  0 | task 0 |    graphs reused =         47
+0.10.550.105 I slot print_timing: id  0 | task 0 |   graph reallocs =          0    /     0        (same size) / (changed size)
+0.10.550.331 I slot      release: id  0 | task 0 | stop processing: n_tokens = 133, truncated = 0
+0.10.558.355 I srv    operator(): operator(): cleaning up before exit...
+diagrams {'bytes': 833606406, 'passed': 3, 'checks': 3}
+INFO:gguf-new-metadata:* Loading: artifacts/python-v2/Qwen3.5-0.8B-Q8_0.gguf
+INFO:gguf-new-metadata:* Writing: /Users/somalip/Documents/GitHub/tessera/artifacts/general-models/summaries/summaries-tiny.Q8_0.partial
+INFO:gguf.gguf_writer:gguf: This GGUF file is for Little Endian only
+Writing:   0%|          | 0.00/823M [00:00<?, ?byte/s]INFO:gguf.gguf_writer:Writing the following files:
+INFO:gguf.gguf_writer:/Users/somalip/Documents/GitHub/tessera/artifacts/general-models/summaries/summaries-tiny.Q8_0.partial: n_tensors = 335, total_size = 822.6M
+Writing:   0%|          | 4.10k/823M [00:00<24:52:18, 9.19kbyte/s]Writing:  33%|███▎      | 270M/823M [00:02<00:05, 102Mbyte/s]     Writing:  35%|███▍      | 287M/823M [00:02<00:05, 105Mbyte/s]Writing:  38%|███▊      | 310M/823M [00:02<00:04, 113Mbyte/s]Writing:  41%|████      | 337M/823M [00:03<00:03, 124Mbyte/s]Writing:  44%|████▎     | 359M/823M [00:03<00:03, 132Mbyte/s]Writing:  46%|████▌     | 379M/823M [00:03<00:03, 133Mbyte/s]Writing:  48%|████▊     | 398M/823M [00:03<00:03, 140Mbyte/s]Writing:  51%|█████     | 417M/823M [00:03<00:02, 144Mbyte/s]Writing:  53%|█████▎    | 435M/823M [00:03<00:02, 149Mbyte/s]Writing:  55%|█████▌    | 456M/823M [00:03<00:02, 148Mbyte/s]Writing:  57%|█████▋    | 472M/823M [00:03<00:02, 146Mbyte/s]Writing:  60%|█████▉    | 491M/823M [00:04<00:02, 139Mbyte/s]Writing:  61%|██████▏   | 506M/823M [00:04<00:02, 134Mbyte/s]Writing:  64%|██████▎   | 523M/823M [00:04<00:02, 116Mbyte/s]Writing:  65%|██████▌   | 536M/823M [00:04<00:02, 114Mbyte/s]Writing:  67%|██████▋   | 552M/823M [00:04<00:02, 124Mbyte/s]Writing:  69%|██████▉   | 567M/823M [00:04<00:03, 85.0Mbyte/s]Writing:  70%|███████   | 579M/823M [00:05<00:02, 88.2Mbyte/s]Writing:  72%|███████▏  | 590M/823M [00:05<00:02, 92.8Mbyte/s]Writing:  73%|███████▎  | 602M/823M [00:05<00:02, 95.2Mbyte/s]Writing:  75%|███████▍  | 616M/823M [00:05<00:02, 89.7Mbyte/s]Writing:  77%|███████▋  | 633M/823M [00:05<00:01, 95.2Mbyte/s]Writing:  78%|███████▊  | 645M/823M [00:05<00:01, 94.8Mbyte/s]Writing:  80%|███████▉  | 656M/823M [00:05<00:02, 82.9Mbyte/s]Writing:  81%|████████▏ | 670M/823M [00:06<00:01, 94.1Mbyte/s]Writing:  83%|████████▎ | 687M/823M [00:06<00:01, 110Mbyte/s] Writing:  85%|████████▌ | 700M/823M [00:06<00:01, 90.4Mbyte/s]Writing:  87%|████████▋ | 715M/823M [00:06<00:01, 102Mbyte/s] Writing:  89%|████████▉ | 733M/823M [00:06<00:00, 113Mbyte/s]Writing:  91%|█████████▏| 752M/823M [00:06<00:00, 130Mbyte/s]Writing:  94%|█████████▍| 775M/823M [00:06<00:00, 145Mbyte/s]Writing:  96%|█████████▋| 793M/823M [00:06<00:00, 152Mbyte/s]Writing:  99%|█████████▉| 813M/823M [00:07<00:00, 153Mbyte/s]Writing: 100%|██████████| 823M/823M [00:07<00:00, 115Mbyte/s]
+0.00.442.267 I srv  llama_server: initializing ...
+0.00.442.275 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.449.985 I srv    load_model: loading model '/Users/somalip/Documents/GitHub/tessera/artifacts/general-models/summaries/summaries-tiny.Q8_0.gguf'
+0.00.858.120 W model has unused tensor blk.24.attn_norm.weight (size = 4096 bytes) -- ignoring
+0.00.858.131 W model has unused tensor blk.24.post_attention_norm.weight (size = 4096 bytes) -- ignoring
+0.00.858.138 W model has unused tensor blk.24.attn_q.weight (size = 4456448 bytes) -- ignoring
+0.00.858.140 W model has unused tensor blk.24.attn_k.weight (size = 557056 bytes) -- ignoring
+0.00.858.142 W model has unused tensor blk.24.attn_v.weight (size = 557056 bytes) -- ignoring
+0.00.858.150 W model has unused tensor blk.24.attn_output.weight (size = 2228224 bytes) -- ignoring
+0.00.858.163 W model has unused tensor blk.24.attn_q_norm.weight (size = 1024 bytes) -- ignoring
+0.00.858.165 W model has unused tensor blk.24.attn_k_norm.weight (size = 1024 bytes) -- ignoring
+0.00.858.168 W model has unused tensor blk.24.ffn_gate.weight (size = 3899392 bytes) -- ignoring
+0.00.858.170 W model has unused tensor blk.24.ffn_down.weight (size = 3899392 bytes) -- ignoring
+0.00.858.172 W model has unused tensor blk.24.ffn_up.weight (size = 3899392 bytes) -- ignoring
+0.00.858.176 W model has unused tensor blk.24.nextn.eh_proj.weight (size = 2228224 bytes) -- ignoring
+0.00.858.178 W model has unused tensor blk.24.nextn.enorm.weight (size = 4096 bytes) -- ignoring
+0.00.858.181 W model has unused tensor blk.24.nextn.hnorm.weight (size = 4096 bytes) -- ignoring
+0.00.858.189 W model has unused tensor blk.24.nextn.shared_head_norm.weight (size = 4096 bytes) -- ignoring
+0.08.058.934 I cmn          init: llama threadpool init, n_threads = 2
+0.27.146.715 I srv    load_model: initializing, n_slots = 1, n_ctx_slot = 2048, kv_unified = 'false'
+0.27.155.452 W srv          init: --cache-idle-slots requires --cache-ram, disabling
+0.27.200.520 I srv  server_run_i: model loaded
+0.27.200.789 I srv  server_on_li: listening on http://127.0.0.1:54169
+0.27.535.076 I slot get_availabl: id  0 | task -1 | selected slot by LRU, n_tokens = 0, t_last = -1
+0.27.536.477 I slot launch_slot_: id  0 | task 0 | processing task, is_child = 0
+0.36.559.253 I slot print_timing: id  0 | task 0 | prompt processing, n_tokens =     36, progress = 0.49, t =   9.02 s / 3.99 tokens per second
+0.46.586.248 I slot print_timing: id  0 | task 0 | prompt processing, n_tokens =     69, progress = 0.95, t =  19.04 s / 3.62 tokens per second
+1.10.858.524 I slot print_timing: id  0 | task 0 | prompt eval time =   38241.84 ms /    73 tokens (  523.86 ms per token,     1.91 tokens per second)
+1.10.858.529 I slot print_timing: id  0 | task 0 |        eval time =    5079.51 ms /    22 tokens (  241.88 ms per token,     4.13 tokens per second)
+1.10.858.530 I slot print_timing: id  0 | task 0 |       total time =   43321.35 ms /    95 tokens
+1.10.858.530 I slot print_timing: id  0 | task 0 |    graphs reused =         21
+1.10.858.531 I slot print_timing: id  0 | task 0 |   graph reallocs =          0    /     0        (same size) / (changed size)
+1.10.869.665 I slot      release: id  0 | task 0 | stop processing: n_tokens = 94, truncated = 0
+1.10.955.676 I srv    operator(): operator(): cleaning up before exit...
+summaries {'bytes': 833606201, 'passed': 2, 'checks': 2}

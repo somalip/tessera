@@ -1,0 +1,34 @@
+Historical pause record. Work resumed and the evaluation and release status are in RESULTS.txt.
+
+Paused on November 20, 2026 at the user's request.
+
+The original VS Code route failed all three Snake prompts. The experimental
+prompt with a reusable moving-marker example passed all three in the pinned
+Docker verifier using the original 934,954,496-byte checkpoint. That experiment
+includes the exact “make a snake game” request. Its prompt addition and results
+are saved in few-shot-experiment.cjs and few-shot-diagnostic.json. It has not
+been merged into the production prompt or installed in VS Code.
+
+The production source changes preserve full standalone project requests,
+allow a larger context, and retry incomplete output. Before adding the
+experimental example, the original weights with the new source route passed
+1/8 on the separate program holdout. Syntax checks and 48 extension unit tests
+passed, and the isolated VS Code integration test exited successfully. The
+repository make check still flags the pre-existing generated test.py sample.
+The targeted Python checks succeeded when that sample was excluded.
+
+The two-epoch LoRA run on 48 verified examples was suspended with SIGSTOP.
+PID 44101 was confirmed stopped after logging epoch 2/2, step 24/48. Its
+intermediate optimizer state is only in memory and will be lost if the process
+or machine exits. The restartable corpus, audit, and training command are saved.
+All benchmark processes started for this task were stopped. The larger verified
+7B model is cached at /private/tmp/tessera-project-quality/teacher.gguf.
+
+When resuming, verify PID 44101 is still the matching stopped train.py process,
+then resume it or restart from training.jsonl using PYTHONPATH set to
+.capsule-router:/private/tmp/tessera-model/source/gguf-py. The run exports to
+/private/tmp/tessera-project-quality/tuned. Finish and quantize the checkpoint,
+then compare its results against the original checkpoint on the same frozen
+prompts, including the moving-marker prompt experiment and the 7B comparator.
+Validate Python chat and autocomplete before promoting any checkpoint. No
+fine-tuned GGUF or VS Code settings change was deployed.

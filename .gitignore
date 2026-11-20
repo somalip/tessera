@@ -1,0 +1,32 @@
+.DS_Store
+.capsule-router/
+.venv/
+node_modules/
+__pycache__/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.vscode-test/
+
+# Keep trained model weights and checkpoint directories local.
+*.gguf
+*.ggml
+*.tcm
+*.safetensors
+*.pt
+*.pth
+*.onnx
+*.ckpt
+*.npz
+pytorch_model*.bin
+checkpoint/
+checkpoint-*/
+artifacts/python-local/base/
+
+# Downloaded runtimes and the upstream exercise checkout.
+artifacts/python-v2/llama-b12244/
+artifacts/python-v2/llama-b12244-bin-macos-arm64.tar.gz
+artifacts/python-base-comparison/llama-metal
+artifacts/python-strength/llama-metal
+artifacts/python-strength/exercism/
+artifacts/python-strength/exercism.tar.gz

@@ -1,0 +1,24 @@
+{
+  "cpt": {
+    "steps": 1,
+    "tokens": 26,
+    "mean_loss": 12.065871238708496
+  },
+  "sft": {
+    "steps": 1,
+    "tokens": 33,
+    "mean_loss": 11.878799438476562
+  },
+  "rejection_sampling": {
+    "steps": 1,
+    "tokens": 32,
+    "mean_loss": 11.798553466796875
+  },
+  "vocab_padding": {
+    "original_rows": 151808,
+    "required_rows": 151665,
+    "trimmed": false,
+    "potential_4bit_bytes_saved": 18304
+  },
+  "device": "mps"
+}

@@ -1,0 +1,141 @@
+{
+  "model": "artifacts/python-brief/streaming/python-brief.Q4_K_M.gguf",
+  "model_sha256": "80d89f3062409084834541c700b127e479d453f7963eb833bbc75e4ae50e01c8",
+  "size_bytes": 995780096,
+  "fixture_sha256": "6166974f8564ae4036d09ba1482488c37ac2cbafca84b219cf513d51b9eaf21b",
+  "runtime": "/Users/somalip/Documents/GitHub/tessera/artifacts/python-strength/serve-metal",
+  "passed": 1,
+  "total": 13,
+  "results": [
+    {
+      "id": "partial_write",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "def write_all(write, data):\n    total = 0\n    while data:\n        remaining = len(data)\n        if remaining <= 0 or remaining > len(data):\n            raise OSError(\"Invalid count or length\")\n        written = write(data[:remaining])\n        if written != remaining:\n            raise OSError(\"Failed to write all data\")\n        total += written\n        data = data[written:]\n    return total",
+      "completion_tokens": 84,
+      "seconds": 4.81
+    },
+    {
+      "id": "ordered_observations",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "def attach_readings(sensors, latest):\n    fresh_dicts = []\n    for sensor_id, sensor in sensors.items():\n        if sensor_id in latest:\n            fresh_dicts.append(sensor.copy())\n            fresh_dicts[-1][\"value\"] = latest[sensor_id]\n        else:\n            fresh_dicts.append(sensor.copy())\n            fresh_dicts[-1][\"value\"] = None\n    return fresh_dicts",
+      "completion_tokens": 78,
+      "seconds": 2.48
+    },
+    {
+      "id": "type_dispatch",
+      "passed": true,
+      "returncode": 0,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "def coerce_field(value):\n    if value is None:\n        return None\n    elif isinstance(value, bool):\n        return \"true\" if value else \"false\"\n    elif isinstance(value, str):\n        return value.strip()\n    elif isinstance(value, (int, float)):\n        return str(value)\n    else:\n        raise TypeError(\"Unsupported type for coercion\")",
+      "completion_tokens": 73,
+      "seconds": 2.3
+    },
+    {
+      "id": "non_overlapping_spans",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "def total_coverage(spans):\n    if not spans:\n        return 0\n    spans.sort(reverse=True)\n    start, end = spans[0]\n    total = 0\n    for start, end in spans[1:]:\n        if start > end:\n            raise ValueError(\"Reversed intervals are not allowed.\")\n        total += end - start\n    return total",
+      "completion_tokens": 75,
+      "seconds": 2.73
+    },
+    {
+      "id": "cache_expiry",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "def ttl_lookup(cache, key, now, fetch, ttl):\n    if key in cache:\n        entry = cache[key]\n        if entry[\"expires_at\"] > now:\n            return entry[\"value\"]\n        else:\n            return None\n    else:\n        result = fetch(key)\n        if result is not None:\n            cache[key] = {\"expires_at\": now + ttl, \"value\": result}\n            return result\n        else:\n            return None",
+      "completion_tokens": 93,
+      "seconds": 2.9
+    },
+    {
+      "id": "path_manifest",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "def select_manifest(root):\n    manifest_files = []\n    for root, dirs, files in os.walk(root):\n        for file in files:\n            if file.endswith('.manifest') and not file.startswith('.'):\n                manifest_files.append(os.path.join(root, file))\n    manifest_files.sort()\n    return manifest_files",
+      "completion_tokens": 62,
+      "seconds": 2.31
+    },
+    {
+      "id": "bounded_unique",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "def first_unique(values, count):\n    seen = set()\n    for value in values:\n        if value not in seen:\n            seen.add(value)\n            count -= 1\n            if count <= 0:\n                return seen\n    return seen\n\ndef main():\n    values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\n    count = 5\n    unique_values = first_unique(values, count)\n    print(unique_values)\n\nif __name__ == \"__main__\":\n    main()",
+      "completion_tokens": 121,
+      "seconds": 3.78
+    },
+    {
+      "id": "byte_frame",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "def encode_frame(payload):\n    if len(payload) > 65535:\n        raise ValueError(\"Length of payload must be less than or equal to 65535\")\n    return payload.encode(\"utf-8\")[:2] + payload.encode(\"utf-8\")[2:]",
+      "completion_tokens": 62,
+      "seconds": 2.17
+    },
+    {
+      "id": "duration_value",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "def wait_microseconds(start, end):\n    if not isinstance(start, datetime) or not isinstance(end, datetime):\n        raise ValueError(\"start and end must be datetime objects\")\n    if start > end:\n        raise ValueError(\"start must be before end\")\n    if start.tzinfo != end.tzinfo:\n        raise ValueError(\"start and end must have the same timezone\")\n    delta = end - start\n    if delta.days > 0:\n        raise ValueError(\"multi-day spans are not supported\")\n    return delta.microseconds",
+      "completion_tokens": 108,
+      "seconds": 3.57
+    },
+    {
+      "id": "nested_context",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "def capture_append(target):\n    with open(target, 'a') as file:\n        try:\n            while True:\n                yield file.write(input(\"Enter text to append: \"))\n        except Exception as e:\n            file.truncate(0)\n            raise e",
+      "completion_tokens": 52,
+      "seconds": 4.34
+    },
+    {
+      "id": "select_rows",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "def find_matches(records, columns, needle):\n    import re\n    needle = needle.lower()\n    matches = []\n    for record in records:\n        for column in columns:\n            if isinstance(record[column], str):\n                if re.search(needle, record[column], re.IGNORECASE):\n                    matches.append(record)\n                    break\n    return matches",
+      "completion_tokens": 69,
+      "seconds": 4.92
+    },
+    {
+      "id": "guarded_quantities",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "def pad_rows(rows, width, fill=None):\n    if width < 0:\n        raise ValueError(\"width must be non-negative\")\n    for row in rows:\n        if len(row) < width:\n            row.extend([fill] * (width - len(row)))\n        yield row",
+      "completion_tokens": 58,
+      "seconds": 3.47
+    },
+    {
+      "id": "snake-terminal-smoke",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "import curses\nimport time\n\ndef main(stdscr):\n    curses.curs_set(0)  # Hide the cursor\n    stdscr.keypad(True)  # Enable keyboard input\n    stdscr.timeout(120)  # Set timeout for getch()\n\n    # Define the grid size and initial position\n    grid_size = 20\n    snake = [(grid_size // 2, grid_size // 2)]\n    direction = (0, 0)  # Initial direction: right\n\n    # Define the key-to-direction map\n    key_to_direction = {\n        curses.KEY_UP: (0, -1),\n        curses.KEY_DOWN: (0, 1),\n        curses.KEY_LEFT: (-1, 0),\n        curses.KEY_RIGHT: (1, 0)\n    }\n\n    # Define the game loop\n    while True:\n        # Get the user input\n        key = stdscr.getch()\n        if key in key_to_direction:\n            direction = key_to_direction[key]\n\n        # Update the snake position\n        new_head = (snake[0][0] + direction[0], snake[0][1] + direction[1])\n        snake.insert(0, new_head)\n\n        # Check for collisions with the walls or itself\n        if new_head[0] < 0 or new_head[0] >= grid_size or new_head[1] < 0 or new_head[1] >= grid_size or new_head in snake[1:]:\n            break\n\n        # Check for collisions with the food\n        if new_head == (grid_size // 2, grid_size // 2):\n            snake.append(snake[-1])  # Add a new segment to the snake\n        else:\n            snake.pop()  # Remove the tail segment of the snake\n\n        # Clear the screen\n        stdscr.clear()\n\n        # Draw the grid\n        for row in range(grid_size):\n            for col in range(grid_size):\n                if (row, col) in snake:\n                    stdscr.addch(row, col, curses.ACS_CKBOARD)  # Draw snake\n                elif (row, col) == (grid_size // 2, grid_size // 2):\n                    stdscr.addch(row, col, curses.ACS_PI)  # Draw food\n                else:\n                    stdscr.addch(row, col, \" \")  # Draw empty space\n\n        # Refresh the screen\n        stdscr.refresh()\n\n        # Wait for the next frame\n        time.sleep(0.1)\n\n    # Clean up\n    curses.curs_set(1)  # Show the cursor\n    stdscr.keypad(False)\n    curses.endwin()\n\nif __name__ == \"__main__\":\n    curses.wrapper(main)",
+      "completion_tokens": 567,
+      "seconds": 26.53
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "model": "scaled.Q4_0.gguf",
+  "model_sha256": "4eabbd11aa32d9d0ed37d206ff15e1549b92cb7f23ef8654cc31b28a39e3f0ab",
+  "size_bytes": 934954496,
+  "reference_only": false,
+  "context": 4096,
+  "gpu_layers": 99,
+  "fixture_sha256": "0684785cf34c699ee9a28baac3ecf5435fb1f99f9f2b7cd8d3d8be38cf0ff52c",
+  "suite": "holdout",
+  "passed": 1,
+  "total": 8,
+  "results": [
+    {
+      "id": "histogram",
+      "code": "import argparse\nimport sys\n\ndef main():\n    parser = argparse.ArgumentParser(description=\"Count whitespace-separated integers and print each value and count separated by one space in numeric order.\")\n    parser.add_argument(\"--min\", type=int, help=\"Drop values below the supplied integer.\")\n    args = parser.parse_args()\n\n    counts = {}\n    for line in sys.stdin:\n        for word in line.split():\n            try:\n                value = int(word)\n                if args.min is not None and value < args.min:\n                    continue\n                counts[value] = counts.get(value, 0) + 1\n            except ValueError:\n                continue\n\n    for value in sorted(counts.keys()):\n        print(f\"{value} {counts[value]}\")\n\nif __name__ == \"__main__\":\n    main()",
+      "route": "Inline generation",
+      "instruction": "Build a stdin histogram CLI. Count whitespace-separated integers and print each value and count separated by one space in numeric order. Add --min to drop values below the supplied integer.",
+      "diagnostics": [],
+      "seconds": 9.093024666000002,
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "syntax_error": null
+    },
+    {
+      "id": "bookmark-store",
+      "code": "import json\nimport sys\n\ndef main():\n    if len(sys.argv) < 2:\n        print(\"Usage: python bookmark_manager.py <json_data_file>\")\n        sys.exit(1)\n\n    json_data_file = sys.argv[1]\n    bookmarks = load_bookmarks(json_data_file)\n\n    while True:\n        print(\"\\nBookmark Manager\")\n        print(\"1. Add Name URL\")\n        print(\"2. List Bookmarks\")\n        print(\"3. Remove Name\")\n        print(\"4. Exit\")\n        choice = input(\"Enter your choice: \")\n\n        if choice == \"1\":\n            name = input(\"Enter name: \")\n            url = input(\"Enter URL: \")\n            bookmarks[name] = url\n            save_bookmarks(json_data_file, bookmarks)\n        elif choice == \"2\":\n            bookmarks = sort_bookmarks(bookmarks)\n            for name, url in bookmarks.items():\n                print(f\"{name}\\t{url}\")\n        elif choice == \"3\":\n            name = input(\"Enter name to remove: \")\n            if name in bookmarks:\n                del bookmarks[name]\n                save_bookmarks(json_data_file, bookmarks)\n            else:\n                print(\"Name not found.\")\n        elif choice == \"4\":\n            sys.exit(0)\n        else:\n            print(\"Invalid choice. Please try again.\")\n\ndef load_bookmarks(json_data_file):\n    try:\n        with open(json_data_file, 'r') as file:\n            return json.load(file)\n    except FileNotFoundError:\n        return {}\n\ndef save_bookmarks(json_data_file, bookmarks):\n    with open(json_data_file, 'w') as file:\n        json.dump(bookmarks, file, indent=4)\n\ndef sort_bookmarks(bookmarks):\n    return dict(sorted(bookmarks.items(), key=lambda item: item[0]))\n\nif __name__ == \"__main__\":\n    main()",
+      "route": "Inline generation",
+      "instruction": "Make a persistent command-line bookmark manager. First arg is the JSON data file, then add NAME URL, list, or remove NAME. list prints name and URL separated by a tab, sorted by name. Removing a missing name exits nonzero.",
+      "diagnostics": [],
+      "seconds": 14.157461042,
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "syntax_error": null
+    },
+    {
+      "id": "expense-report",
+      "code": "import sys\nimport json\nimport decimal\n\ndef parse_csv(csv_data):\n    return [tuple(map(decimal.Decimal, row)) for row in csv_data.splitlines()]\n\ndef summarize_expenses(expenses, category=None):\n    if category:\n        expenses = [expense for expense in expenses if expense[0] == category]\n    total_expenses = sum(expense[1] for expense in expenses)\n    return {\n        \"total\": total_expenses.quantize(decimal.Decimal(\"0.01\")),\n        \"categories\": {category: expense[1].quantize(decimal.Decimal(\"0.01\")) for category, expense in expenses}\n    }\n\ndef main():\n    if len(sys.argv) != 2:\n        print(\"Usage: python expenses.py <csv_data>\")\n        sys.exit(1)\n\n    csv_data = sys.stdin.read()\n    expenses = parse_csv(csv_data)\n\n    if len(expenses) == 0:\n        print(\"No expenses found.\")\n        sys.exit(0)\n\n    if len(expenses) == 1:\n        category = expenses[0][0]\n        summary = summarize_expenses(expenses, category)\n        print(json.dumps(summary))\n    else:\n        summary = summarize_expenses(expenses)\n        print(json.dumps(summary))\n\nif __name__ == \"__main__\":\n    main()",
+      "route": "Inline generation",
+      "instruction": "Write a CLI to summarize CSV expenses from stdin with category and amount columns. Use exact decimal money arithmetic and print a JSON object mapping category to 2-decimal strings. --category limits results to that name.",
+      "diagnostics": [],
+      "seconds": 10.811487417,
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "syntax_error": null
+    },
+    {
+      "id": "tic-tac-toe",
+      "code": "import sys\n\ndef print_board(board):\n    print(\" 1 | 2 | 3 \")\n    print(\"-----------\")\n    print(\" 4 | 5 | 6 \")\n    print(\"-----------\")\n    print(\" 7 | 8 | 9 \")\n\ndef check_winner(board):\n    win_conditions = [\n        (0, 1, 2), (3, 4, 5), (6, 7, 8),  # rows\n        (0, 3, 6), (1, 4, 7), (2, 5, 8),  # columns\n        (0, 4, 8), (2, 4, 6)               # diagonals\n    ]\n    for condition in win_conditions:\n        if board[condition[0]] == board[condition[1]] == board[condition[2]] != ' ':\n            return board[condition[0]]\n    return None\n\ndef main():\n    board = [' '] * 9\n    current_player = 'X'\n    print_board(board)\n\n    while True:\n        try:\n            move = int(input(f\"{current_player}'s turn. Enter a number (1-9): \"))\n            if move < 1 or move > 9 or board[move - 1] != ' ':\n                print(\"Invalid move. Try again.\")\n                continue\n            board[move - 1] = current_player\n            print_board(board)\n            winner = check_winner(board)\n            if winner:\n                print(f\"{winner} wins!\")\n                break\n            elif all(board[i] != ' ' for i in range(9)):\n                print(\"Draw!\")\n                break\n            current_player = 'O' if current_player == 'X' else 'X'\n        except ValueError:\n            print(\"Invalid input. Please enter a number.\")\n\nif __name__ == \"__main__\":\n    main()",
+      "route": "Inline generation",
+      "instruction": "Make a two-player terminal tic-tac-toe game. X goes first. Read one square numbered 1 to 9 per line, retry invalid or occupied moves without switching turns, and print 'X wins', 'O wins', or 'Draw' when done.",
+      "diagnostics": [],
+      "seconds": 18.261850583,
+      "passed": true,
+      "returncode": 0,
+      "timed_out": false,
+      "syntax_error": null
+    },
+    {
+      "id": "countdown",
+      "code": "",
+      "route": "Inline generation",
+      "instruction": "Create a command-line Pomodoro timer. Accept --work and --break durations in seconds and --rounds. Run work followed by break for every round except the last. Print phase names and round numbers. Reject negative durations.",
+      "diagnostics": [
+        "Error: The previous answer contained invalid Python syntax."
+      ],
+      "seconds": 19.754025040999995,
+      "passed": false,
+      "syntax_error": null
+    },
+    {
+      "id": "directory-inventory",
+      "code": "import os\nimport json\n\ndef inventory_directory(directory, suffix=None):\n    inventory = {}\n    for root, dirs, files in os.walk(directory):\n        for file in files:\n            if suffix and not file.endswith(suffix):\n                continue\n            path = os.path.join(root, file)\n            size = os.path.getsize(path)\n            inventory[path] = size\n    return inventory\n\ndef main():\n    import argparse\n    parser = argparse.ArgumentParser(description=\"Inventory a directory\")\n    parser.add_argument(\"directory\", help=\"Directory to inventory\")\n    parser.add_argument(\"--suffix\", help=\"Suffix to filter files by\")\n    args = parser.parse_args()\n    inventory = inventory_directory(args.directory, args.suffix)\n    print(json.dumps(inventory, indent=4))\n\nif __name__ == \"__main__\":\n    main()",
+      "route": "Inline generation",
+      "instruction": "directory inventory command. Take a directory and optional --suffix. Recursively print a JSON mapping of relative POSIX file paths to byte sizes. Skip hidden files, hidden directories, and symlinks.",
+      "diagnostics": [],
+      "seconds": 14.450731417000002,
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "syntax_error": null
+    },
+    {
+      "id": "checkbook",
+      "code": "import sys\nimport json\n\ndef validate_transactions(file_path):\n    total_cents = 0\n    with open(file_path, 'r') as file:\n        for line_number, line in enumerate(file, start=1):\n            if not line.strip():\n                continue\n            try:\n                transaction = json.loads(line)\n                if not isinstance(transaction, dict) or 'id' not in transaction or 'cents' not in transaction:\n                    raise ValueError(\"Invalid transaction format\")\n                if not isinstance(transaction['id'], str) or not isinstance(transaction['cents'], int):\n                    raise ValueError(\"Invalid transaction data\")\n                total_cents += transaction['cents']\n            except json.JSONDecodeError:\n                print(f\"Error decoding line {line_number}: {line}\", file=sys.stderr)\n    return total_cents\n\ndef main():\n    if len(sys.argv) != 2:\n        print(\"Usage: python validate_transactions.py <file_path>\", file=sys.stderr)\n        sys.exit(1)\n    file_path = sys.argv[1]\n    total_cents = validate_transactions(file_path)\n    print(total_cents)\n\nif __name__ == \"__main__\":\n    main()",
+      "route": "Inline generation",
+      "instruction": "Create a CLI to validate transactions in a JSONL file given as its positional argument. Each row needs a nonempty string id and integer cents, with unique ids. Ignore blank lines. Print the total cents as an integer, or exit nonzero and report the original line number to stderr.",
+      "diagnostics": [],
+      "seconds": 10.805237792,
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "syntax_error": null
+    },
+    {
+      "id": "quiz",
+      "code": "import json\nimport sys\n\ndef load_quiz(file_path):\n    with open(file_path, 'r') as file:\n        return json.load(file)\n\ndef run_quiz(quiz):\n    score = 0\n    for question in quiz:\n        print(question['question'])\n        for answer in question['answers']:\n            print(answer)\n            user_answer = input().strip().lower()\n            if user_answer == question['correct_answer'].lower():\n                score += 1\n    print(f\"Score: {score}/{len(quiz)}\")\n\ndef main():\n    if len(sys.argv) != 2:\n        print(\"Usage: python quiz.py <quiz_file>\")\n        sys.exit(1)\n    quiz_file = sys.argv[1]\n    quiz = load_quiz(quiz_file)\n    run_quiz(quiz)\n\nif __name__ == \"__main__\":\n    main()",
+      "route": "Inline generation",
+      "instruction": "Build a terminal quiz from a positional JSON file containing a list of objects with question and answer fields. Print each question, read one answer per line, compare case-insensitively after trimming, and show the score as correct/total at the end.",
+      "diagnostics": [],
+      "seconds": 8.922250958000005,
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "syntax_error": null
+    }
+  ]
+}

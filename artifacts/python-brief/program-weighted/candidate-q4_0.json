@@ -1,0 +1,141 @@
+{
+  "model": "artifacts/python-brief/program-weighted/python-brief.Q4_0.gguf",
+  "model_sha256": "7c438b520b153860ffa5350d75d53f2903f6bb7a954be024f7cd7ca00c893dfe",
+  "size_bytes": 934954496,
+  "fixture_sha256": "6166974f8564ae4036d09ba1482488c37ac2cbafca84b219cf513d51b9eaf21b",
+  "runtime": "/Users/somalip/Documents/GitHub/tessera/artifacts/python-strength/serve-metal",
+  "passed": 2,
+  "total": 13,
+  "results": [
+    {
+      "id": "partial_write",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "from typing import *\nfrom itertools import *\nfrom collections import *\n\ndef write_all(write, data):\n    if not write or not data:\n        return 0\n    if not write.write(data):\n        raise OSError\n    return len(data)",
+      "completion_tokens": 49,
+      "seconds": 3.78
+    },
+    {
+      "id": "ordered_observations",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "from collections import defaultdict\n\ndef attach_readings(sensors, latest):\n    readings = defaultdict(dict)\n    for sensor_id, sensor in sensors.items():\n        if sensor_id not in readings:\n            readings[sensor_id] = {}\n        if sensor.get(\"latest\") is not None:\n            readings[sensor_id][sensor_id] = sensor.get(\"latest\")\n        else:\n            readings[sensor_id][sensor_id] = None\n    return {sensor_id: {sensor_id: reading} for sensor_id, reading in readings.items() if reading}",
+      "completion_tokens": 112,
+      "seconds": 5.22
+    },
+    {
+      "id": "type_dispatch",
+      "passed": true,
+      "returncode": 0,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "from typing import *\nfrom collections.abc import *\n\ndef coerce_field(value):\n    if value is None:\n        return None\n    elif isinstance(value, bool):\n        return \"true\" if value else \"false\"\n    elif isinstance(value, str):\n        return value.strip()\n    elif isinstance(value, (int, float)):\n        return str(value)\n    else:\n        raise TypeError(f\"unsupported type {type(value)}\")",
+      "completion_tokens": 86,
+      "seconds": 4.17
+    },
+    {
+      "id": "non_overlapping_spans",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "from itertools import accumulate\n\ndef total_coverage(spans):\n    if not spans:\n        return 0\n    sorted_spans = sorted(spans, key=lambda x: x[0])\n    return sum(accumulate([span[1] - span[0] for span in sorted_spans[1:]]))",
+      "completion_tokens": 65,
+      "seconds": 3.49
+    },
+    {
+      "id": "cache_expiry",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "from datetime import datetime\n\ndef ttl_lookup(cache, key, now, fetch, ttl):\n    if key not in cache:\n        cache[key] = fetch(key)\n    if cache[key] is not None:\n        if cache[key]['expires_at'] > now:\n            return cache[key]['value']\n    cache[key] = fetch(key)\n    cache[key]['expires_at'] = now + ttl\n    return cache[key]['value']",
+      "completion_tokens": 88,
+      "seconds": 4.23
+    },
+    {
+      "id": "path_manifest",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "from pathlib import Path\n\ndef select_manifest(root):\n    return sorted(Path(root).iterdir()\n        .filter(lambda p: p.is_file() and p.suffix == \".manifest\")\n        .map(Path.getname)\n        .exclude(Path.is_hidden))",
+      "completion_tokens": 52,
+      "seconds": 2.82
+    },
+    {
+      "id": "bounded_unique",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "from collections import deque\n\ndef first_unique(values, count):\n    if not values or not count:\n        return []\n    seen = set()\n    queue = deque()\n    for value in values:\n        if value not in seen:\n            queue.append(value)\n            seen.add(value)\n        if len(queue) > count:\n            queue.popleft()\n    return list(queue)",
+      "completion_tokens": 75,
+      "seconds": 3.7
+    },
+    {
+      "id": "byte_frame",
+      "passed": true,
+      "returncode": 0,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "from struct import pack\n\ndef encode_frame(payload):\n    if len(payload) > 65535:\n        raise ValueError(\"payload length cannot exceed 65535\")\n    return pack(\">H\", len(payload)) + payload",
+      "completion_tokens": 50,
+      "seconds": 3.0
+    },
+    {
+      "id": "duration_value",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "from datetime import datetime\n\ndef wait_microseconds(start, end):\n    if not (isinstance(start, datetime) and isinstance(end, datetime)):\n        raise ValueError(\"Both arguments must be datetime objects\")\n    if start > end:\n        raise ValueError(\"start must be less than or equal to end\")\n    if start.tzinfo is not None and end.tzinfo is not None and start.tzinfo != end.tzinfo:\n        raise ValueError(\"start and end must have the same timezone\")\n    if start.tzinfo is not None:\n        start = start.astimezone(end.tzinfo)\n    delta = end - start\n    if delta < datetime.min:\n        raise ValueError(\"negative timedelta\")\n    if delta > datetime.max:\n        raise ValueError(\"negative timedelta\")\n    return delta.microseconds",
+      "completion_tokens": 164,
+      "seconds": 8.05
+    },
+    {
+      "id": "nested_context",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "from contextlib import contextmanager\n\n@contextmanager\ndef capture_append(target):\n    try:\n        while True:\n            yield target\n    except:\n        target.clear()",
+      "completion_tokens": 35,
+      "seconds": 2.32
+    },
+    {
+      "id": "select_rows",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "from itertools import filterfalse\n\ndef find_matches(records, columns, needle):\n    matches = (record for record in records if all(\n        field is not None and isinstance(field, str) and field.lower() == needle.lower()\n        for field in record\n    ))\n    return matches",
+      "completion_tokens": 58,
+      "seconds": 3.2
+    },
+    {
+      "id": "guarded_quantities",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "from itertools import zip_longest\n\ndef pad_rows(rows, width, fill=None):\n    if width < 0:\n        raise ValueError(\"negative width\")\n    for row in rows:\n        if len(row) < width:\n            row = row + [fill] * (width - len(row))\n        yield row\n\ndef main(argv=None):\n    if argv is None:\n        import sys\n        argv = sys.argv\n    if len(argv) < 3:\n        raise ValueError(\"usage: python script.py <number_of_rows> <width> [fill]\")\n    rows = [input() for _ in range(int(argv[1]))]\n    width = int(argv[2])\n    fill = argv[3] if len(argv) > 3 else None\n    for row in pad_rows(rows, width, fill):\n        print(row, flush=True)",
+      "completion_tokens": 175,
+      "seconds": 8.92
+    },
+    {
+      "id": "snake-terminal-smoke",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "import curses\n\ndef main(stdscr):\n    stdscr.timeout(120)\n    stdscr.keypad(True)\n    height, width = stdscr.getmaxyx()\n    stdscr.erase()\n    stdscr.refresh()\n    snake = [(height // 2, width // 2)]\n    direction = (0, 0)\n    while True:\n        key = stdscr.getch()\n        if key == ord(\"q\"):\n            break\n        if key == ord(\"w\") and (direction != (0, 1)):\n            direction = (0, -1)\n        elif key == ord(\"a\") and (direction != (1, 0)):\n            direction = (-1, 0)\n        elif key == ord(\"s\") and (direction != (0, -1)):\n            direction = (0, 1)\n        elif key == ord(\"d\") and (direction != (-1, 0)):\n            direction = (1, 0)\n        snake = [(snake[0][0] + direction[0], snake[0][1] + direction[1])] + snake[:-1]\n        if snake[0] == (height // 2, width // 2):\n            score = 0\n        elif snake[0] == (height - 1, width - 1) or snake[0] == (height - 1, 0) or snake[0] == (0, width - 1) or snake[0] == (0, 0):\n            score = -1\n        else:\n            score = 1\n        if score == -1:\n            stdscr.erase()\n            stdscr.addnstr(0, 0, \"Game Over\")\n            stdscr.refresh()\n            break\n        elif score == 1:\n            stdscr.erase()\n            stdscr.addnstr(0, 0, \"You Win\")\n            stdscr.refresh()\n            break\n        stdscr.erase()\n        for row in range(height):\n            for col in range(width):\n                if (row, col) == (height // 2, width // 2):\n                    stdscr.addch(row, col, ord(\"O\"))\n                elif (row, col) == (height - 1, width - 1) or (row, col) == (height - 1, 0) or (row, col) == (0, width - 1) or (row, col) == (0, 0):\n                    stdscr.addch(row, col, ord(\"#\"))\n                elif (row, col) in snake:\n                    stdscr.addch(row, col, ord(\"X\"))\n                else:\n                    stdscr.addch(row, col, ord(\" \"))\n        stdscr.refresh()\n        stdscr.timeout(120)\n\nif __name__ == \"__main__\":\n    curses.wrapper(main)",
+      "completion_tokens": 592,
+      "seconds": 28.26
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "host": "macOS-26.5.1-arm64-arm-64bit",
+  "machine": "arm64",
+  "mode": "warm",
+  "model_sha256": "1d9614638d18024d0fbb36575a15f1302a3adf044df10345688ec4f6e1c4ff32",
+  "load_ms": 675.3078330075368,
+  "first_token_p95_ms": 112.15216699929442,
+  "median_tokens_per_second": 64.42333032662916,
+  "peak_rss_bytes": 767328256,
+  "memory_budget_bytes": 1073741824,
+  "gates": {
+    "size": true,
+    "prompt_window": true,
+    "load_time": true,
+    "first_token": true,
+    "throughput": true,
+    "resident_memory": true
+  },
+  "runs": [
+    {
+      "first_token_ms": 112.15216699929442,
+      "tokens_per_second": 64.9346696347222,
+      "prompt_tokens": 1230,
+      "generated_tokens": 32
+    },
+    {
+      "first_token_ms": 100.69566700258292,
+      "tokens_per_second": 64.79070577325682,
+      "prompt_tokens": 1230,
+      "generated_tokens": 32
+    },
+    {
+      "first_token_ms": 100.80270899925381,
+      "tokens_per_second": 64.44401929292827,
+      "prompt_tokens": 1230,
+      "generated_tokens": 32
+    },
+    {
+      "first_token_ms": 100.97600000153761,
+      "tokens_per_second": 64.40601552184974,
+      "prompt_tokens": 1230,
+      "generated_tokens": 32
+    },
+    {
+      "first_token_ms": 101.04029200738296,
+      "tokens_per_second": 64.64633404781,
+      "prompt_tokens": 1230,
+      "generated_tokens": 32
+    },
+    {
+      "first_token_ms": 101.47566700470634,
+      "tokens_per_second": 64.44064513140857,
+      "prompt_tokens": 1230,
+      "generated_tokens": 32
+    },
+    {
+      "first_token_ms": 102.4138749926351,
+      "tokens_per_second": 64.27909985155546,
+      "prompt_tokens": 1230,
+      "generated_tokens": 32
+    },
+    {
+      "first_token_ms": 101.66320799908135,
+      "tokens_per_second": 64.01113793800121,
+      "prompt_tokens": 1230,
+      "generated_tokens": 32
+    },
+    {
+      "first_token_ms": 102.69491700455546,
+      "tokens_per_second": 63.29414370935329,
+      "prompt_tokens": 1230,
+      "generated_tokens": 32
+    },
+    {
+      "first_token_ms": 102.65058399818372,
+      "tokens_per_second": 63.828174554100364,
+      "prompt_tokens": 1230,
+      "generated_tokens": 32
+    }
+  ]
+}

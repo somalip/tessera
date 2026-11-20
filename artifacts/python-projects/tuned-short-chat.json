@@ -1,0 +1,166 @@
+{
+  "model_sha256": "aefb498da3f0a84a226315a9ac03bf0c4395d49f7d855f7b0833679b8bb6ecf4",
+  "size_bytes": 934954496,
+  "thinking": false,
+  "thinking_budget": null,
+  "suites": [
+    {
+      "dataset_sha256": "a21a15d4297f9fe3dcbb78b4a99071fed3bb57f344344ebc72e530a19fb110ba",
+      "results": [
+        {
+          "id": "sqlite_query",
+          "finish_reason": "stop",
+          "generated_code_sha256": "4fd2efb49fc6bd15a190191b869a49a28c896796a3c0ac2ff75adbee88ac85e1",
+          "reply": "import sqlite3\n\ndef active_names(conn, minimum):\n    cursor = conn.cursor()\n    cursor.execute(\"SELECT name FROM users WHERE active = 1 AND points >= ? ORDER BY points DESC, name ASC\", (minimum,))\n    return cursor.fetchall()",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "snapshot",
+          "finish_reason": "stop",
+          "generated_code_sha256": "3a850b6ebc144f928f3357fb0340f5e37ade174bab5366e966b99379aabe7797",
+          "reply": "def enqueue(queue, task, tags=[]):\n    if not tags:\n        return None\n    queue.append({\"task\": task, \"tags\": tags})\n    return None",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "async_limit",
+          "finish_reason": "stop",
+          "generated_code_sha256": "83fc7271317e5e06e2fa9d227f73125decd859b1ca3f2a4dc6195ff9787c4a0b",
+          "reply": "import asyncio\n\nasync def map_limited(fn, inputs, limit):\n    if limit <= 0:\n        raise ValueError(\"limit must be positive\")\n    async def worker(input):\n        return await fn(input)\n    async def main():\n        return await asyncio.gather(*[worker(input) for input in inputs], return_exceptions=True)\n    return await main()",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "path_parts",
+          "finish_reason": "stop",
+          "generated_code_sha256": "b1708335c6f85333ea2d4a0958ec84ab854b3bbba595662980f4e8e4a2ff0e6e",
+          "reply": "import pathlib\nfrom pathlib import Path\n\ndef image_files(root):\n    return sorted([p.relative_to(root) for p in root.rglob(\"*.png\") + root.rglob(\"*.jpg\") if not p.name.lower().endswith((\".png\", \".jpg\"))])",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "log_summary",
+          "finish_reason": "stop",
+          "generated_code_sha256": "b94aaf0c445129f93ddb4762897b41371250614319c97045278b001ccce2e01a",
+          "reply": "def top_errors(events, count):\n    if count <= 0:\n        return []\n    error_counts = {}\n    for level, message in events:\n        if level == \"ERROR\":\n            error_counts[message] = error_counts.get(message, 0) + 1\n    return sorted(error_counts.items(), key=lambda x: (-x[1], x[0]))[:count]",
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "duration",
+          "finish_reason": "stop",
+          "generated_code_sha256": "be3b5067a981e19b46407234815572a5ea433f7f8b50204441d4ef3b77d91279",
+          "reply": "def elapsed(start_ns, finish_ns):\n    if finish_ns < start_ns:\n        raise ValueError(\"finish_ns must be greater than start_ns\")\n    return round((finish_ns - start_ns) / 1e6)",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "decode",
+          "finish_reason": "stop",
+          "generated_code_sha256": "c0590766741df3fe069106d3a0867962c5def0c4d1edab650adc4bf50227d6a1",
+          "reply": "def decode_record(payload):\n    try:\n        record = json.loads(payload.decode('utf-8'))\n        if not isinstance(record, dict):\n            raise ValueError(\"record is not a dict\")\n        return record\n    except (json.JSONDecodeError, ValueError, TypeError):\n        raise ValueError(\"bad encoding, invalid JSON, a non-object top level, or a missing or non-dict record\")",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "one_shot",
+          "finish_reason": "stop",
+          "generated_code_sha256": "94d2dffe8e0675e33d8593f8da111365e04903e8a6504151eda6640ddf257890",
+          "reply": "def stream_window(stream, start, stop):\n    for item in stream:\n        if start <= item < stop:\n            yield item - start",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        }
+      ],
+      "passed": 1,
+      "total": 8
+    },
+    {
+      "dataset_sha256": "12f9c0c9408696773da6fcc58de92f124ec145958d3e5ca1f5490dd283808432",
+      "results": [
+        {
+          "id": "stable_group",
+          "finish_reason": "stop",
+          "generated_code_sha256": "f3fe5936cb95dc7d267c704962e5682e41657afd8b03280f823f2a18cbd29e67",
+          "reply": "def group_updates(updates):\n    updates = list(updates)\n    updates.sort()\n    return updates",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "recursive_config",
+          "finish_reason": "stop",
+          "generated_code_sha256": "3ab725d6bd5d1b07c39cc12f404f728922afb10503da42cd9804f2f0680fb9fd",
+          "reply": "def merge_config(base, patch):\n    if not isinstance(base, dict) or not isinstance(patch, dict):\n        return patch if patch is not None else base\n    merged = base.copy()\n    for key, value in patch.items():\n        if key not in merged:\n            merged[key] = value\n        elif isinstance(merged[key], dict) and isinstance(value, dict):\n            merged[key] = merge_config(merged[key], value)\n        elif value is None:\n            merged[key] = None\n        else:\n            merged[key] = value\n    return merged",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "pathlib_api",
+          "finish_reason": "stop",
+          "generated_code_sha256": "05e842edca4958552de193f8e18c816851efc931b38da827c318891f6030bc35",
+          "reply": "import pathlib\nfrom datetime import datetime\n\ndef report_paths(root):\n    return sorted((datetime.strptime(path.name, \"report-%Y-%m-%d.csv\").date(), path) for path in pathlib.Path(root).iterdir() if path.is_file() and path.name.startswith(\"report-\"))",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "legacy_cursor",
+          "finish_reason": "stop",
+          "generated_code_sha256": "357404e0e81d85a4f8dc509260f7dde9118bc2f75379c4a3e523937ab3caf10a",
+          "reply": "def page_bounds(page, size, total):\n    if page <= 0 or size <= 0 or total < 0:\n        raise ValueError(\"page, size, and total must be nonnegative\")\n    start = page * size\n    return start, min(start + size, total)",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "queue_accounting",
+          "finish_reason": "stop",
+          "generated_code_sha256": "1d5d762bd8f615f8b1623bce9bb5455ff762a71a77cdc02c0db7e5d0a5134d2b",
+          "reply": "def summarize_jobs(jobs):\n    return {status: (sum(size for job in jobs if job.status == status), sum(job.size for job in jobs if job.status == status)) for status in set(job.status for job in jobs)}",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "retry",
+          "finish_reason": "stop",
+          "generated_code_sha256": "bb2c63dbfba716459ce9df194f3de1ee9c56dfdae87d14106e9ccca20b1851ba",
+          "reply": "def retry_read(read, attempts):\n    if attempts < 1:\n        raise ValueError(\"attempts must be at least 1\")\n    for attempt in range(attempts):\n        try:\n            return read()\n        except TimeoutError:\n            pass\n    raise ValueError(\"all attempts failed\")",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "event_dedup",
+          "finish_reason": "stop",
+          "generated_code_sha256": "aa089d900ed7e976fe5003d573a87cc501b250bd4b65be5d5829e357804e9332",
+          "reply": "def iter_unique_events(events):\n    seen = set()\n    for event in events:\n        if event.get(\"id\") is not None:\n            if event[\"id\"] not in seen:\n                seen.add(event[\"id\"])\n                yield event",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "record_composition",
+          "finish_reason": "stop",
+          "generated_code_sha256": "9eb07f564036e97413427c9c014b3abc4104023d755e0e16be771e4b9c518cd7",
+          "reply": "def render_row(fields, record, missing=\"-\"):\n    def escape(value):\n        return value.replace(\"\\\\\", \"\\\\\\\\\").replace(\"\\n\", \"\\\\n\").replace(\"\\t\", \"\\\\t\")\n    return \"\\t\".join([escape(field) if field is not None else missing for field in fields])",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        }
+      ],
+      "passed": 0,
+      "total": 8
+    }
+  ]
+}

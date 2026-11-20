@@ -1,0 +1,29 @@
+Cached frozen layers 4/24
+Cached frozen layers 8/24
+Cached frozen layers 12/24
+Cached frozen layers 16/24
+Cached frozen layers 20/24
+Cached frozen layers 24/24
+Training 32 briefs through 4 layers
+Epoch 1/3, 1/42, loss 0.6856
+Epoch 1/3, 8/42, loss 0.3707
+Epoch 1/3, 16/42, loss 0.1779
+Epoch 1/3, 24/42, loss 0.5846
+Epoch 1/3, 32/42, loss 0.4697
+Epoch 1/3, 40/42, loss 0.7754
+Epoch 1/3, 42/42, loss 0.3349
+Epoch 2/3, 1/42, loss 0.3067
+Epoch 2/3, 8/42, loss 0.6367
+Epoch 2/3, 16/42, loss 0.4409
+Epoch 2/3, 24/42, loss 0.3764
+Epoch 2/3, 32/42, loss 0.3685
+Epoch 2/3, 40/42, loss 0.3135
+Epoch 2/3, 42/42, loss 0.3237
+Epoch 3/3, 1/42, loss 0.6945
+Epoch 3/3, 8/42, loss 0.0858
+Epoch 3/3, 16/42, loss 0.4496
+Epoch 3/3, 24/42, loss 0.2313
+Epoch 3/3, 32/42, loss 0.7706
+Epoch 3/3, 40/42, loss 0.2198
+Epoch 3/3, 42/42, loss 0.1572
+Merged LoRA weights into GGUF

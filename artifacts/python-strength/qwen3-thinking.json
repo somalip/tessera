@@ -1,0 +1,114 @@
+{
+  "model_sha256": "8070f21b9763ef653289e20252592d0aab6680948f36eb5b4362d403fef09170",
+  "size_bytes": 939539008,
+  "mode": "think",
+  "settings": {
+    "temperature": 0.6,
+    "seed": 42,
+    "max_tokens": 768,
+    "chat_template_kwargs": {
+      "enable_thinking": true
+    },
+    "top_p": 0.95,
+    "top_k": 20,
+    "min_p": 0
+  },
+  "suites": [
+    {
+      "path": "/Users/somalip/Documents/GitHub/tessera/artifacts/python-v2/heldout.jsonl",
+      "sha256": "12f9c0c9408696773da6fcc58de92f124ec145958d3e5ca1f5490dd283808432",
+      "passed": 1,
+      "total": 8,
+      "results": [
+        {
+          "id": "stable_group",
+          "finish_reason": "length",
+          "reply": "To implement `group_updates(updates)`, we need to:\n\n1. **Group updates by key** while preserving the order of first appearance of each key.\n2. **Collect values in the order they were added** for each key.\n3. **Ensure keys are in the order of their first appearance** in the output.\n\nHere's the Python code that achieves this:\n\n```python\ndef group_updates(updates):\n    # Use a dictionary to store the values for each key\n    key_values = {}\n    result = []\n\n    for key, value in updates:\n        if key in key_values:\n            # Append the value to the existing list\n            key_values[key].append(value)\n        else:\n            # Create a new list for this key\n            key_values[key] = [value]\n\n    # Collect the results in the order of first appearance of keys\n    # We can sort the keys by their first occurrence (in the original order)\n    # However, since the input is a one-pass iterable, we can process the keys in order as they are encountered.\n    # So we can collect the keys in the order they were first seen and then build the result list.\n\n    # To preserve the order of first appearance, we can use a list to track the keys in order\n    # and then build the result list accordingly.\n    # Alternatively, we can use a list to track the keys in order and then build the result.\n\n    # Here's a way to do it:\n    # Use a list to track the keys in order of first occurrence\n    first_occurrence = []\n    for key, _ in updates:\n        if key not in first_occurrence:\n            first_occurrence.append(key)\n\n    # Now, build the result list by iterating through the updates in the order of first occurrence\n    # and collect the values in the order they were added\n    result = []\n    for key in first_occurrence:\n        result.append((key, key_values[key]))\n\n    return result\n```\n\n### Explanation:\n- We iterate through the updates, grouping values by key and preserving their order.\n- We track the first occurrence of each key using a list `first_occurrence`.\n- Finally, we build the result list by iterating through the keys in the order of their first occurrence and appending the grouped values.\n\nThis ensures that:\n- Keys are in the order of their first appearance.\n- Values for each key are in the order they were added.\n- Duplicates are preserved as per the input.\n\n###",
+          "reasoning_chars": 1044,
+          "tokens": 768,
+          "wall_seconds": 32.74,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "recursive_config",
+          "finish_reason": "stop",
+          "reply": "Here's a Python function that implements the `merge_config` as described:\n\n```python\ndef merge_config(base, patch):\n    def _merge(d1, d2):\n        for key in d1:\n            if key in d2:\n                if d2[key] is None:\n                    continue  # Skip if patch value is None\n                if isinstance(d1[key], dict) and isinstance(d2[key], dict):\n                    _merge(d1[key], d2[key])\n                else:\n                    d1[key] = d2[key]\n            else:\n                d1[key] = d2[key]\n        return d1\n    \n    # Merge the base with the patch\n    for key in patch:\n        if key in base:\n            if patch[key] is None:\n                continue  # Skip if patch value is None\n            if isinstance(base[key], dict) and isinstance(patch[key], dict):\n                _merge(base[key], patch[key])\n            else:\n                base[key] = patch[key]\n        else:\n            base[key] = patch[key]\n    \n    return base\n```\n\n**Explanation:**\n\n- The function `_merge` recursively merges two dictionaries. It handles nested dictionaries by recursively calling itself.\n- If the patch has a value of `None`, it skips over that key in the base dictionary to avoid overwriting.\n- If both the base and patch have a dictionary at a key, it recursively merges them.\n- Otherwise, the patch value replaces the base value if it's not `None`.\n\nThis function returns an independent result, meaning the base dictionary is modified in place, but the function returns it so that it can be used elsewhere. The merging is done in-place for the base dictionary, but the function returns it so that it can be used in other parts of the code.",
+          "reasoning_chars": 1107,
+          "tokens": 624,
+          "wall_seconds": 24.55,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "pathlib_api",
+          "finish_reason": "stop",
+          "reply": "To implement the `report_paths` function as described, we need to generate all valid dates in the current year (assuming the current date is the latest possible date), create files named `report-YYYY-MM-DD.csv` in the specified directory, and return the paths sorted by date in ascending order.\n\nHere's the Python code for the `report_paths` function:\n\n```python\nfrom datetime import datetime, date\nfrom pathlib import Path\nimport os\n\ndef report_paths(root):\n    # Get the current date\n    today = date.today()\n    current_year = today.year\n    current_month = today.month\n    current_day = today.day\n\n    # Generate all possible valid dates in the current year\n    dates = []\n    for year in range(current_year):\n        for month in range(1, 13):\n            for day in range(1, 32):\n                # Check if the date is valid\n                try:\n                    date_obj = date(year, month, day)\n                    dates.append((date_obj, Path(root, f'report-{year}-{month:02d}-{day:02d}.csv')))\n                except ValueError:\n                    # Skip invalid dates\n                    continue\n    # Sort the dates by date in ascending order\n    sorted_dates = sorted(dates, key=lambda x: x[0])\n    return sorted_dates\n```\n\n**Explanation:**\n\n- We generate all possible valid dates in the current year.\n- For each date, we create a file named `report-YYYY-MM-DD.csv` in the `root` directory.\n- The paths are sorted by the date in ascending order.\n- The `date_obj` is a `date` object, and the `Path` object is created using `Path(root, ...)`.\n\nThis function will return a list of tuples, where each tuple contains the date (as a `date` object) and the corresponding `Path` object. The paths are sorted by the date in ascending order.",
+          "reasoning_chars": 1174,
+          "tokens": 662,
+          "wall_seconds": 30.08,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "legacy_cursor",
+          "finish_reason": "stop",
+          "reply": "Here's the corrected function that properly calculates the start and stop indices, clamping them to the total, and raises appropriate errors:\n\n```python\ndef page_bounds(page, size, total):\n    # Validate inputs\n    if page <= 0 or size <= 0 or total <= 0:\n        raise ValueError(\"page, size, and total must be positive integers.\")\n    \n    start = page * size\n    stop = start + size\n    \n    # Clamp start and stop to total\n    start = max(0, min(start, total))\n    stop = max(0, min(stop, total))\n    \n    return start, stop\n```\n\n**Explanation:**\n- The function first checks if `page`, `size`, or `total` are nonpositive, raising a `ValueError` if any are.\n- It calculates `start` as `page * size`.\n- It calculates `stop` as `start + size`.\n- It clamps both `start` and `stop` to ensure they don't exceed the total number of items.\n- Finally, it returns the clamped start and stop indices.",
+          "reasoning_chars": 1168,
+          "tokens": 487,
+          "wall_seconds": 20.07,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "queue_accounting",
+          "finish_reason": "stop",
+          "reply": "Here's a Python function that implements the `summarize_jobs` function as described:\n\n```python\ndef summarize_jobs(jobs):\n    status_counts = {}\n    for job in jobs:\n        status = job.status\n        size = job.size\n        if status in status_counts:\n            status_counts[status] = (status_counts[status][0] + 1, status_counts[status][1] + size)\n        else:\n            status_counts[status] = (1, size)\n    return status_counts\n```\n\nThis function iterates through each job in the provided iterable, updates the count and total size for each status in a dictionary, and returns the dictionary with the summarized data.",
+          "reasoning_chars": 1140,
+          "tokens": 402,
+          "wall_seconds": 14.8,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "retry",
+          "finish_reason": "stop",
+          "reply": "Here's the implementation of `retry_read` that meets all the specified requirements:\n\n```python\ndef retry_read(read, attempts):\n    if attempts < 1:\n        raise ValueError(\"Number of attempts must be at least 1\")\n    \n    for attempt in range(attempts):\n        try:\n            result = read()\n            return result\n        except TimeoutError:\n            continue\n    # If all attempts timeout, propagate the final exception\n    raise Exception(\"All attempts timed out\")\n```\n\n### Explanation:\n- **ValueError Check**: If `attempts` is less than 1, a `ValueError` is raised.\n- **Retry Logic**: For each attempt, call `read()`. If `read()` raises a `TimeoutError`, it is ignored (retry), otherwise, the result is returned immediately.\n- **Final Exception**: If all attempts fail (i.e., no successful result was returned), the final exception (e.g., `Exception`) is raised.\n\nThis implementation ensures that the function only retries on `TimeoutError` and raises the appropriate error messages as specified.",
+          "reasoning_chars": 1167,
+          "tokens": 479,
+          "wall_seconds": 23.56,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "event_dedup",
+          "finish_reason": "length",
+          "reply": "Here's a Python function that implements the required behavior:\n\n```python\ndef iter_unique_events(events):\n    seen_ids = set()\n    for event in events:\n        if event.get('id') is not None:\n            if event['id'] not in seen_ids:\n                seen_ids.add(event['id'])\n                yield event\n```\n\nWait, but the problem says that events with missing or None ids are retained. So, even if the id is None, the event is retained. So, in the code, we need to check if the id is None or not. But the code above checks if the id is not None. So, for events with id None, they are retained, but since the id is None, they are not added to the seen_ids. So, the code will yield all events with id None, and for those with non-None ids, only the first occurrence is yielded.\n\nBut wait, the problem says that events with missing or None ids are retained. So, the event is retained, but the id is None. So, for events with id None, they are included in the output. So, the code above is correct.\n\nBut the code above will yield all events, including those with None id, but for those with non-None id, only the first occurrence is yielded.\n\nYes, that's correct. So the function will yield the original objects in input order, keeping only the first event for each non-None id. Events with None id are retained, but they are not processed (since they are not added to the seen_ids). So, the code is correct.\n\nBut wait, the problem says that events with missing or None ids are retained. So, the code above is correct. Because for events with id None, they are retained, but they are not added to the seen_ids, so they are yielded. But the code will yield all events, including those with None id. So, the function is correct.\n\nBut the problem says that events with missing or None ids are retained. So, the code is correct.\n\nSo the function is as above. But the code needs to process the input lazily, which is handled by iterating through the events in order, and yielding as needed.\n\nSo the code should work. Let me test it with some examples.\n\nTest case 1: events with id None.\n\nevents = [ {\"id\": None}, {\"id\": \"a\"}, {\"id\": \"a\"} ]\n\nThe output should be:\n\n{\"id\": None}, {\"",
+          "reasoning_chars": 1048,
+          "tokens": 768,
+          "wall_seconds": 34.0,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "record_composition",
+          "finish_reason": "stop",
+          "reply": "Here's the Python code that implements the `render_row` function as described:\n\n```python\ndef render_row(fields, record, missing=\"-\"):\n    # Convert the record to a dictionary for easier access\n    record_dict = {field: value for field, value in record.items()}\n    \n    # Prepare the output fields\n    output = []\n    for field in fields:\n        # Check if the field exists in the record\n        if field in record_dict:\n            value = str(record_dict[field])\n        else:\n            value = missing\n        \n        # Escape tabs and newlines\n        if value == \"\":  # If value is empty, convert to str()\n            value = \"\"\n        elif value == \"\\t\":  # Escape tab\n            value = \"\\\\t\"\n        elif value == \"\\n\":  # Escape newline\n            value = \"\\\\n\"\n        else:\n            # Escape backslashes first\n            if value == \"\\\\\":  # Escape literal backslash\n                value = \"\\\\\"\n            value = value.replace(\"\\\\\", \"\\\\\")  # Escape any existing backslashes\n        \n        output.append(value)\n    \n    return \"\\t\".join(output)\n```\n\n**Explanation:**\n\n- **Field Handling:** Each field in `fields` is checked against the `record` dictionary. If the field exists, its value is converted to a string; otherwise, it's replaced with the `missing` value.\n- **Escaping:** Tabs (`\\t`) and newlines (`\\n`) are escaped as `\\\\t` and `\\\\n`. Literal backslashes are escaped first to prevent unintended interpretation.\n- **Empty Values:** Empty strings are converted to empty strings, as per the requirement to convert falsey values to strings.\n\nThis function handles all the requirements: field ordering, missing fields, escaping, and falsey value conversion.",
+          "reasoning_chars": 1157,
+          "tokens": 630,
+          "wall_seconds": 25.63,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        }
+      ]
+    }
+  ]
+}

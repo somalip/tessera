@@ -1,0 +1,26 @@
+Cached frozen layers 4/24
+Cached frozen layers 8/24
+Cached frozen layers 12/24
+Cached frozen layers 16/24
+Cached frozen layers 20/24
+Cached frozen layers 24/24
+Training 48 briefs through 4 layers
+Epoch 1/2, 1/48, loss 0.3247
+Epoch 1/2, 8/48, loss 0.8325
+Epoch 1/2, 16/48, loss 0.4360
+Epoch 1/2, 24/48, loss 0.6747
+Epoch 1/2, 32/48, loss 0.4988
+Epoch 1/2, 40/48, loss 0.2152
+Epoch 1/2, 48/48, loss 0.1718
+Epoch 2/2, 1/48, loss 0.5032
+Epoch 2/2, 8/48, loss 0.6493
+Epoch 2/2, 16/48, loss 0.2758
+Epoch 2/2, 24/48, loss 0.3923
+Epoch 2/2, 32/48, loss 0.5787
+Epoch 2/2, 40/48, loss 0.4409
+Epoch 2/2, 48/48, loss 0.3911
+huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
+To disable this warning, you can either:
+	- Avoid using `tokenizers` before the fork if possible
+	- Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+Merged LoRA weights into GGUF

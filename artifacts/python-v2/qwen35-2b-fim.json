@@ -1,0 +1,34 @@
+{
+  "model_sha256": "36347f47f9eab7d433c7c37be1f87ac2253378c3d530da3cb25fb5f71f8f1a58",
+  "dataset_sha256": "e049fcc892662272cb9a1622308cc910a8fc18460ba9d72d297545c4cc469cd1",
+  "results": [
+    {
+      "id": "region_normalization",
+      "exact": false,
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false
+    },
+    {
+      "id": "factory_call",
+      "exact": false,
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false
+    },
+    {
+      "id": "frozen_timestamp",
+      "exact": false,
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false
+    },
+    {
+      "id": "integer_chunks",
+      "exact": false,
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false
+    }
+  ]
+}

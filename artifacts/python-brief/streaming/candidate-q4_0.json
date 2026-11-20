@@ -1,0 +1,141 @@
+{
+  "model": "artifacts/python-brief/streaming/python-brief.Q4_0.gguf",
+  "model_sha256": "5aa426650085fc4de1e01258cec4f74bbc717ad7f03397c8cd2e1db4937d204d",
+  "size_bytes": 934954496,
+  "fixture_sha256": "6166974f8564ae4036d09ba1482488c37ac2cbafca84b219cf513d51b9eaf21b",
+  "runtime": "/Users/somalip/Documents/GitHub/tessera/artifacts/python-strength/serve-metal",
+  "passed": 1,
+  "total": 13,
+  "results": [
+    {
+      "id": "partial_write",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "def write_all(write, data):\n    total = 0\n    while data:\n        bytes_written = write(data)\n        if bytes_written <= 0:\n            raise OSError(\"Failed to write data\")\n        total += bytes_written\n        data = data[bytes_written:]\n    return total",
+      "completion_tokens": 59,
+      "seconds": 4.41
+    },
+    {
+      "id": "ordered_observations",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "def attach_readings(sensors, latest):\n    fresh_dicts = []\n    for sensor in sensors:\n        sensor_id = sensor[\"id\"]\n        latest_value = latest.get(sensor_id, None)\n        fresh_dict = {\n            \"id\": sensor_id,\n            \"value\": latest_value if latest_value is not None else sensor[\"value\"]\n        }\n        fresh_dicts.append(fresh_dict)\n    return fresh_dicts",
+      "completion_tokens": 83,
+      "seconds": 4.73
+    },
+    {
+      "id": "type_dispatch",
+      "passed": true,
+      "returncode": 0,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "def coerce_field(value):\n    if value is None:\n        return None\n    elif isinstance(value, bool):\n        return \"true\" if value else \"false\"\n    elif isinstance(value, str):\n        return value.strip()\n    elif isinstance(value, (int, float)):\n        return str(value)\n    else:\n        raise TypeError(\"Unsupported type for coercion\")",
+      "completion_tokens": 73,
+      "seconds": 5.15
+    },
+    {
+      "id": "non_overlapping_spans",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "def total_coverage(spans):\n    if not spans:\n        return 0\n    if any(span[0] >= span[1] for span in spans):\n        raise ValueError(\"Reversed intervals are not allowed\")\n    spans.sort()\n    coverage = 0\n    start = spans[0][0]\n    for end, _ in spans:\n        coverage += end - start\n        start = end\n    return coverage",
+      "completion_tokens": 87,
+      "seconds": 4.62
+    },
+    {
+      "id": "cache_expiry",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "def ttl_lookup(cache, key, now, fetch, ttl):\n    if key in cache:\n        entry = cache[key]\n        if entry['expires_at'] > now:\n            return entry['value']\n    try:\n        result = fetch(key)\n        if result is not None:\n            cache[key] = {'expires_at': now + ttl, 'value': result}\n            return result\n    except Exception as e:\n        print(f\"Error fetching {key}: {e}\")\n        return None",
+      "completion_tokens": 101,
+      "seconds": 3.49
+    },
+    {
+      "id": "path_manifest",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "def select_manifest(root):\n    import os\n    return sorted([f for f in os.listdir(root) if f.endswith('.manifest') and not f.startswith('.')])",
+      "completion_tokens": 34,
+      "seconds": 1.31
+    },
+    {
+      "id": "bounded_unique",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "def first_unique(values, count):\n    seen = set()\n    unique_values = []\n    for value in values:\n        if value not in seen:\n            seen.add(value)\n            unique_values.append(value)\n            if len(unique_values) == count:\n                break\n    return unique_values",
+      "completion_tokens": 58,
+      "seconds": 1.9
+    },
+    {
+      "id": "byte_frame",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "def encode_frame(payload):\n    if len(payload) > 65535:\n        raise ValueError(\"Length cannot exceed 65535\")\n    return payload.encode(\"utf-8\") + bytes([len(payload) & 0xFF, (len(payload) >> 8) & 0xFF])",
+      "completion_tokens": 66,
+      "seconds": 1.87
+    },
+    {
+      "id": "duration_value",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "length",
+      "code": "def wait_microseconds(start, end):\n    if not isinstance(start, datetime) or not isinstance(end, datetime):\n        raise ValueError(\"Both start and end must be datetime objects\")\n    if start.tzinfo != end.tzinfo:\n        raise ValueError(\"Start and end must be in the same timezone\")\n    if start > end:\n        raise ValueError(\"Start cannot be after end\")\n    delta = end - start\n    if delta.total_seconds() < 0:\n        raise ValueError(\"Start cannot be after end\")\n    if delta.total_seconds() > 1e6:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e9:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e12:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e15:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e18:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e21:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e24:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e27:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e30:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e33:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e36:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e39:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e42:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e45:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e48:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e51:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e54:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e57:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e60:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e63:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e66:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e69:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e72:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e75:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e78:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e81:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e84:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e87:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e90:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e93:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e96:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e99:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e102:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e105:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e108:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e111:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e114:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e117:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e120:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e123:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e126:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e129:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e132:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e135:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e138:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if delta.total_seconds() > 1e141:\n        raise ValueError(\"Delta cannot be more than 1 second\")\n    if",
+      "completion_tokens": 1315,
+      "seconds": 34.21
+    },
+    {
+      "id": "nested_context",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "from contextlib import contextmanager\n\n@contextmanager\ndef capture_append(target):\n    try:\n        target.append(\"data\")\n        yield target\n    except Exception as e:\n        target.clear()\n        raise e",
+      "completion_tokens": 43,
+      "seconds": 2.07
+    },
+    {
+      "id": "select_rows",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "def find_matches(records, columns, needle):\n    def is_match(record, needle):\n        for column in columns:\n            if column not in record or not isinstance(record[column], str):\n                return False\n            if needle.lower() in record[column].lower():\n                return True\n        return False\n\n    return (record for record in records if is_match(record, needle))",
+      "completion_tokens": 76,
+      "seconds": 2.74
+    },
+    {
+      "id": "guarded_quantities",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "def pad_rows(rows, width, fill=None):\n    if width < 0:\n        raise ValueError(\"width must be non-negative\")\n    for row in rows:\n        if len(row) < width:\n            row.extend([fill] * (width - len(row)))\n        yield row",
+      "completion_tokens": 58,
+      "seconds": 2.41
+    },
+    {
+      "id": "snake-terminal-smoke",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "import curses\nimport time\n\ndef main(stdscr):\n    curses.curs_set(0)\n    stdscr.keypad(True)\n    stdscr.timeout(120)\n\n    snake = [(0, 0)]\n    direction = (0, 1)\n    food = (0, 0)\n    score = 0\n\n    def draw_snake():\n        for pos in snake:\n            stdscr.addch(pos[0], pos[1], curses.ACS_CKBOARD)\n\n    def draw_food():\n        stdscr.addch(food[0], food[1], curses.ACS_PI)\n\n    def move_snake():\n        new_head = (snake[0][0] + direction[0], snake[0][1] + direction[1])\n        snake.insert(0, new_head)\n\n        if new_head == food:\n            score += 1\n            food = (random.randint(0, curses.LINES - 1), random.randint(0, curses.WIDTH - 1))\n        else:\n            snake.pop()\n\n    def handle_input():\n        key = stdscr.getch()\n        if key == ord('q'):\n            return False\n        elif key == curses.KEY_UP and direction != (0, 1):\n            direction = (0, -1)\n        elif key == curses.KEY_DOWN and direction != (0, -1):\n            direction = (0, 1)\n        elif key == curses.KEY_LEFT and direction != (1, 0):\n            direction = (-1, 0)\n        elif key == curses.KEY_RIGHT and direction != (-1, 0):\n            direction = (1, 0)\n        return True\n\n    while True:\n        if not handle_input():\n            break\n        move_snake()\n        draw_snake()\n        draw_food()\n        stdscr.refresh()\n        time.sleep(0.1)\n\nif __name__ == \"__main__\":\n    curses.wrapper(main)",
+      "completion_tokens": 396,
+      "seconds": 13.07
+    }
+  ]
+}

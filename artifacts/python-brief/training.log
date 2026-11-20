@@ -1,0 +1,5 @@
+Loaded active weights; starting 2 passes over 32 verified briefs
+Epoch 1/2, 1/32, last loss 0.5137
+Epoch 1/2, 5/32, last loss 0.3711
+Epoch 1/2, 10/32, last loss 1.3631
+Epoch 1/2, 15/32, last loss 0.1895

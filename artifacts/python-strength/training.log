@@ -1,0 +1,17 @@
+The tokenizer you are loading from '/Users/somalip/Documents/GitHub/tessera/artifacts/python-local/checkpoint' with an incorrect regex pattern: https://huggingface.co/mistralai/Mistral-Small-3.1-24B-Instruct-2503/discussions/84#69121093e8b480e709447d5e. This will lead to incorrect tokenization. You should set the `fix_mistral_regex=True` flag when loading this tokenizer to fix this issue.
+Epoch 1/1, sample 5/72
+Epoch 1/1, sample 10/72
+Epoch 1/1, sample 15/72
+Epoch 1/1, sample 20/72
+Epoch 1/1, sample 25/72
+Epoch 1/1, sample 30/72
+Epoch 1/1, sample 35/72
+Epoch 1/1, sample 40/72
+Epoch 1/1, sample 45/72
+Epoch 1/1, sample 50/72
+Epoch 1/1, sample 55/72
+Epoch 1/1, sample 60/72
+Epoch 1/1, sample 65/72
+Epoch 1/1, sample 70/72
+Epoch 1/1, sample 72/72
+Epoch 1/1: loss 0.5230

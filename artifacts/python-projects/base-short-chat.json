@@ -1,0 +1,166 @@
+{
+  "model_sha256": "4eabbd11aa32d9d0ed37d206ff15e1549b92cb7f23ef8654cc31b28a39e3f0ab",
+  "size_bytes": 934954496,
+  "thinking": false,
+  "thinking_budget": null,
+  "suites": [
+    {
+      "dataset_sha256": "a21a15d4297f9fe3dcbb78b4a99071fed3bb57f344344ebc72e530a19fb110ba",
+      "results": [
+        {
+          "id": "sqlite_query",
+          "finish_reason": "stop",
+          "generated_code_sha256": "979344cf3c2b61eb906f5cfb9f5a9e54057ea97e400f8b01c7a25d84f6528b8f",
+          "reply": "import sqlite3\n\ndef active_names(conn, minimum):\n    cursor = conn.cursor()\n    cursor.execute(\"SELECT name FROM users WHERE active = 1 AND points >= ? ORDER BY points DESC, name ASC\", (minimum,))\n    return cursor.fetchall()\n\n# Example usage:\nconn = sqlite3.connect('example.db')\nminimum_points = 100\nactive_users = active_names(conn, minimum_points)\nfor user in active_users:\n    print(user)\nconn.close()\n",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "snapshot",
+          "finish_reason": "stop",
+          "generated_code_sha256": "3c692871abac60100364d69f908d84c6f3eb99e17030252f6581d65a6799db75",
+          "reply": "def enqueue(queue, task, tags=[]):\n    if not tags:\n        tags = []\n    queue.append({'task': task, 'tags': tags})\n    return None",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "async_limit",
+          "finish_reason": "stop",
+          "generated_code_sha256": "fffa016ce7fbd3de4b6dc56b73b163e039e18d419e94b2db147355809b93af5f",
+          "reply": "import asyncio\n\nasync def map_limited(fn, inputs, limit):\n    if limit <= 0:\n        raise ValueError(\"limit must be a positive integer\")\n    \n    async def worker(input):\n        return await fn(input)\n    \n    async def run(limit):\n        tasks = []\n        for input in inputs:\n            task = worker(input)\n            tasks.append(task)\n            if len(tasks) >= limit:\n                result = await asyncio.gather(*tasks)\n                tasks.clear()\n                yield from result\n        \n        if tasks:\n            yield from asyncio.gather(*tasks)\n    \n    return await run(limit)\n\n# Example usage:\nasync def square(x):\n    return x * x\n\nasync def main():\n    inputs = [1, 2, 3, 4, 5]\n    limit = 2\n    results = await map_limited(square, inputs, limit)\n    print(results)  # Output: [1, 4, 9, 16, 25]\n\nasyncio.run(main())\n```\n\nThis Python code defines an asynchronous function `map_limited` that takes a function `fn`, a list of inputs `inputs`, and a limit `limit`. It uses asyncio to run the function concurrently with at most `limit` calls in flight, and returns the results in the order of the inputs. The `worker` function is a helper that runs the function `fn` on each input. The `run` function manages the execution of the tasks and yields the results in the order of the inputs.",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "path_parts",
+          "finish_reason": "stop",
+          "generated_code_sha256": "54761c4c05c895ff95caecc3442705a97b963e8c46de85578f8878650b294750",
+          "reply": "from pathlib import Path\n\ndef image_files(root):\n    return sorted(root.glob('**/*.{png,jpg}', recursive=True), key=lambda x: x.name.lower())",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "log_summary",
+          "finish_reason": "stop",
+          "generated_code_sha256": "2ce52b3183485b0f1c0e31877f84ad602ec914c1b9e132e4a8aaa4351a389031",
+          "reply": "def top_errors(events, count):\n    if count <= 0:\n        return []\n    \n    error_counts = {}\n    for level, message in events:\n        if level == 'ERROR':\n            error_counts[message] = error_counts.get(message, 0) + 1\n    \n    sorted_errors = sorted(error_counts.items(), key=lambda x: (-x[1], x[0]))\n    return sorted_errors[:count]",
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "duration",
+          "finish_reason": "stop",
+          "generated_code_sha256": "8a4b12c73901945d7f6c78346735401508831b8d1a967b1fd35be9b1e00e07dd",
+          "reply": "import math\n\ndef elapsed(start_ns, finish_ns):\n    if finish_ns < start_ns:\n        raise ValueError(\"finish_ns must be greater than start_ns\")\n    return math.floor((finish_ns - start_ns) / 1e6)",
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "decode",
+          "finish_reason": "stop",
+          "generated_code_sha256": "17a1c9a9fcf4b17e62b45b949f29271a447f16127706543fcbb2033622c45b2f",
+          "reply": "def decode_record(payload):\n    import json\n    try:\n        record = json.loads(payload.decode('utf-8'))\n        if not isinstance(record, dict):\n            raise ValueError(\"Record is not a dictionary\")\n        return record['record']\n    except (json.JSONDecodeError, ValueError, KeyError):\n        raise ValueError(\"Invalid JSON or missing record field\")",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "one_shot",
+          "finish_reason": "stop",
+          "generated_code_sha256": "15f4367916524f613ca4d0cdaf209d61d6e5fc61cec464e0cf71a0a2a97fd745",
+          "reply": "from typing import *\nfrom collections import *\n\ndef stream_window(stream: Iterator[T], start: int, stop: int) -> Iterator[T]:\n    def window_generator():\n        for item in stream:\n            if start <= item < stop:\n                yield item\n    return window_generator()",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        }
+      ],
+      "passed": 2,
+      "total": 8
+    },
+    {
+      "dataset_sha256": "12f9c0c9408696773da6fcc58de92f124ec145958d3e5ca1f5490dd283808432",
+      "results": [
+        {
+          "id": "stable_group",
+          "finish_reason": "stop",
+          "generated_code_sha256": "d59d891c5a3971c80e47a0612f5d6055d3a3725036eae7fdda686664bfe030f0",
+          "reply": "def group_updates(updates):\n    updates_dict = {}\n    for key, value in updates:\n        if key not in updates_dict:\n            updates_dict[key] = []\n        updates_dict[key].append(value)\n    return list(updates_dict.items())",
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "recursive_config",
+          "finish_reason": "stop",
+          "generated_code_sha256": "6d11bbdc7a98828ab003f0b1475804e592507e6a5f3b4908e39633026160887e",
+          "reply": "def merge_config(base, patch):\n    if not isinstance(base, dict) or not isinstance(patch, dict):\n        raise ValueError(\"Both base and patch must be dictionaries\")\n    \n    merged = base.copy()\n    for key, value in patch.items():\n        if key in merged:\n            if isinstance(merged[key], dict) and isinstance(value, dict):\n                merged[key] = merge_config(merged[key], value)\n            elif value is None:\n                merged[key] = None\n            else:\n                merged[key] = value\n        else:\n            merged[key] = value\n    \n    return merged",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "pathlib_api",
+          "finish_reason": "stop",
+          "generated_code_sha256": "11ca9427154f7837500b47247b11392202f54af5f5db45e3d9416c7d61f1cf4c",
+          "reply": "import pathlib\nfrom datetime import datetime\n\ndef report_paths(root):\n    paths = []\n    for path in pathlib.Path(root).iterdir():\n        if path.is_file() and path.name.startswith(\"report-\") and path.name.endswith(\".csv\"):\n            date_str = path.name[7:-4]\n            date_obj = datetime.strptime(date_str, \"%Y-%m-%d\")\n            paths.append((date_obj, path))\n    return sorted(paths, key=lambda x: x[0])",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "legacy_cursor",
+          "finish_reason": "stop",
+          "generated_code_sha256": "063915834675f5b0e36b7680911ae2c9616f84a028a1b7efa8681d613dd4e300",
+          "reply": "def page_bounds(page, size, total):\n    if page <= 0 or size <= 0 or total < 0:\n        raise ValueError(\"Invalid input values\")\n    start = max(0, min(page * size, total))\n    return start, start + size",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "queue_accounting",
+          "finish_reason": "stop",
+          "generated_code_sha256": "310608f7c0aa132a71f3584d6f95ea80a8da8668c8b59068e5e7994f60791fc3",
+          "reply": "from typing import Dict, List, Tuple\n\ndef summarize_jobs(jobs: List[Job]) -> Dict[str, Tuple[int, int]]:\n    summary = {}\n    for job in jobs:\n        status = job.status\n        size = job.size\n        if status not in summary:\n            summary[status] = (0, 0)\n        summary[status] = (summary[status][0] + 1, summary[status][1] + size)\n    return {status: (count, total_size) for status, (count, total_size) in summary.items() if total_size != 0}",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "retry",
+          "finish_reason": "stop",
+          "generated_code_sha256": "0e0a28fa24e0efa9302f5afe138b34e5a1a41e4b306f197bafa00fbace3c55e0",
+          "reply": "import time\nfrom typing import Callable, Optional, Any\n\ndef retry_read(read: Callable[[], Any], attempts: int) -> Optional[Any]:\n    if attempts < 1:\n        raise ValueError(\"attempts must be at least 1\")\n    \n    for attempt in range(attempts):\n        try:\n            return read()\n        except TimeoutError:\n            if attempt < attempts - 1:\n                time.sleep(1)  # Wait for a second before retrying\n            else:\n                raise  # Propagate the final exception if all attempts fail",
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "event_dedup",
+          "finish_reason": "stop",
+          "generated_code_sha256": "0ef49e4e5817c88e996157a6d69f6c87aae997d90196ff025ee463001e93a9d3",
+          "reply": "from collections import defaultdict\n\ndef iter_unique_events(events):\n    seen_ids = defaultdict(list)\n    for event in events:\n        if event.get('id') is not None:\n            seen_ids[event['id']].append(event)\n    for id, events in seen_ids.items():\n        yield events[0]",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "record_composition",
+          "finish_reason": "stop",
+          "generated_code_sha256": "137ca878f6ac879302f5ba6ee543b29071ed0182aa666c5d26c62c09ead240dd",
+          "reply": "import csv\n\ndef render_row(fields, record, missing=\"-\"):\n    def escape(value):\n        if value is None:\n            return missing\n        if isinstance(value, bool):\n            return str(value).lower()\n        if isinstance(value, str):\n            value = value.replace(\"\\\\\", \"\\\\\\\\\")\n            value = value.replace(\"\\t\", \"\\\\t\")\n            value = value.replace(\"\\n\", \"\\\\n\")\n        return value\n\n    return \"\\t\".join(escape(field) for field in fields)",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        }
+      ],
+      "passed": 2,
+      "total": 8
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "documentation": {
+    "bytes": 833606681,
+    "passed": 2,
+    "checks": 4
+  },
+  "english": {
+    "bytes": 833606154,
+    "passed": 1,
+    "checks": 1
+  },
+  "diagrams": {
+    "bytes": 833606406,
+    "passed": 3,
+    "checks": 3
+  },
+  "summaries": {
+    "bytes": 833606201,
+    "passed": 2,
+    "checks": 2
+  }
+}

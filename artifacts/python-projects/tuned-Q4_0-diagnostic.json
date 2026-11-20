@@ -1,0 +1,50 @@
+{
+  "model": "python-projects.Q4_0.gguf",
+  "model_sha256": "aefb498da3f0a84a226315a9ac03bf0c4395d49f7d855f7b0833679b8bb6ecf4",
+  "size_bytes": 934954496,
+  "reference_only": false,
+  "context": 4096,
+  "gpu_layers": 99,
+  "fixture_sha256": "db7670e0ecae96d52f7cc68cb7a0bd5d462387f7af37788aca301fa6fecc9fc3",
+  "suite": "diagnostic",
+  "passed": 2,
+  "total": 3,
+  "results": [
+    {
+      "id": "snake-vague",
+      "code": "import curses\n\nMOVES = {curses.KEY_UP: (-1, 0), curses.KEY_DOWN: (1, 0),\n         curses.KEY_LEFT: (0, -1), curses.KEY_RIGHT: (0, 1)}\n\ndef main(screen):\n    screen.keypad(True)\n    screen.timeout(120)\n    height, width = screen.getmaxyx()\n    if height < 5 or width < 10:\n        return\n    row, col = height // 2, width // 2\n    dr, dc = 0, 1\n    score = 0\n    collectibles = []\n    while True:\n        screen.erase()\n        screen.addnstr(0, 0, f'Arrows to steer, q to quit, Score: {score}', width - 1)\n        screen.addch(row, col, '@')\n        for r, c in collectibles:\n            screen.addch(r, c, 'O')\n        screen.refresh()\n        key = screen.getch()\n        if key == ord('q'):\n            return\n        dr, dc = MOVES.get(key, (dr, dc))\n        nr, nc = row + dr, col + dc\n        if not (1 <= nr < height - 1 and 0 <= nc < width - 1):\n            screen.addnstr(0, 0, 'Game over', width - 1)\n            screen.refresh()\n            screen.getch()\n            return\n        row, col = nr, nc\n        if (nr, nc) not in collectibles:\n            collectibles.append((nr, nc))\n            score += 1\n        if len(collectibles) == height * width - 1:\n            screen.addnstr(0, 0, 'You win!', width - 1)\n            screen.refresh()\n            screen.getch()\n            return\n\nif __name__ == '__main__':\n    curses.wrapper(main)",
+      "route": "Inline generation",
+      "instruction": "make a snake game",
+      "diagnostics": [],
+      "seconds": 21.815908958,
+      "passed": true,
+      "returncode": 0,
+      "timed_out": false,
+      "syntax_error": null
+    },
+    {
+      "id": "snake-terminal",
+      "code": "import curses\n\nMOVES = {curses.KEY_UP: (-1, 0), curses.KEY_DOWN: (1, 0),\n         curses.KEY_LEFT: (0, -1), curses.KEY_RIGHT: (0, 1)}\n\ndef main(screen):\n    screen.keypad(True)\n    screen.timeout(120)\n    height, width = screen.getmaxyx()\n    if height < 5 or width < 10:\n        return\n    row, col = height // 2, width // 2\n    dr, dc = 0, 1\n    score = 0\n    collectibles = []\n    while True:\n        screen.erase()\n        screen.addnstr(0, 0, f'Arrows to steer, q to quit, Score: {score}', width - 1)\n        screen.addch(row, col, '@')\n        for r, c in collectibles:\n            screen.addch(r, c, 'o')\n        screen.refresh()\n        key = screen.getch()\n        if key == ord('q'):\n            return\n        dr, dc = MOVES.get(key, (dr, dc))\n        nr, nc = row + dr, col + dc\n        if not (1 <= nr < height - 1 and 0 <= nc < width - 1):\n            screen.addnstr(0, 0, 'Game over', width - 1)\n            screen.refresh()\n            screen.getch()\n            return\n        row, col = nr, nc\n        if (nr, nc) not in collectibles:\n            collectibles.append((nr, nc))\n            score += 1\n        if len(collectibles) == height * width - 1:\n            screen.addnstr(0, 0, 'You win!', width - 1)\n            screen.refresh()\n            screen.getch()\n            return\n\nif __name__ == '__main__':\n    curses.wrapper(main)",
+      "route": "Inline generation",
+      "instruction": "create a tui based snake game",
+      "diagnostics": [],
+      "seconds": 21.834233834,
+      "passed": true,
+      "returncode": 0,
+      "timed_out": false,
+      "syntax_error": null
+    },
+    {
+      "id": "snake-detailed",
+      "code": "import curses\nimport random\n\nMOVES = {curses.KEY_UP: (-1, 0), curses.KEY_DOWN: (1, 0),\n         curses.KEY_LEFT: (0, -1), curses.KEY_RIGHT: (0, 1)}\n\ndef main(screen):\n    screen.keypad(True)\n    screen.timeout(120)\n    height, width = screen.getmaxyx()\n    if height < 5 or width < 10:\n        return\n    row, col = height // 2, width // 2\n    dr, dc = 0, 1\n    score = 0\n    snake = [(row, col)]\n    food = (random.randint(1, height - 2), random.randint(1, width - 2))\n    screen.addch(food[0], food[1], 'F')\n    while True:\n        screen.erase()\n        screen.addnstr(0, 0, f'Score: {score}', width - 1)\n        screen.addch(row, col, '@')\n        for r, c in snake:\n            screen.addch(r, c, ' ')\n        screen.refresh()\n        key = screen.getch()\n        if key == ord('q'):\n            return\n        dr, dc = MOVES.get(key, (dr, dc))\n        nr, nc = row + dr, col + dc\n        if not (1 <= nr < height - 1 and 0 <= nc < width - 1):\n            screen.addnstr(0, 0, 'Game over', width - 1)\n            screen.refresh()\n            screen.getch()\n            return\n        if (nr, nc) == food:\n            score += 1\n            food = (random.randint(1, height - 2), random.randint(1, width - 2))\n            screen.addch(food[0], food[1], 'F')\n        snake.insert(0, (nr, nc))\n        if len(snake) > score + 1:\n            snake.pop()",
+      "route": "Inline generation",
+      "instruction": "Build a terminal Snake game using curses, with arrow keys, random food, score, growth, wall and body collisions, and q to quit.",
+      "diagnostics": [],
+      "seconds": 22.350672125000003,
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "syntax_error": null
+    }
+  ]
+}

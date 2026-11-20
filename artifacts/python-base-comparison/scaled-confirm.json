@@ -1,0 +1,188 @@
+{
+  "language": "python",
+  "model_sha256": "4eabbd11aa32d9d0ed37d206ff15e1549b92cb7f23ef8654cc31b28a39e3f0ab",
+  "system_profiles": [],
+  "model_size_bytes": 934954496,
+  "suites": {
+    "humaneval": {
+      "dataset_sha256": "6504ea6febc1e53759d9bb147614e470d2abb6d440ec83cd3322bf3ea8ee8429",
+      "metrics": {
+        "pass_at_1": 0.5833333333333334
+      },
+      "tasks": [
+        {
+          "id": "HumanEval/66",
+          "latency_seconds": 0.8642628329980653,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/32",
+          "latency_seconds": 7.241774125010124,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/103",
+          "latency_seconds": 1.4624492079892661,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/100",
+          "latency_seconds": 2.924568749993341,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/114",
+          "latency_seconds": 1.728910416000872,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/43",
+          "latency_seconds": 1.0444286249985453,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/97",
+          "latency_seconds": 0.6341518749977695,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/70",
+          "latency_seconds": 0.7723478340049041,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/117",
+          "latency_seconds": 1.7082946250011446,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/23",
+          "latency_seconds": 0.2907837910024682,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/101",
+          "latency_seconds": 0.6611609169922303,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/87",
+          "latency_seconds": 1.2298322080023354,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/105",
+          "latency_seconds": 2.466896625002846,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/160",
+          "latency_seconds": 2.725433624989819,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/47",
+          "latency_seconds": 1.4561398340010783,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/95",
+          "latency_seconds": 1.8606491669925163,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/30",
+          "latency_seconds": 0.6029661250067875,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/8",
+          "latency_seconds": 1.2851647499919636,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/58",
+          "latency_seconds": 0.5875042089901399,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/88",
+          "latency_seconds": 1.5645229169895174,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/9",
+          "latency_seconds": 1.370811707995017,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/89",
+          "latency_seconds": 1.7426777910004603,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/80",
+          "latency_seconds": 1.7950317500071833,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "HumanEval/111",
+          "latency_seconds": 2.611834084003931,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        }
+      ]
+    }
+  },
+  "gate_passed": false,
+  "gate_failures": [
+    "Baseline and competitor reports are required for release"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "language": "summaries",
+  "model_sha256": "44d7398aceece414b12e571c054114f9005d9613f0d5f77230b84f8476cbecb2",
+  "gate_passed": false,
+  "smoke": true,
+  "fixture_license": "CC0-1.0",
+  "training_examples": 0,
+  "base_revision": "004fd086eccea9f7cf867aa07ba328773beef81d",
+  "base_gguf_sha256": "37ae482d336108d23516fa35e8e0c4126688d81018b87178a18d752a1357814f",
+  "template_sha256": "2c8a4a21cad7342c46d3e13ec19f36d40f39910beb55dbf179a43dea31961d0f",
+  "prompt": "Summarize in two bullets. Priya will send the draft by Thursday. The team has yet to select a venue.",
+  "completion": "- Priya will send the draft by Thursday.\n- The team has yet to select a venue.",
+  "checks": {
+    "(?im)^[-*] .*Priya.*Thursday": true,
+    "(?im)^[-*] .*(venue.*(select|decid|open)|(?:select|decid|open).*venue)": true
+  }
+}

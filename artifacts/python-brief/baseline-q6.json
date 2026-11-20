@@ -1,0 +1,141 @@
+{
+  "model": "artifacts/python-brief/baseline-q6-attention.Q4_K_M.gguf",
+  "model_sha256": "77552bf742dac44432c3f1bc3a5d427ca50c8e9bb1d5efa20395b10c66067986",
+  "size_bytes": 995780096,
+  "fixture_sha256": "6166974f8564ae4036d09ba1482488c37ac2cbafca84b219cf513d51b9eaf21b",
+  "runtime": "/Users/somalip/Documents/GitHub/tessera/artifacts/python-strength/serve-metal",
+  "passed": 1,
+  "total": 13,
+  "results": [
+    {
+      "id": "partial_write",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "```python\nimport os\n\ndef write_all(write, data):\n    total = 0\n    while data:\n        bytes_written = write(data)\n        if bytes_written <= 0:\n            raise OSError(\"Failed to write data\")\n        total += bytes_written\n        data = data[bytes_written:]\n    return total\n\ndef main():\n    # Example usage\n    def write_memoryview(memoryview):\n        # Simulate writing to a memoryview\n        return len(memoryview)\n\n    data = b\"Hello, world!\"\n    total_written = write_all(write_memoryview, data)\n    print(f\"Total bytes written: {total_written}\")\n\nif __name__ == \"__main__\":\n    main()\n```\n\nThis code defines a function `write_all` that repeatedly passes a memoryview of remaining bytes to a `write` function until all data is written or the remaining length is zero. It raises an `OSError` if the count of bytes written is less than or equal to zero or if the remaining length is zero. The `main` function demonstrates how to use `write_all` with a simple `write_memoryview` function that returns the length of the memoryview.",
+      "completion_tokens": 239,
+      "seconds": 10.52
+    },
+    {
+      "id": "ordered_observations",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "import json\n\ndef attach_readings(sensors, latest):\n    fresh_dicts = []\n    for sensor_id, sensor in sensors.items():\n        if sensor_id in latest:\n            fresh_dicts.append({\n                \"sensor_id\": sensor_id,\n                \"reading\": latest[sensor_id]\n            })\n        else:\n            fresh_dicts.append({\n                \"sensor_id\": sensor_id,\n                \"reading\": None\n            })\n    return fresh_dicts",
+      "completion_tokens": 87,
+      "seconds": 5.29
+    },
+    {
+      "id": "type_dispatch",
+      "passed": true,
+      "returncode": 0,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "def coerce_field(value):\n    if value is None:\n        return None\n    elif isinstance(value, bool):\n        return \"true\" if value else \"false\"\n    elif isinstance(value, str):\n        return value.strip()\n    elif isinstance(value, (int, float)):\n        return str(value)\n    else:\n        raise TypeError(f\"Unsupported type: {type(value)}\")\n\n# Example usage:\nprint(coerce_field(None))  # Output: None\nprint(coerce_field(True))  # Output: \"true\"\nprint(coerce_field(\"Hello\"))  # Output: \"Hello\"\nprint(coerce_field(42))  # Output: \"42\"\nprint(coerce_field(3.14))  # Output: \"3.14\"\ntry:\n    print(coerce_field([1, 2, 3]))  # Output: TypeError: Unsupported type: <class 'list'>\nexcept TypeError as e:\n    print(e)",
+      "completion_tokens": 199,
+      "seconds": 6.71
+    },
+    {
+      "id": "non_overlapping_spans",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "def total_coverage(spans):\n    if not spans:\n        return 0\n    \n    spans.sort(reverse=True)\n    total_length = 0\n    current_end = float('-inf')\n    \n    for start, end in spans:\n        if start > current_end:\n            total_length += end - start\n            current_end = end\n        elif start == current_end:\n            current_end = end\n    \n    return total_length\n\n# Example usage:\nspans = [(1, 5), (3, 7), (2, 4)]\nprint(total_coverage(spans))  # Output: 6",
+      "completion_tokens": 128,
+      "seconds": 5.31
+    },
+    {
+      "id": "cache_expiry",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "```python\nimport time\n\ndef ttl_lookup(cache, key, now, fetch, ttl):\n    if key in cache:\n        entry = cache[key]\n        if entry['expires_at'] > now:\n            return entry['value']\n        else:\n            fetch(key)\n            cache[key] = {'expires_at': now + ttl, 'value': fetch(key)}\n    else:\n        fetch(key)\n        cache[key] = {'expires_at': now + ttl, 'value': fetch(key)}\n\ndef fetch(key):\n    # Simulate fetching data from a database or other source\n    return f\"Data for {key}\"\n\ndef main():\n    cache = {}\n    now = time.time()\n    ttl = 3600  # 1 hour in seconds\n\n    # Example usage\n    ttl_lookup(cache, \"example_key\", now, fetch, ttl)\n\n    # Output the cache to verify the result\n    for key, entry in cache.items():\n        print(f\"{key}: Expires at {entry['expires_at']}, Value: {entry['value']}\")\n\nif __name__ == \"__main__\":\n    main()\n```\n\nThis code defines a `ttl_lookup` function that implements the specified behavior. It uses a dictionary `cache` to store entries with their expiration times and values. The `fetch` function simulates fetching data from a source. The `main` function demonstrates how to use `ttl_lookup` and prints the cache to verify the result.",
+      "completion_tokens": 297,
+      "seconds": 9.65
+    },
+    {
+      "id": "path_manifest",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "import os\n\ndef select_manifest(root):\n    manifest_files = []\n    for root, dirs, files in os.walk(root):\n        for file in files:\n            if file.endswith('.manifest'):\n                manifest_files.append(os.path.join(root, file))\n    manifest_files.sort()\n    return manifest_files",
+      "completion_tokens": 59,
+      "seconds": 3.34
+    },
+    {
+      "id": "bounded_unique",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "```python\ndef first_unique(values, count):\n    seen = set()\n    for value in values:\n        if value not in seen:\n            seen.add(value)\n            count -= 1\n            if count <= 0:\n                return values[:len(values) - count]\n    return values[:len(values) - count]\n\ndef main():\n    values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\n    count = 5\n    result = first_unique(values, count)\n    print(result)\n\nif __name__ == \"__main__\":\n    main()\n```\n\nThis code defines a function `first_unique` that takes a list of values and a count as input. It uses a set to keep track of seen values and iterates through the list, adding each unique value to the set and decrementing the count until it reaches zero or the end of the list. If the count is nonpositive, it returns the first `count` unique values from the list. The `main` function demonstrates how to use `first_unique` with a sample list and count.",
+      "completion_tokens": 237,
+      "seconds": 13.0
+    },
+    {
+      "id": "byte_frame",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "```python\nimport struct\n\ndef encode_frame(payload):\n    if len(payload) > 65535:\n        raise ValueError(\"Length of payload must be less than or equal to 65535\")\n    length = struct.pack(\">H\", len(payload))\n    return length + payload\n\ndef main():\n    payload = b\"Hello, World!\"\n    encoded_frame = encode_frame(payload)\n    print(encoded_frame)\n\nif __name__ == \"__main__\":\n    main()\n```\n\nThis code defines a function `encode_frame` that takes a payload and encodes it into a frame with a 2-byte unsigned big-endian length followed by the original bytes. It raises a `ValueError` if the length of the payload exceeds 65535. The `main` function demonstrates how to use `encode_frame` with a sample payload and prints the encoded frame.",
+      "completion_tokens": 181,
+      "seconds": 13.56
+    },
+    {
+      "id": "duration_value",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "import datetime\n\ndef wait_microseconds(start, end):\n    if start > end:\n        raise ValueError(\"start time must be less than or equal to end time\")\n    if start.tzinfo != end.tzinfo:\n        raise ValueError(\"start and end times must have the same timezone\")\n    delta = end - start\n    if delta.days > 0:\n        raise ValueError(\"multi-day spans are not supported\")\n    return delta.microseconds",
+      "completion_tokens": 91,
+      "seconds": 3.94
+    },
+    {
+      "id": "nested_context",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "```python\nimport contextlib\n\nclass CaptureAppend:\n    def __init__(self, target):\n        self.target = target\n        self.additions = []\n\n    def __enter__(self):\n        return self\n\n    def __exit__(self, exc_type, exc_value, traceback):\n        if exc_type is not None:\n            self.target = self.target[:len(self.additions)]\n            self.additions = []\n        return False\n\n    def append(self, item):\n        self.additions.append(item)\n\ndef capture_append(target):\n    with CaptureAppend(target) as manager:\n        yield manager.additions\n\ndef main():\n    target = []\n    for item in capture_append(target):\n        target.extend(item)\n    print(target)\n\nif __name__ == \"__main__\":\n    main()\n```\n\nThis code defines a `CaptureAppend` class that uses a context manager to safely append items to a target list. If an exception occurs during the context, it truncates the additions and rethrows the exception. The `capture_append` function returns a generator that yields the additions made during the context. The `main` function demonstrates how to use `capture_append` to append items to a list and print the result.",
+      "completion_tokens": 244,
+      "seconds": 7.89
+    },
+    {
+      "id": "select_rows",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "import re\n\ndef find_matches(records, columns, needle):\n    needle = needle.lower()\n    matches = []\n    for record in records:\n        for column in columns:\n            if isinstance(record[column], str):\n                if re.search(needle, record[column], re.IGNORECASE):\n                    matches.append(record)\n                    break\n    return matches",
+      "completion_tokens": 68,
+      "seconds": 8.75
+    },
+    {
+      "id": "guarded_quantities",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "import itertools\n\ndef pad_rows(rows, width, fill=None):\n    if width < 0:\n        raise ValueError(\"width must be non-negative\")\n    for row in rows:\n        if len(row) < width:\n            row += [fill] * (width - len(row))\n        yield row[:width]\n\ndef main():\n    rows = [[\"a\", \"b\", \"c\"], [\"d\", \"e\"], [\"f\"]]\n    width = 4\n    for row in pad_rows(rows, width):\n        print(row)\n\nif __name__ == \"__main__\":\n    main()\n```\n\nThis code defines a function `pad_rows` that takes a list of rows, a width, and an optional fill value. It pads each row with the fill value until it reaches the specified width. The `main` function demonstrates how to use `pad_rows` with a sample list of rows and a width of 4.",
+      "completion_tokens": 187,
+      "seconds": 14.13
+    },
+    {
+      "id": "snake-terminal-smoke",
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "finish_reason": "stop",
+      "code": "```python\nimport curses\nimport time\n\ndef main(stdscr):\n    curses.curs_set(0)\n    stdscr.keypad(True)\n    stdscr.timeout(120)\n\n    grid_size = 20\n    snake = [(grid_size // 2, grid_size // 2)]\n    direction = curses.KEY_RIGHT\n    food = (grid_size // 2, grid_size // 2)\n    score = 0\n\n    def draw_grid():\n        for y in range(grid_size):\n            for x in range(grid_size):\n                if (x, y) == food:\n                    stdscr.addch(y, x, curses.ACS_PI)\n                elif (x, y) in snake:\n                    stdscr.addch(y, x, curses.ACS_CKBOARD)\n                else:\n                    stdscr.addch(y, x, ' ')\n\n    def move_snake():\n        head = snake[0]\n        new_head = (head[0] + direction[0], head[1] + direction[1])\n\n        if new_head == food:\n            score += 1\n            food = (random.randint(0, grid_size - 1), random.randint(0, grid_size - 1))\n        else:\n            snake.pop()\n\n        if new_head[0] < 0 or new_head[0] >= grid_size or new_head[1] < 0 or new_head[1] >= grid_size or new_head in snake:\n            curses.endwin()\n            return\n\n        snake.insert(0, new_head)\n\n    def handle_input():\n        key = stdscr.getch()\n        if key == ord('q'):\n            curses.endwin()\n            return\n        elif key == curses.KEY_UP:\n            direction = curses.KEY_UP\n        elif key == curses.KEY_DOWN:\n            direction = curses.KEY_DOWN\n        elif key == curses.KEY_LEFT:\n            direction = curses.KEY_LEFT\n        elif key == curses.KEY_RIGHT:\n            direction = curses.KEY_RIGHT\n\n    def game_loop():\n        while True:\n            draw_grid()\n            move_snake()\n            handle_input()\n            time.sleep(0.1)\n\n    curses.wrapper(game_loop)\n\nif __name__ == \"__main__\":\n    import random\n    curses.wrapper(main)\n```\n\nThis code defines a simple text-based snake game using the curses library in Python. The game loop handles the game state, including drawing the grid, moving the snake, handling user input, and checking for collisions. The game ends when the player presses 'q'.",
+      "completion_tokens": 515,
+      "seconds": 21.14
+    }
+  ]
+}

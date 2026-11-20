@@ -1,0 +1,6 @@
+import sqlite3
+
+def active_names(conn, minimum):
+    cursor = conn.cursor()
+    cursor.execute("SELECT name FROM users WHERE active = 1 AND points >= ? ORDER BY points DESC, name ASC", (minimum,))
+    return cursor.fetchall()

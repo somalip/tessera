@@ -1,0 +1,166 @@
+{
+  "model_sha256": "37ae482d336108d23516fa35e8e0c4126688d81018b87178a18d752a1357814f",
+  "size_bytes": 833592096,
+  "thinking": false,
+  "thinking_budget": null,
+  "suites": [
+    {
+      "dataset_sha256": "a21a15d4297f9fe3dcbb78b4a99071fed3bb57f344344ebc72e530a19fb110ba",
+      "results": [
+        {
+          "id": "sqlite_query",
+          "finish_reason": "stop",
+          "generated_code_sha256": "8c3f17239cad7d5f876e61b0c79247f49567c66de5fc827ed2ffcd2250c966e8",
+          "reply": "```python\nimport sqlite3\n\ndef active_names(conn, minimum):\n    \"\"\"\n    Query the users table for active users with points >= minimum.\n    Return names ordered by descending points, then ascending name.\n    Bind minimum as a parameter. Leave the connection open.\n    \"\"\"\n    cursor = conn.cursor()\n    cursor.execute(\"\"\"\n        SELECT name, points \n        FROM users \n        WHERE active = 1 \n        AND points >= ?\n    \"\"\", (minimum,))\n    results = cursor.fetchall()\n    \n    # Sort by points descending, then by name ascending\n    results.sort(key=lambda x: (-x[1], x[0]))\n    \n    return [name for name, _ in results]\n```",
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "snapshot",
+          "finish_reason": "stop",
+          "generated_code_sha256": "7834ea7215375fa4d29bc06d4970cbe25e0a66ae3ba92f859d9330811151534e",
+          "reply": "```python\ndef enqueue(queue, task, tags=[]):\n    \"\"\"\n    Enqueue a task with optional tags.\n    \n    This function ensures that:\n    1. Tasks without tags are not shared mutable state across calls.\n    2. Subsequent calls to the same queue with different tags do not affect the task.\n    \n    Args:\n        queue (list): The queue to enqueue to.\n        task (any): The task to enqueue.\n        tags (list, optional): Tags to associate with the task. Defaults to [].\n    \n    Returns:\n        None: The task is added to the queue and returned.\n    \"\"\"\n    # Create a new dict with task and tags if tags are provided\n    if tags:\n        queue.append({\n            'task': task,\n            'tags': tags\n        })\n    else:\n        # For tasks without tags, ensure they don't share mutable state\n        # by not modifying the queue in place (though the task itself is added)\n        pass\n\n    return None\n```",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "async_limit",
+          "finish_reason": "stop",
+          "generated_code_sha256": "01a83a3adcd3949519c0d4ea06adacf46e3474671e223e105a68f4d963a61187",
+          "reply": "```python\nimport asyncio\nfrom typing import Any, Callable, List, Optional, Union\n\nasync def map_limited(fn: Callable[[Any], Any], inputs: List[Any], limit: int) -> List[Any]:\n    \"\"\"\n    Run the async function fn concurrently with at most 'limit' calls in flight.\n    Returns results in input order.\n    \n    Args:\n        fn: The async function to run concurrently\n        inputs: List of input values\n        limit: Maximum number of concurrent calls allowed\n    \n    Raises:\n        ValueError: If limit is not positive\n    \"\"\"\n    if limit <= 0:\n        raise ValueError(\"Limit must be a positive integer\")\n    \n    # Convert inputs to async tasks\n    tasks = [asyncio.create_task(fn(x)) for x in inputs]\n    \n    # Collect results\n    results = []\n    for task in tasks:\n        try:\n            result = await task\n            results.append(result)\n        except asyncio.CancelledError:\n            # Cancel the task if it's being cancelled by the caller\n            raise\n    \n    return results\n```",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "path_parts",
+          "finish_reason": "stop",
+          "generated_code_sha256": "3d9e61a8251a538d465b97b9ea54f5bee2feba62cd2b9fe91d4216b8a83dc46d",
+          "reply": "```python\nimport os\nfrom pathlib import Path\n\ndef image_files(root: Path) -> list[str]:\n    \"\"\"\n    Recursively find regular files ending in .png or .jpg case-insensitively.\n    Exclude directories whose names end in those extensions.\n    \n    Returns a sorted list of POSIX-style paths relative to root.\n    \"\"\"\n    if not root.exists():\n        return []\n    \n    result = []\n    \n    # Get all regular files (not directories)\n    for item in root.rglob(\"*\"):\n        if item.is_file():\n            # Check if it's a regular file\n            if item.is_file():\n                # Check if it ends with .png or .jpg (case-insensitive)\n                if item.suffix.lower() in (\".png\", \".jpg\"):\n                    # Get the relative path from root\n                    rel_path = item.relative_to(root)\n                    result.append(str(rel_path))\n    \n    # Sort the results\n    return sorted(result)\n```",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "log_summary",
+          "finish_reason": "stop",
+          "generated_code_sha256": "4b7f7b68f53e892bfb74c744fee6d4d32af207efb9ef2665afbc4b4bb587877e",
+          "reply": "```python\nfrom collections import Counter\nfrom typing import Iterable, Tuple\n\ndef top_errors(events: Iterable[Tuple[str, str]], count: int) -> List[Tuple[str, int]]:\n    \"\"\"\n    Count only level exactly 'ERROR' and return up to 'count' (message, frequency) tuples.\n    Ranked by descending frequency and lexicographic message for ties.\n    Returns [] when count is nonpositive.\n    \"\"\"\n    if count <= 0:\n        return []\n\n    # Count ERROR messages\n    error_counts = Counter(events)\n\n    # Filter and sort ERROR messages\n    error_messages = [msg for msg, _ in error_counts if msg == 'ERROR']\n\n    # Sort by frequency descending, then by message lexicographically ascending\n    error_messages.sort(key=lambda x: (-x[1], x))\n\n    # Return up to 'count' tuples\n    return error_messages[:count]\n```",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "duration",
+          "finish_reason": "stop",
+          "generated_code_sha256": "5217a617e8e0ff312f1ab4db91fc6ba8c244b40462630addafbaf6365d81964d",
+          "reply": "```python\nfrom typing import Optional, Union\n\ndef elapsed(start_ns: Union[int, float], finish_ns: Union[int, float]) -> int:\n    \"\"\"\n    Calculate the number of complete milliseconds elapsed between two timestamps.\n    \n    Args:\n        start_ns: Start timestamp in nanoseconds (integer or float)\n        finish_ns: Finish timestamp in nanoseconds (integer or float)\n    \n    Returns:\n        Number of complete milliseconds elapsed (floor of (finish_ns - start_ns) / 1000.0)\n    \n    Raises:\n        ValueError: If finish_ns < start_ns\n    \"\"\"\n    if not isinstance(start_ns, (int, float)) or not isinstance(finish_ns, (int, float)):\n        raise TypeError(\"Both start_ns and finish_ns must be numeric types\")\n    \n    if start_ns < finish_ns:\n        raise ValueError(\"finish_ns must not precede start_ns\")\n    \n    # Convert to nanoseconds if they are floats\n    if isinstance(start_ns, float) and not isinstance(start_ns, int):\n        start_ns = int(start_ns)\n    if isinstance(finish_ns, float) and not isinstance(finish_ns, int):\n        finish_ns = int(finish_ns)\n    \n    # Calculate difference in nanoseconds\n    nanos = finish_ns - start_ns\n    \n    # Calculate milliseconds (floor)\n    milliseconds = int(nanos // 1000)\n    \n    return milliseconds\n```",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "decode",
+          "finish_reason": "stop",
+          "generated_code_sha256": "484b348de20ab8881fae4cc7cb71f54313c7d0138b2afff145751f29639adca2",
+          "reply": "```python\nimport json\nimport base64\nfrom typing import Any, Dict, Union\n\ndef decode_record(payload: bytes) -> Dict[str, Any]:\n    \"\"\"\n    Decode a bytes-encoded JSON record.\n    \n    Args:\n        payload: Bytes encoded as UTF-8 JSON.\n        \n    Returns:\n        The 'record' field if its value is a dict.\n        \n    Raises:\n        ValueError: If payload is not valid JSON, not a dict, or missing non-dict fields.\n    \"\"\"\n    if payload is None:\n        raise ValueError(\"Payload cannot be None\")\n    \n    # Check if payload is bytes\n    if not isinstance(payload, bytes):\n        raise ValueError(\"Payload must be bytes\")\n    \n    # Try to decode as UTF-8 JSON\n    try:\n        data = json.loads(payload.decode('utf-8'))\n    except UnicodeDecodeError:\n        raise ValueError(\"Payload must be valid UTF-8 JSON\")\n    except json.JSONDecodeError:\n        raise ValueError(\"Payload must be valid JSON\")\n    \n    # Check if payload is a dict\n    if not isinstance(data, dict):\n        raise ValueError(\"Payload must be a dict\")\n    \n    # Check for missing or non-dict fields\n    for key, value in data.items():\n        if not isinstance(value, dict):\n            raise ValueError(f\"Record must have a 'record' field, but got {type(value).__name__} for key '{key}'\")\n    \n    return data.get('record')\n```",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "one_shot",
+          "finish_reason": "stop",
+          "generated_code_sha256": "2447147277087a26792abf2b15e22256b90c9dc8660b7f06348f4ef377583cc3",
+          "reply": "```python\nfrom typing import Iterator, Iterable, Tuple, List\n\ndef stream_window(stream: Iterator, start: int, stop: int) -> Iterator[Tuple[int, int]]:\n    \"\"\"\n    Yield zero-based offsets in the range [start, stop).\n    \n    Parameters:\n    stream (Iterator): A one-pass iterator over the stream\n    start (int): Start of the window range (inclusive)\n    stop (int): End of the window range (exclusive)\n    \n    Returns:\n    Iterator[Tuple[int, int]]: An iterator yielding (offset, value) pairs\n    \"\"\"\n    if start >= stop:\n        return\n    \n    # Convert to zero-based offsets\n    offset = start\n    value = stream.next()\n    \n    while offset < stop:\n        yield (offset, value)\n        offset += 1\n        value = stream.next()\n```",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        }
+      ],
+      "passed": 1,
+      "total": 8
+    },
+    {
+      "dataset_sha256": "12f9c0c9408696773da6fcc58de92f124ec145958d3e5ca1f5490dd283808432",
+      "results": [
+        {
+          "id": "stable_group",
+          "finish_reason": "stop",
+          "generated_code_sha256": "6c7352dfcd2567b0ccbdca5f8b16023b18f209302d52ca83eb209106744e14cb",
+          "reply": "```python\nfrom typing import List, Tuple, Iterable\n\ndef group_updates(updates: Iterable[Tuple[str, str]]) -> List[Tuple[str, List[str]]]:\n    \"\"\"\n    Group updates by key and return a list of (key, values) tuples.\n    \n    Args:\n        updates: One-pass iterable of (key, value) pairs.\n        \n    Returns:\n        List of (key, values) tuples where keys are in order of first appearance\n        and values are in arrival order.\n    \"\"\"\n    result = []\n    seen_keys = set()\n    \n    for key, value in updates:\n        if key not in seen_keys:\n            seen_keys.add(key)\n            result.append((key, [value]))\n        else:\n            # If key already exists, append the existing value list\n            result.append((key, value))\n    \n    return result\n```",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "recursive_config",
+          "finish_reason": "stop",
+          "generated_code_sha256": "91a10bb0f08e0e03b69f4c6e727501fb81f1b514d9d5e8e354501ab67dedc1ed",
+          "reply": "```python\ndef merge_config(base, patch):\n    \"\"\"\n    Merge nested configuration dictionaries recursively.\n    \n    - If both sides are dictionaries, merge them recursively.\n    - If one is a list and the other is a dictionary, merge the list into the dict.\n    - If one is a list and the other is a list, merge them recursively.\n    - If one is a list and the other is None, the list is kept.\n    - If one is None and the other is a list, the list is kept.\n    - If both are None, return None.\n    - All other values (strings, numbers, booleans, etc.) are replaced by the other side.\n    \n    Args:\n        base (dict or list): The base configuration.\n        patch (dict or list): The patch configuration.\n    \n    Returns:\n        dict or list: The merged result.\n    \"\"\"\n    if base is None:\n        return patch\n    \n    if patch is None:\n        return base\n    \n    if isinstance(base, dict) and isinstance(patch, dict):\n        result = {}\n        for key, value in base.items():\n            if key in patch:\n                result[key] = merge_config(value, patch[key])\n            else:\n                result[key] = value\n        return result\n    elif isinstance(base, list) and isinstance(patch, dict):\n        result = []\n        for item in base:\n            result.append(merge_config(item, patch))\n        return result\n    elif isinstance(base, list) and isinstance(patch, list):\n        result = []\n        for item in base:\n            result.append(merge_config(item, item))\n        return result\n    else:\n        # If neither is a dict or list, return the other as-is\n        if isinstance(base, dict):\n            return patch\n        else:\n            return base\n```",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "pathlib_api",
+          "finish_reason": "stop",
+          "generated_code_sha256": "9a622627be19bcbbb7e29e2081fbb7b600830b365688f4ad69b558cecae73be2",
+          "reply": "```python\nfrom datetime import datetime\nfrom pathlib import Path\nfrom typing import List, Tuple\n\ndef report_paths(root: Path) -> List[Tuple[datetime, Path]]:\n    \"\"\"\n    Returns a list of tuples (day, path) representing regular files\n    directly under root whose names exactly match 'report-YYYY-MM-DD.csv'.\n    \n    Args:\n        root: The root directory path.\n        \n    Returns:\n        List of (datetime, Path) tuples sorted by date ascending.\n    \"\"\"\n    if not root.exists():\n        return []\n    \n    # Find all files matching the pattern\n    pattern = root / \"report-YYYY-MM-DD.csv\"\n    files = list(pattern.glob(\"*\"))\n    \n    if not files:\n        return []\n    \n    # Parse dates and sort\n    dates = []\n    for f in files:\n        try:\n            # Extract YYYY-MM-DD from filename\n            date_str = f.stem  # filename without extension\n            date_obj = datetime.strptime(date_str, \"%Y-%m-%d\")\n            dates.append((date_obj, f))\n        except ValueError:\n            continue\n    \n    # Sort by date ascending\n    dates.sort(key=lambda x: x[0])\n    \n    return dates\n```",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "legacy_cursor",
+          "finish_reason": "stop",
+          "generated_code_sha256": "da20957c4f48b1d0b48062fa99ff6bf7f6348f9e36128d0b458f1e98ce46d3bc",
+          "reply": "```python\ndef page_bounds(page, size, total):\n    \"\"\"\n    Calculate half-open index bounds for a page in a list of size total.\n    \n    Args:\n        page (int): 1-based page number.\n        size (int): Number of items per page.\n        total (int): Total number of items in the list.\n    \n    Returns:\n        tuple: (start, stop) where start is inclusive and stop is exclusive.\n    \n    Raises:\n        ValueError: If page or size is nonpositive or total is negative.\n    \"\"\"\n    if page <= 0 or size <= 0 or total <= 0:\n        raise ValueError(\"page, size, or total must be positive integers.\")\n    \n    start = page * size\n    stop = start + size\n    return start, stop\n```",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "queue_accounting",
+          "finish_reason": "stop",
+          "generated_code_sha256": "c321fa7a694b7664e8bc6b7c8d5fe17fa655004c604e1d116a5984d5a9c686e4",
+          "reply": "```python\nfrom collections import defaultdict\n\nclass Job:\n    def __init__(self, status, size):\n        self.status = status\n        self.size = size\n\ndef summarize_jobs(jobs):\n    \"\"\"\n    Summarize jobs by returning a dictionary mapping status to (count, total_size).\n    Retains statuses whose total_size is zero.\n    \"\"\"\n    # Use a defaultdict to count occurrences of each status\n    status_counts = defaultdict(int)\n    total_sizes = defaultdict(int)\n\n    for job in jobs:\n        status_counts[job.status] += 1\n        total_sizes[job.status] += job.size\n\n    # Build the result dictionary\n    result = {}\n    for status, count in status_counts.items():\n        if count > 0:\n            result[status] = (count, total_sizes[status])\n        else:\n            # Status with zero total size is still included in the result\n            # as per the requirement to \"retain statuses whose total_size is zero\"\n            result[status] = (0, 0)\n\n    return result\n```",
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "retry",
+          "finish_reason": "stop",
+          "generated_code_sha256": "a7004bdb62087c0175fac83c6a49fa941bafbe7aec37308fd60b3fe86831ff40",
+          "reply": "```python\nimport time\nfrom typing import Any, Callable, Optional, Union\n\ndef retry_read(\n    read: Callable[[Any], Any],\n    attempts: int,\n) -> Union[Optional[Any], Exception]:\n    \"\"\"\n    Retry read() up to 'attempts' times and return its first successful result.\n    Retry only TimeoutError. If all attempts time out, propagate the final exception.\n    Raise ValueError before calling read if attempts is less than one.\n    Do not sleep.\n    \n    Args:\n        read: The function to call for reading.\n        attempts: Number of attempts to retry.\n    \n    Returns:\n        The first successful result from read() or the final exception.\n    \n    Raises:\n        ValueError: If attempts is less than 1.\n        TimeoutError: If read() times out.\n        Exception: If read() raises any other exception.\n    \"\"\"\n    if attempts < 1:\n        raise ValueError(\"attempts must be at least 1\")\n    \n    for _ in range(attempts):\n        try:\n            return read()\n        except TimeoutError:\n            continue\n        except Exception:\n            raise\n    raise TimeoutError(\"All attempts timed out\")\n```",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "event_dedup",
+          "finish_reason": "stop",
+          "generated_code_sha256": "1852fc5f3d6d718511af6ca7403f5760e9acd4f266503eb7ff4d45dcf5e9633c",
+          "reply": "```python\nfrom typing import List, Dict, Any\n\ndef iter_unique_events(events: List[Dict[str, Any]]) -> List[Dict[str, Any]]:\n    \"\"\"\n    Yield events in input order, keeping only the first occurrence of each non-None id.\n    Events with missing or None ids are always retained.\n    \"\"\"\n    seen_ids: set = set()\n    result: List[Dict[str, Any]] = []\n\n    for event in events:\n        if event is None:\n            continue\n        if event[\"id\"] is not None:\n            if event[\"id\"] not in seen_ids:\n                seen_ids.add(event[\"id\"])\n                result.append(event)\n\n    return result\n```",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "record_composition",
+          "finish_reason": "stop",
+          "generated_code_sha256": "46161132d8c9a43d4325ff5293a9c929bb285c81bdd12fc9c56a97ebd06b764b",
+          "reply": "```python\ndef render_row(fields, record, missing=\"-\"):\n    \"\"\"\n    Render a single row of data from a tab-separated exporter.\n    \n    Parameters:\n    fields (list): Ordered list of field names. Can contain repeats.\n    record (dict): Dictionary mapping field names to values.\n    missing (str): Default value for missing fields (default=\"-\").\n    \n    Returns:\n    list: List of strings representing the rendered row.\n    \"\"\"\n    result = []\n    \n    for field in fields:\n        value = record.get(field, missing)\n        \n        # Handle None values\n        if value is None:\n            value = missing\n        \n        # Handle missing values\n        if value == missing:\n            value = missing\n        \n        # Escape backslashes first\n        escaped = value.replace('\\\\', '\\\\\\\\')\n        \n        # Escape tabs and newlines\n        escaped = escaped.replace('\\t', '\\\\t')\n        escaped = escaped.replace('\\n', '\\\\n')\n        \n        result.append(escaped)\n    \n    return result\n```",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        }
+      ],
+      "passed": 1,
+      "total": 8
+    }
+  ]
+}

@@ -1,0 +1,111 @@
+{
+  "model_sha256": "4eabbd11aa32d9d0ed37d206ff15e1549b92cb7f23ef8654cc31b28a39e3f0ab",
+  "size_bytes": 934954496,
+  "mode": "deliberate",
+  "settings": {
+    "temperature": 0,
+    "seed": 42,
+    "max_tokens": 512,
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    }
+  },
+  "suites": [
+    {
+      "path": "/Users/somalip/Documents/GitHub/tessera/artifacts/python-v2/heldout.jsonl",
+      "sha256": "12f9c0c9408696773da6fcc58de92f124ec145958d3e5ca1f5490dd283808432",
+      "passed": 0,
+      "total": 8,
+      "results": [
+        {
+          "id": "stable_group",
+          "finish_reason": "stop",
+          "reply": "def group_updates(updates):\n    from collections import defaultdict\n    from typing import List, Tuple\n\n    def group_updates(updates: List[Tuple[str, int]]) -> List[Tuple[str, List[int]]]:\n        updates_dict = defaultdict(list)\n        for key, value in updates:\n            updates_dict[key].append(value)\n        return [(key, values) for key, values in updates_dict.items()]\n\n# Example usage:\nupdates = [(\"a\", 1), (\"b\", 2), (\"a\", 3), (\"c\", 4), (\"b\", 5)]\nprint(group_updates(updates))",
+          "reasoning_chars": 0,
+          "tokens": 126,
+          "wall_seconds": 4.84,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "recursive_config",
+          "finish_reason": "stop",
+          "reply": "def merge_config(base, patch):\n    if not isinstance(base, dict) or not isinstance(patch, dict):\n        raise ValueError(\"Both base and patch must be dictionaries\")\n    result = base.copy()\n    for key, value in patch.items():\n        if key in result:\n            if isinstance(result[key], dict) and isinstance(value, dict):\n                result[key] = merge_config(result[key], value)\n            elif value is None:\n                result[key] = None\n            else:\n                result[key] = value\n        else:\n            result[key] = value\n    return result",
+          "reasoning_chars": 0,
+          "tokens": 118,
+          "wall_seconds": 4.11,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "pathlib_api",
+          "finish_reason": "stop",
+          "reply": "from pathlib import Path\nfrom datetime import datetime\n\ndef report_paths(root):\n    paths = []\n    for path in Path(root).iterdir():\n        if path.is_file() and path.name.startswith(\"report-\") and path.name.endswith(\".csv\"):\n            date_str = path.name[7:-4]\n            date = datetime.strptime(date_str, \"%Y-%m-%d\")\n            paths.append((date, path))\n    return sorted(paths, key=lambda x: x[0])",
+          "reasoning_chars": 0,
+          "tokens": 98,
+          "wall_seconds": 3.83,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "legacy_cursor",
+          "finish_reason": "stop",
+          "reply": "def page_bounds(page, size, total):\n    if page <= 0 or size <= 0 or total < 0:\n        raise ValueError(\"Invalid input values\")\n    start = page * size\n    stop = min(start + size, total)\n    return start, stop",
+          "reasoning_chars": 0,
+          "tokens": 57,
+          "wall_seconds": 2.24,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "queue_accounting",
+          "finish_reason": "stop",
+          "reply": "def summarize_jobs(jobs):\n    summary = {}\n    for job in jobs:\n        status = job.status\n        size = job.size\n        if status not in summary:\n            summary[status] = (0, 0)\n        summary[status] = (summary[status][0] + 1, summary[status][1] + size)\n    return {status: (count, total_size) for status, (count, total_size) in summary.items() if total_size != 0}",
+          "reasoning_chars": 0,
+          "tokens": 105,
+          "wall_seconds": 3.53,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "retry",
+          "finish_reason": "stop",
+          "reply": "def retry_read(read, attempts):\n    if attempts < 1:\n        raise ValueError(\"attempts must be at least 1\")\n    for attempt in range(attempts):\n        try:\n            return read()\n        except TimeoutError:\n            pass\n    raise TimeoutError(\"All attempts timed out\")",
+          "reasoning_chars": 0,
+          "tokens": 61,
+          "wall_seconds": 2.37,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "event_dedup",
+          "finish_reason": "stop",
+          "reply": "def iter_unique_events(events):\n    seen_ids = set()\n    for event in events:\n        if event.get('id') is not None:\n            seen_ids.add(event['id'])\n        yield event",
+          "reasoning_chars": 0,
+          "tokens": 41,
+          "wall_seconds": 1.55,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "record_composition",
+          "finish_reason": "stop",
+          "reply": "def render_row(fields, record, missing=\"-\"):\n    def escape(s):\n        return s.replace(\"\\\\\", \"\\\\\\\\\").replace(\"\\t\", \"\\\\t\").replace(\"\\n\", \"\\\\n\")\n    return \"\\t\".join(map(lambda field: escape(str(record[field] if record[field] is not None else missing)), fields))",
+          "reasoning_chars": 0,
+          "tokens": 66,
+          "wall_seconds": 2.52,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        }
+      ]
+    }
+  ]
+}

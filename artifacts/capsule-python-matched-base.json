@@ -1,0 +1,281 @@
+{
+  "suite": "heldout",
+  "fixture_sha256": "a21a15d4297f9fe3dcbb78b4a99071fed3bb57f344344ebc72e530a19fb110ba",
+  "retries": 1,
+  "models": [
+    {
+      "id": "base.Q4_0.gguf",
+      "sha256": "069e25eded20e56b9d05acf269e3851e9d579a8fb51996e1c4814888c08bad9a",
+      "pass_at_1": 0.125,
+      "escalation_rate": 0,
+      "avg_capsule_tokens": 137.33333333333334,
+      "final_pass_rate": 0.125,
+      "results": [
+        {
+          "order": {
+            "id": "sqlite_query",
+            "role": "implement",
+            "language": "python",
+            "signature": "Implement active_names(conn, minimum), using the caller's sqlite3 connection. Query the users table (name TEXT, active INTEGER, points INTEGER) for active=1 and points at least minimum. Return names ordered by descending points, then ascending name. Bind minimum as a parameter. Leave the connection open.",
+            "acceptance_checks": [
+              "suite"
+            ],
+            "needs_symbols": [],
+            "difficulty": "routine"
+          },
+          "passed": false,
+          "attempts": [
+            {
+              "id": "sqlite_query",
+              "phase": "candidate",
+              "model": "base.Q4_0.gguf",
+              "tier": 0,
+              "tokens": 140,
+              "passed": false,
+              "fingerprint": "suite:1 [704b124a2ee1]"
+            },
+            {
+              "id": "sqlite_query",
+              "phase": "candidate",
+              "model": "base.Q4_0.gguf",
+              "tier": 0,
+              "tokens": 157,
+              "passed": false,
+              "fingerprint": "suite:1 [704b124a2ee1]"
+            }
+          ]
+        },
+        {
+          "order": {
+            "id": "snapshot",
+            "role": "implement",
+            "language": "python",
+            "signature": "Fix enqueue(queue, task, tags=[]) so calls without tags never share mutable state and subsequent caller changes to the supplied tags list cannot affect a queued task. Append a dict with keys task and tags to queue, and return None.",
+            "acceptance_checks": [
+              "suite"
+            ],
+            "needs_symbols": [],
+            "difficulty": "routine"
+          },
+          "passed": false,
+          "attempts": [
+            {
+              "id": "snapshot",
+              "phase": "candidate",
+              "model": "base.Q4_0.gguf",
+              "tier": 0,
+              "tokens": 125,
+              "passed": false,
+              "fingerprint": "suite:1 [704b124a2ee1]"
+            },
+            {
+              "id": "snapshot",
+              "phase": "candidate",
+              "model": "base.Q4_0.gguf",
+              "tier": 0,
+              "tokens": 142,
+              "passed": false,
+              "fingerprint": "suite:1 [704b124a2ee1]"
+            }
+          ]
+        },
+        {
+          "order": {
+            "id": "async_limit",
+            "role": "implement",
+            "language": "python",
+            "signature": "Implement async map_limited(fn, inputs, limit). Run the async function fn concurrently with at most limit calls in flight, and return results in input order. Raise ValueError for a non-positive limit.",
+            "acceptance_checks": [
+              "suite"
+            ],
+            "needs_symbols": [],
+            "difficulty": "routine"
+          },
+          "passed": false,
+          "attempts": [
+            {
+              "id": "async_limit",
+              "phase": "candidate",
+              "model": "base.Q4_0.gguf",
+              "tier": 0,
+              "tokens": 119,
+              "passed": false,
+              "fingerprint": "suite:1 [704b124a2ee1]"
+            },
+            {
+              "id": "async_limit",
+              "phase": "candidate",
+              "model": "base.Q4_0.gguf",
+              "tier": 0,
+              "tokens": 136,
+              "passed": false,
+              "fingerprint": "suite:1 [704b124a2ee1]"
+            }
+          ]
+        },
+        {
+          "order": {
+            "id": "path_parts",
+            "role": "implement",
+            "language": "python",
+            "signature": "Implement image_files(root) with pathlib. Recursively find regular files ending in .png or .jpg case-insensitively. Return sorted POSIX-style paths relative to root as strings. Exclude directories whose names end in those extensions.",
+            "acceptance_checks": [
+              "suite"
+            ],
+            "needs_symbols": [],
+            "difficulty": "routine"
+          },
+          "passed": false,
+          "attempts": [
+            {
+              "id": "path_parts",
+              "phase": "candidate",
+              "model": "base.Q4_0.gguf",
+              "tier": 0,
+              "tokens": 125,
+              "passed": false,
+              "fingerprint": "suite:1 [704b124a2ee1]"
+            },
+            {
+              "id": "path_parts",
+              "phase": "candidate",
+              "model": "base.Q4_0.gguf",
+              "tier": 0,
+              "tokens": 142,
+              "passed": false,
+              "fingerprint": "suite:1 [704b124a2ee1]"
+            }
+          ]
+        },
+        {
+          "order": {
+            "id": "log_summary",
+            "role": "implement",
+            "language": "python",
+            "signature": "Implement top_errors(events, count) for an iterable of (level, message) pairs. Count only level exactly 'ERROR'. Return up to count (message, frequency) tuples, ranked by descending frequency and lexicographic message for ties. Return [] when count is nonpositive.",
+            "acceptance_checks": [
+              "suite"
+            ],
+            "needs_symbols": [],
+            "difficulty": "routine"
+          },
+          "passed": true,
+          "attempts": [
+            {
+              "id": "log_summary",
+              "phase": "candidate",
+              "model": "base.Q4_0.gguf",
+              "tier": 0,
+              "tokens": 135,
+              "passed": true,
+              "fingerprint": ""
+            }
+          ],
+          "retained_signatures": 0
+        },
+        {
+          "order": {
+            "id": "duration",
+            "role": "implement",
+            "language": "python",
+            "signature": "Fix elapsed(start_ns, finish_ns), currently implemented as round((finish_ns - start_ns) / 1e6), so that it returns the number of complete milliseconds elapsed. Inputs are integer monotonic clock timestamps in nanoseconds. Raise ValueError when finish precedes start. Handle very large integers exactly.",
+            "acceptance_checks": [
+              "suite"
+            ],
+            "needs_symbols": [],
+            "difficulty": "routine"
+          },
+          "passed": false,
+          "attempts": [
+            {
+              "id": "duration",
+              "phase": "candidate",
+              "model": "base.Q4_0.gguf",
+              "tier": 0,
+              "tokens": 139,
+              "passed": false,
+              "fingerprint": "suite:1 [704b124a2ee1]"
+            },
+            {
+              "id": "duration",
+              "phase": "candidate",
+              "model": "base.Q4_0.gguf",
+              "tier": 0,
+              "tokens": 156,
+              "passed": false,
+              "fingerprint": "suite:1 [704b124a2ee1]"
+            }
+          ]
+        },
+        {
+          "order": {
+            "id": "decode",
+            "role": "implement",
+            "language": "python",
+            "signature": "Implement decode_record(payload), taking bytes encoded as UTF-8 JSON. Return the 'record' field if its value is a dict. Raise ValueError for bad encoding, invalid JSON, a non-object top level, or a missing or non-dict record.",
+            "acceptance_checks": [
+              "suite"
+            ],
+            "needs_symbols": [],
+            "difficulty": "routine"
+          },
+          "passed": false,
+          "attempts": [
+            {
+              "id": "decode",
+              "phase": "candidate",
+              "model": "base.Q4_0.gguf",
+              "tier": 0,
+              "tokens": 129,
+              "passed": false,
+              "fingerprint": "suite:1 [704b124a2ee1]"
+            },
+            {
+              "id": "decode",
+              "phase": "candidate",
+              "model": "base.Q4_0.gguf",
+              "tier": 0,
+              "tokens": 146,
+              "passed": false,
+              "fingerprint": "suite:1 [704b124a2ee1]"
+            }
+          ]
+        },
+        {
+          "order": {
+            "id": "one_shot",
+            "role": "implement",
+            "language": "python",
+            "signature": "Implement stream_window(stream, start, stop) yielding items with zero-based offsets in [start, stop). Inputs are a one-pass iterator and nonnegative offsets. Do not consume the item at stop or any item when stop <= start.",
+            "acceptance_checks": [
+              "suite"
+            ],
+            "needs_symbols": [],
+            "difficulty": "routine"
+          },
+          "passed": false,
+          "attempts": [
+            {
+              "id": "one_shot",
+              "phase": "candidate",
+              "model": "base.Q4_0.gguf",
+              "tier": 0,
+              "tokens": 126,
+              "passed": false,
+              "fingerprint": "suite:1 [704b124a2ee1]"
+            },
+            {
+              "id": "one_shot",
+              "phase": "candidate",
+              "model": "base.Q4_0.gguf",
+              "tier": 0,
+              "tokens": 143,
+              "passed": false,
+              "fingerprint": "suite:1 [704b124a2ee1]"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

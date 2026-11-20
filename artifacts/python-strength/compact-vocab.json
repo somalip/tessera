@@ -1,0 +1,7 @@
+{
+  "original_rows": 151936,
+  "retained_rows": 44283,
+  "original_merges": 151387,
+  "retained_merges": 44005,
+  "training_source": "exercism-verified.jsonl"
+}

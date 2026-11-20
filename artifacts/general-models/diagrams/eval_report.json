@@ -1,0 +1,18 @@
+{
+  "language": "diagrams",
+  "model_sha256": "82a0bde33046d213104b57b3aaaa51b6020bdc3137302b4c12588d50cc07a023",
+  "gate_passed": false,
+  "smoke": true,
+  "fixture_license": "CC0-1.0",
+  "training_examples": 0,
+  "base_revision": "004fd086eccea9f7cf867aa07ba328773beef81d",
+  "base_gguf_sha256": "37ae482d336108d23516fa35e8e0c4126688d81018b87178a18d752a1357814f",
+  "template_sha256": "8ae074bec40ed459f4463d24bb1a6f5855de24f09c4f1bb75f820688b194d9aa",
+  "prompt": "Return a raw Mermaid flowchart. Use node IDs and labels Intake, Review, and Archive, with the edges Intake to Review and Review to Archive.",
+  "completion": "```mermaid\nflowchart TD\n    Start([Start]) --> Intake([Intake])\n    Intake --> Review([Review])\n    Review --> Archive([Archive])\n    Archive --> End([End])\n```",
+  "checks": {
+    "(?m)^(flowchart|graph) (TD|TB|LR|RL|BT)": true,
+    "Intake[^\\n]*-->[^\\n]*Review": true,
+    "Review[^\\n]*-->[^\\n]*Archive": true
+  }
+}

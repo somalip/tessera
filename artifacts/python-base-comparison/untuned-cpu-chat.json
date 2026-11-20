@@ -1,0 +1,166 @@
+{
+  "model_sha256": "069e25eded20e56b9d05acf269e3851e9d579a8fb51996e1c4814888c08bad9a",
+  "size_bytes": 934954496,
+  "thinking": false,
+  "thinking_budget": null,
+  "suites": [
+    {
+      "dataset_sha256": "a21a15d4297f9fe3dcbb78b4a99071fed3bb57f344344ebc72e530a19fb110ba",
+      "results": [
+        {
+          "id": "sqlite_query",
+          "finish_reason": "stop",
+          "generated_code_sha256": "0b8a63000f410893957c4ab21f2b2e722ec472c527ea93f8065d96d80b5cba8f",
+          "reply": "```python\nimport sqlite3\n\ndef active_names(conn, minimum):\n    cursor = conn.cursor()\n    cursor.execute(\"SELECT name FROM users WHERE active = 1 AND points >= ? ORDER BY points DESC, name ASC\", (minimum,))\n    names = cursor.fetchall()\n    cursor.close()\n    return names\n```\n\nTo use this function, you would first need to establish a connection to your SQLite database. Here's an example:\n\n```python\n# Assuming 'db_path' is the path to your SQLite database\ndb_path = 'example.db'\nconn = sqlite3.connect(db_path)\n\n# Example usage\nminimum_points = 100\nactive_users = active_names(conn, minimum_points)\nfor user in active_users:\n    print(user[0])  # Assuming the name is stored in the first column\n\n# Don't forget to close the connection when done\nconn.close()\n```\n\nThis code snippet defines a function `active_names` that takes a SQLite connection and a minimum points value as arguments. It executes a SQL query to select names from the `users` table where `active` is 1 and `points` are at least the specified minimum. The results are ordered by points in descending order and then by name in ascending order. The function returns the list of names.",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "snapshot",
+          "finish_reason": "stop",
+          "generated_code_sha256": "3c692871abac60100364d69f908d84c6f3eb99e17030252f6581d65a6799db75",
+          "reply": "```python\ndef enqueue(queue, task, tags=[]):\n    if not tags:\n        tags = []\n    queue.append({'task': task, 'tags': tags})\n    return None\n```",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "async_limit",
+          "finish_reason": "stop",
+          "generated_code_sha256": "16cbff2f1e313314e3384d7324bbe4bfe037fbe4b1c6063200ae81b8dd293ef5",
+          "reply": "```python\nimport asyncio\n\nasync def map_limited(fn, inputs, limit):\n    if limit <= 0:\n        raise ValueError(\"Limit must be a positive integer\")\n    \n    async def worker(index):\n        return await fn(inputs[index])\n    \n    tasks = [worker(index) for index in range(len(inputs))]\n    results = await asyncio.gather(*tasks, limit=limit)\n    return results\n```\n\nTo use this function, you can call it with a function `fn` and a list of inputs, and optionally a limit. For example:\n\n```python\nasync def square(x):\n    return x * x\n\ninputs = [1, 2, 3, 4, 5]\nlimit = 3\n\nasync def main():\n    results = await map_limited(square, inputs, limit)\n    print(results)  # Output: [1, 4, 9, 16, 25]\n\nasyncio.run(main())\n```\n\nThis will run the `square` function concurrently with at most 3 tasks in flight, and return the results in the order they were input.",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "path_parts",
+          "finish_reason": "stop",
+          "generated_code_sha256": "f34eef31f4debcd849e1152156204c016d8304a9be83c57f7cda65317ba86d29",
+          "reply": "```python\nfrom pathlib import Path\n\ndef image_files(root):\n    # Ensure the root is a Path object\n    root = Path(root)\n    \n    # Filter files ending in .png or .jpg\n    png_files = root.glob('**/*.png')\n    jpg_files = root.glob('**/*.jpg')\n    \n    # Combine the lists and filter out directories\n    all_files = png_files.union(jpg_files)\n    filtered_files = [file for file in all_files if not file.is_dir()]\n    \n    # Sort the files and return their POSIX-style paths\n    return sorted(filtered_files, key=lambda x: x.name)\n```\n\nThis function uses the `glob` method to find all files ending in `.png` or `.jpg` in the specified directory and its subdirectories. It then filters out directories and sorts the remaining files by their names. The paths are returned as strings in POSIX-style format.",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "log_summary",
+          "finish_reason": "stop",
+          "generated_code_sha256": "2ce52b3183485b0f1c0e31877f84ad602ec914c1b9e132e4a8aaa4351a389031",
+          "reply": "```python\ndef top_errors(events, count):\n    if count <= 0:\n        return []\n    \n    error_counts = {}\n    for level, message in events:\n        if level == 'ERROR':\n            error_counts[message] = error_counts.get(message, 0) + 1\n    \n    sorted_errors = sorted(error_counts.items(), key=lambda x: (-x[1], x[0]))\n    return sorted_errors[:count]\n```",
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "duration",
+          "finish_reason": "stop",
+          "generated_code_sha256": "bd8e110d30480efeded66566031682c641dcf23dc6573641f668130ccdeec403",
+          "reply": "```python\ndef elapsed(start_ns, finish_ns):\n    if finish_ns < start_ns:\n        raise ValueError(\"finish_ns must be greater than start_ns\")\n    \n    # Convert nanoseconds to milliseconds\n    elapsed_ms = (finish_ns - start_ns) / 1e6\n    \n    # Handle very large integers exactly\n    if elapsed_ms > 9999999999999999:\n        raise ValueError(\"Elapsed time is too large to be represented as an integer\")\n    \n    return int(elapsed_ms)\n```",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "decode",
+          "finish_reason": "stop",
+          "generated_code_sha256": "344568745d744ba855029f828239ee89e56f1c6d0d643e5489ac63c2b4de0e50",
+          "reply": "```python\nimport json\n\ndef decode_record(payload):\n    try:\n        # Decode the bytes to UTF-8\n        decoded_payload = payload.decode('utf-8')\n        # Parse the JSON\n        data = json.loads(decoded_payload)\n        # Check if the top level is a dictionary\n        if not isinstance(data, dict):\n            raise ValueError(\"The top level of the JSON is not a dictionary.\")\n        # Check if the 'record' field exists and is a dictionary\n        if 'record' not in data or not isinstance(data['record'], dict):\n            raise ValueError(\"The 'record' field is missing or not a dictionary.\")\n        return data['record']\n    except (UnicodeDecodeError, json.JSONDecodeError):\n        raise ValueError(\"Invalid encoding or JSON format.\")\n```",
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "one_shot",
+          "finish_reason": "stop",
+          "generated_code_sha256": "820ef8ca0f693c53a8cf8af00d3165815d2823ff76d0aba920f77196b5868db9",
+          "reply": "```python\ndef stream_window(stream, start, stop):\n    for item in stream:\n        if start <= item < stop:\n            yield item - start\n```\n\nThis function takes a one-pass iterator `stream` and two nonnegative integers `start` and `stop`. It yields the zero-based offsets of items in the stream that fall within the range `[start, stop)`. The function iterates over each item in the stream, checks if it falls within the specified range, and if so, yields the offset.",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        }
+      ],
+      "passed": 2,
+      "total": 8
+    },
+    {
+      "dataset_sha256": "12f9c0c9408696773da6fcc58de92f124ec145958d3e5ca1f5490dd283808432",
+      "results": [
+        {
+          "id": "stable_group",
+          "finish_reason": "stop",
+          "generated_code_sha256": "ebc7fff8121963df02055b84cce56a11d69515d3e753581682a02732c35fc168",
+          "reply": "```python\ndef group_updates(updates):\n    # Initialize an empty dictionary to store updates\n    update_dict = {}\n    \n    # Iterate over each update in the iterable\n    for key, value in updates:\n        # If the key is already in the dictionary, append the value to the list\n        if key in update_dict:\n            update_dict[key].append(value)\n        # Otherwise, create a new list with the value and add it to the dictionary\n        else:\n            update_dict[key] = [value]\n    \n    # Convert the dictionary to a list of tuples, preserving the order of keys\n    return list(update_dict.items())\n```\n\nThis function `group_updates` takes a one-pass iterable of (key, value) pairs and returns a list of (key, values) tuples. Each key appears only once in the output list, and each value list is sorted in the order it was first encountered. The function uses a dictionary to efficiently group the updates by key and maintain the order of appearance.",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "recursive_config",
+          "finish_reason": "stop",
+          "generated_code_sha256": "3259e3563e0eea921d93517cba10631bdaac077844f3dab4fb734dba29a985a2",
+          "reply": "```python\ndef merge_config(base, patch):\n    if not isinstance(base, dict) or not isinstance(patch, dict):\n        raise ValueError(\"Both base and patch must be dictionaries\")\n    \n    merged = base.copy()\n    \n    for key, value in patch.items():\n        if key in merged:\n            if isinstance(merged[key], dict) and isinstance(value, dict):\n                merged[key] = merge_config(merged[key], value)\n            elif value is None:\n                merged[key] = None\n            else:\n                merged[key] = value\n        else:\n            merged[key] = value\n    \n    return merged\n```\n\nThis function `merge_config` takes two dictionaries, `base` and `patch`, and merges them recursively. If a key exists in both dictionaries and both values are dictionaries, it calls itself to merge those nested dictionaries. If a key exists in `patch` but not in `base`, it adds the key-value pair from `patch` to `merged`. If a key exists in `base` but not in `patch`, it simply copies the value from `base` to `merged`. If a value in `patch` is `None`, it sets the corresponding value in `merged` to `None`. The function returns a new dictionary that is the result of the merge.",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "pathlib_api",
+          "finish_reason": "stop",
+          "generated_code_sha256": "c9727ef0ad1dce26a58fa0e67c0a9045fd7f5968e0116858a4c3716dd6486216",
+          "reply": "```python\nfrom pathlib import Path\nfrom datetime import datetime\n\ndef report_paths(root):\n    # Ensure the root is a valid directory\n    if not root.is_dir():\n        raise ValueError(\"Root must be a directory\")\n\n    # List all files in the root directory\n    files = root.iterdir()\n\n    # Filter files to only include those that match the report format\n    reports = [file for file in files if file.is_file() and file.name.startswith('report-') and file.name.endswith('.csv')]\n\n    # Convert file names to datetime objects\n    dates = [datetime.strptime(file.name[7:-4], '%Y-%m-%d') for file in reports]\n\n    # Sort the files by date\n    reports.sort(key=lambda x: dates[x.name[7:-4]])\n\n    # Return the sorted list of (date, path) pairs\n    return [(date, Path(root, file)) for date, file in zip(dates, reports)]\n```\n\nThis function first checks if the provided root directory is valid. It then lists all files in the directory, filters out those that do not match the report format, converts the file names to datetime objects, sorts the files by date, and finally returns a list of tuples containing the date and the corresponding path.",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "legacy_cursor",
+          "finish_reason": "stop",
+          "generated_code_sha256": "ebb54e8873d09dd74a937ad1f5e7d21e43faa6c94d0e1e8b576066fedcaec900",
+          "reply": "```python\ndef page_bounds(page, size, total):\n    if page <= 0 or size <= 0 or total < 0:\n        raise ValueError(\"Page, size, and total must be nonnegative.\")\n    start = page * size\n    stop = min(start + size, total)\n    return start, stop\n```",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "queue_accounting",
+          "finish_reason": "stop",
+          "generated_code_sha256": "34283b2a41b2c5e1db3210193412d7152bbfbc1d3999e95ce950d5d25a62b04c",
+          "reply": "```python\ndef summarize_jobs(jobs):\n    summary = {}\n    for job in jobs:\n        status = job.status\n        size = job.size\n        if status in summary:\n            summary[status][0] += 1\n            summary[status][1] += size\n        else:\n            summary[status] = [1, size]\n    return {status: (count, total_size) for status, (count, total_size) in summary.items() if total_size != 0}\n```",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "retry",
+          "finish_reason": "stop",
+          "generated_code_sha256": "e77d9e230355fd7094c2c5e995246bc8dad29eec6197296df4547a88936944c1",
+          "reply": "```python\nimport time\n\ndef retry_read(read, attempts):\n    if attempts < 1:\n        raise ValueError(\"attempts must be at least 1\")\n    \n    for attempt in range(attempts):\n        try:\n            return read()\n        except TimeoutError:\n            if attempt < attempts - 1:\n                time.sleep(1)  # Wait for 1 second before retrying\n            else:\n                raise  # Propagate the final exception if all attempts fail\n```\n\nThis function `retry_read` takes a function `read` that is expected to raise a `TimeoutError` and an integer `attempts`. It attempts to call `read()` up to `attempts` times, waiting for 1 second between each attempt if a `TimeoutError` is raised. If all attempts fail, it raises the final exception.",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "event_dedup",
+          "finish_reason": "stop",
+          "generated_code_sha256": "ac193c336ffb9e1c49615f68d5fb23faf035ea71598e84a6c89a90816a6d2169",
+          "reply": "```python\ndef iter_unique_events(events):\n    seen_ids = set()\n    for event in events:\n        if event.get('id') is not None:\n            if event['id'] not in seen_ids:\n                seen_ids.add(event['id'])\n                yield event\n```",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "record_composition",
+          "finish_reason": "stop",
+          "generated_code_sha256": "bf11e7532ce367abc018bd52c06f1e1c307c72587b55a572c35b3bae6471fa4e",
+          "reply": "```python\ndef render_row(fields, record, missing=\"-\"):\n    def escape(s):\n        return s.replace(\"\\\\\", \"\\\\\\\\\").replace(\"\\t\", \"\\\\t\").replace(\"\\n\", \"\\\\n\")\n\n    def render_field(field, record):\n        if field not in record:\n            return missing\n        value = record[field]\n        if value is None:\n            return missing\n        if value is False:\n            return \"False\"\n        if value is True:\n            return \"True\"\n        if isinstance(value, str):\n            return escape(value)\n        return str(value)\n\n    return \"\\t\".join(render_field(field, record) for field in fields)\n```\n\nThis function `render_row` takes a list of field names `fields`, a dictionary `record` containing the data, and an optional `missing` value. It returns a string representing a row in a tab-separated format, with each field rendered according to the rules specified. The function handles missing values, None values, and falsey values by converting them to strings. It also escapes tabs, newlines, and backslashes as required.",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        }
+      ],
+      "passed": 0,
+      "total": 8
+    }
+  ]
+}

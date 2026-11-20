@@ -1,0 +1,13 @@
+{
+  "base": "Qwen/Qwen2.5-Coder-0.5B",
+  "revision": "8123ea2e9354afb7ffcc6c8641d1b2f5ecf18301",
+  "base_sha256": "aff8914ec707fcaf9e2d4dc97197cded50b1c63e1d3a7a82e56f54d83ea47f80",
+  "data_license": "CC0-1.0",
+  "seed": 42,
+  "device": "mps",
+  "examples": 96,
+  "epoch_losses": [
+    0.9403392982979616,
+    0.29333012644201517
+  ]
+}

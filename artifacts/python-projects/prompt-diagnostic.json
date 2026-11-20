@@ -1,0 +1,50 @@
+{
+  "model": "scaled.Q4_0.gguf",
+  "model_sha256": "4eabbd11aa32d9d0ed37d206ff15e1549b92cb7f23ef8654cc31b28a39e3f0ab",
+  "size_bytes": 934954496,
+  "reference_only": false,
+  "context": 4096,
+  "gpu_layers": 0,
+  "fixture_sha256": "db7670e0ecae96d52f7cc68cb7a0bd5d462387f7af37788aca301fa6fecc9fc3",
+  "suite": "diagnostic",
+  "passed": 0,
+  "total": 3,
+  "results": [
+    {
+      "id": "snake-vague",
+      "code": "import curses\nimport random\nimport time\n\ndef main(stdscr):\n    curses.curs_set(0)\n    stdscr.nodelay(1)\n    stdscr.timeout(100)\n\n    snake = [(0, 0)]\n    direction = curses.KEY_RIGHT\n    food = random.choice([(i, j) for i in range(-10, 11) for j in range(-10, 11) if (i, j) != (0, 0)])\n    score = 0\n\n    def draw_snake(snake):\n        for pos in snake:\n            stdscr.addch(pos[0], pos[1], curses.ACS_CKBOARD)\n\n    def draw_food(food):\n        stdscr.addch(food[0], food[1], curses.ACS_PI)\n\n    def move_snake(snake, direction):\n        head = snake[0]\n        new_head = (head[0] + direction[0], head[1] + direction[1])\n        if new_head == food:\n            score += 1\n            food = random.choice([(i, j) for i in range(-10, 11) for j in range(-10, 11) if (i, j) != (0, 0)])\n        else:\n            snake.pop()\n        snake.insert(0, new_head)\n        return snake\n\n    def check_bounds(snake):\n        for pos in snake:\n            if not (-10 <= pos[0] <= 10 and -10 <= pos[1] <= 10):\n                return True\n        return False\n\n    def handle_input(stdscr):\n        while True:\n            key = stdscr.getch()\n            if key == ord('q'):\n                return\n            elif key == curses.KEY_UP and direction != curses.KEY_DOWN:\n                direction = curses.KEY_UP\n            elif key == curses.KEY_DOWN and direction != curses.KEY_UP:\n                direction = curses.KEY_DOWN\n            elif key == curses.KEY_LEFT and direction != curses.KEY_RIGHT:\n                direction = curses.KEY_LEFT\n            elif key == curses.KEY_RIGHT and direction != curses.KEY_LEFT:\n                direction = curses.KEY_RIGHT\n\n    def game_loop():\n        while True:\n            handle_input(stdscr)\n            snake = move_snake(snake, direction)\n            if check_bounds(snake):\n                stdscr.addstr(0, 0, \"Game Over! Score: {}\".format(score))\n                break\n            draw_snake(snake)\n            draw_food(food)\n            stdscr.refresh()\n            time.sleep(0.1)\n\n    game_loop()\n\nif __name__ == \"__main__\":\n    curses.wrapper(main)",
+      "route": "Inline generation",
+      "instruction": "make a snake game",
+      "diagnostics": [],
+      "seconds": 26.672768,
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "syntax_error": null
+    },
+    {
+      "id": "snake-terminal",
+      "code": "import curses\nimport random\nimport time\n\ndef main(stdscr):\n    curses.curs_set(0)\n    stdscr.nodelay(1)\n    stdscr.timeout(100)\n\n    snake = [(0, 0)]\n    direction = curses.KEY_RIGHT\n    food = random.choice([(i, j) for i in range(-10, 11) for j in range(-10, 11) if (i, j) != (0, 0)])\n    score = 0\n\n    while True:\n        stdscr.clear()\n        stdscr.addstr(food[0], food[1], \"O\")\n\n        for i, j in snake:\n            stdscr.addstr(i, j, \"#\")\n\n        stdscr.addstr(0, 0, f\"Score: {score}\")\n\n        key = stdscr.getch()\n        if key == ord('q'):\n            break\n        elif key == curses.KEY_UP and direction != curses.KEY_DOWN:\n            direction = curses.KEY_UP\n        elif key == curses.KEY_DOWN and direction != curses.KEY_UP:\n            direction = curses.KEY_DOWN\n        elif key == curses.KEY_LEFT and direction != curses.KEY_RIGHT:\n            direction = curses.KEY_LEFT\n        elif key == curses.KEY_RIGHT and direction != curses.KEY_LEFT:\n            direction = curses.KEY_RIGHT\n\n        head = snake[0]\n        new_head = (head[0] + direction[0], head[1] + direction[1])\n\n        if new_head in snake[1:]:\n            break\n\n        if new_head == food:\n            score += 1\n            food = random.choice([(i, j) for i in range(-10, 11) for j in range(-10, 11) if (i, j) != (0, 0)])\n        else:\n            snake.pop()\n\n        snake.insert(0, new_head)\n\n        stdscr.refresh()\n\nif __name__ == \"__main__\":\n    curses.wrapper(main)",
+      "route": "Inline generation",
+      "instruction": "create a tui based snake game",
+      "diagnostics": [],
+      "seconds": 820.092331625,
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "syntax_error": null
+    },
+    {
+      "id": "snake-detailed",
+      "code": "import curses\nimport random\nimport time\n\ndef main(stdscr):\n    curses.curs_set(0)\n    stdscr.timeout(100)\n    height, width = stdscr.getmaxyx()\n    snake = [(height // 2, width // 2)]\n    direction = curses.KEY_RIGHT\n    food = (random.randint(1, height - 2), random.randint(1, width - 2))\n    score = 0\n\n    def draw_snake(snake):\n        for pos in snake:\n            stdscr.addch(pos[0], pos[1], curses.ACS_CKBOARD)\n\n    def draw_food(food):\n        stdscr.addch(food[0], food[1], curses.ACS_PI)\n\n    def move_snake(snake, direction):\n        head = snake[0]\n        new_head = (head[0] + direction[0], head[1] + direction[1])\n        if new_head in snake[1:]:\n            return False\n        if new_head[0] < 1 or new_head[0] >= height or new_head[1] < 1 or new_head[1] >= width:\n            return False\n        snake.insert(0, new_head)\n        if new_head == food:\n            score += 1\n            food = (random.randint(1, height - 2), random.randint(1, width - 2))\n        else:\n            snake.pop()\n        return True\n\n    def handle_input(stdscr):\n        while True:\n            key = stdscr.getch()\n            if key == ord('q'):\n                return\n            if key == curses.KEY_UP and direction != curses.KEY_DOWN:\n                direction = curses.KEY_UP\n            elif key == curses.KEY_DOWN and direction != curses.KEY_UP:\n                direction = curses.KEY_DOWN\n            elif key == curses.KEY_LEFT and direction != curses.KEY_RIGHT:\n                direction = curses.KEY_LEFT\n            elif key == curses.KEY_RIGHT and direction != curses.KEY_LEFT:\n                direction = curses.KEY_RIGHT\n\n    def game_loop():\n        while True:\n            draw_snake(snake)\n            draw_food(food)\n            stdscr.refresh()\n            if not move_snake(snake, direction):\n                break\n            handle_input(stdscr)\n            time.sleep(0.1)\n\n    game_loop()\n\nif __name__ == \"__main__\":\n    curses.wrapper(main)",
+      "route": "Inline generation",
+      "instruction": "Build a terminal Snake game using curses, with arrow keys, random food, score, growth, wall and body collisions, and q to quit.",
+      "diagnostics": [],
+      "seconds": 45.914139916999964,
+      "passed": false,
+      "returncode": 1,
+      "timed_out": false,
+      "syntax_error": null
+    }
+  ]
+}

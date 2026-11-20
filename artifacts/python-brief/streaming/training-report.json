@@ -1,0 +1,43 @@
+{
+  "active_f16_sha256": "03b0f0f4a9dbb3803676d8c7592c0047b277f61466de5257c4abf28649ff9a33",
+  "trained_f16_sha256": "030c36a29d5ff5d390925e02c0028e83356c7faeeab1840ff11711352d5f01b2",
+  "dataset": {
+    "data_sha256": "510de18b54250c05db9a477cb0fa5dcae4be4c24aa386f1ea33dd23889a87732",
+    "examples": 32,
+    "sources": {
+      "exercism": 13,
+      "replay": 14,
+      "programs": 5
+    },
+    "licenses": [
+      "CC0-1.0",
+      "MIT"
+    ],
+    "overlap": 0,
+    "benchmarks": {
+      "/private/tmp/tessera-model/HumanEval.jsonl.gz": "b796127e635a67f93fb35c04f4cb03cf06f38c8072ee7cee8833d7bee06979ef",
+      "/Users/somalip/Documents/GitHub/tessera/artifacts/python-local/heldout.jsonl": "a21a15d4297f9fe3dcbb78b4a99071fed3bb57f344344ebc72e530a19fb110ba",
+      "/Users/somalip/Documents/GitHub/tessera/artifacts/python-v2/heldout.jsonl": "12f9c0c9408696773da6fcc58de92f124ec145958d3e5ca1f5490dd283808432",
+      "/Users/somalip/Documents/GitHub/tessera/artifacts/python-v2/fim.jsonl": "e049fcc892662272cb9a1622308cc910a8fc18460ba9d72d297545c4cc469cd1",
+      "/Users/somalip/Documents/GitHub/tessera/artifacts/python-strength/fresh-audited.jsonl": "08028436b3cfde2adce2d8cacb825f747f29b45e49eadcafb0a279e001984cde",
+      "/Users/somalip/Documents/GitHub/tessera/artifacts/python-brief/heldout-briefs.jsonl": "6166974f8564ae4036d09ba1482488c37ac2cbafca84b219cf513d51b9eaf21b"
+    },
+    "rejected": {
+      "cli-json-count": "license, private-data, or overlap flag",
+      "cli-vocabulary": "license, private-data, or overlap flag"
+    }
+  },
+  "seed": 42,
+  "epochs": 2,
+  "loss": [
+    0.5101299742236733,
+    0.4761482768226415
+  ],
+  "trainable_parameters": 589824,
+  "trained_layers": [
+    24,
+    25,
+    26,
+    27
+  ]
+}

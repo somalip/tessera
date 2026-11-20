@@ -1,0 +1,150 @@
+{
+  "model_sha256": "36347f47f9eab7d433c7c37be1f87ac2253378c3d530da3cb25fb5f71f8f1a58",
+  "size_bytes": 931823872,
+  "thinking": false,
+  "thinking_budget": null,
+  "suites": [
+    {
+      "dataset_sha256": "a21a15d4297f9fe3dcbb78b4a99071fed3bb57f344344ebc72e530a19fb110ba",
+      "results": [
+        {
+          "id": "sqlite_query",
+          "finish_reason": "stop",
+          "generated_code_sha256": "35cf3c2b82ac8c49349838281df4b26bd40d2078717c764badf40a9a01af98fc",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "snapshot",
+          "finish_reason": "stop",
+          "generated_code_sha256": "5f1d96c940c5002f73746c64ca4610f902a2c347e799b5d294dbe8d8f984448b",
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        },
+        {
+          "id": "async_limit",
+          "finish_reason": "length",
+          "generated_code_sha256": "ad37792a72e0f7b12b913aa7cc39e3b4bc6f74aa6db10eef251872d9c6c1ed9e",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "path_parts",
+          "finish_reason": "length",
+          "generated_code_sha256": "4a21a671db7b92449677ea11a19f63b8ff078fb18586c3b02d133b2a3261fe57",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "log_summary",
+          "finish_reason": "stop",
+          "generated_code_sha256": "eab7755b2e788b34c54310d1f8ea168421e4405d6fa5df70e9fd213df925b1bc",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "duration",
+          "finish_reason": "stop",
+          "generated_code_sha256": "c80dc9f7c94bca16f2cfc39b9ef86142d71e7be1000d72eb20cde20354613ec6",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "decode",
+          "finish_reason": "stop",
+          "generated_code_sha256": "b1491d6a6ab809e3ed5c333302fe484fdc547e8968c87157aa11c9ba2e42f244",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "one_shot",
+          "finish_reason": "stop",
+          "generated_code_sha256": "108ccec1a2319dc23b39c83d839a5de808b302d8111294893d1482deecd7b8a7",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        }
+      ],
+      "passed": 1,
+      "total": 8
+    },
+    {
+      "dataset_sha256": "12f9c0c9408696773da6fcc58de92f124ec145958d3e5ca1f5490dd283808432",
+      "results": [
+        {
+          "id": "stable_group",
+          "finish_reason": "stop",
+          "generated_code_sha256": "2748a10eac6f5ca6761d085b7db077adae3ab700113db09004e5326e788dbce0",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "recursive_config",
+          "finish_reason": "stop",
+          "generated_code_sha256": "b2a362a33cbacf62892f44d4c988366feb9159f7157adff84365d06564c56fa0",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "pathlib_api",
+          "finish_reason": "stop",
+          "generated_code_sha256": "4d2226a6f85fd0226872f787bafc66c4bee6e0b9aa6958596e088485e387b841",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "legacy_cursor",
+          "finish_reason": "stop",
+          "generated_code_sha256": "3064bbc5c98de4e10493eb5535be5ffcd154b320d3dbcbd93732132cf9f55dc2",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "queue_accounting",
+          "finish_reason": "stop",
+          "generated_code_sha256": "6efa877217a6a175449c15d09217a7a55db693d2fb5839fbf8a24e94258ece98",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "retry",
+          "finish_reason": "length",
+          "generated_code_sha256": "cf2467fc0ade2528ce93fdec8a7c02e6562c43539fd1df840b17b0ca4a3f129c",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "event_dedup",
+          "finish_reason": "stop",
+          "generated_code_sha256": "588bfd4f138744336cbe89d6b9fcfd6a163b6bfb719198fd53ace389c54a2ed3",
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "record_composition",
+          "finish_reason": "stop",
+          "generated_code_sha256": "b1836427720aaaaeb296e2846803f4ce68e4918b732139aaa6ed860565b9ca37",
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        }
+      ],
+      "passed": 1,
+      "total": 8
+    }
+  ]
+}

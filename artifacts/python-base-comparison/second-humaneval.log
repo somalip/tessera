@@ -1,0 +1,880 @@
+ggml_metal_device_init: tensor API disabled for pre-M5 and pre-A19 devices
+ggml_metal_library_init: using embedded metal library
+ggml_metal_library_init: loaded in 0.075 sec
+ggml_metal_rsets_init: creating a residency set collection (keep_alive = 180 s)
+ggml_metal_device_init: GPU name:   MTL0
+ggml_metal_device_init: GPU family: MTLGPUFamilyApple9  (1009)
+ggml_metal_device_init: GPU family: MTLGPUFamilyCommon3 (3003)
+ggml_metal_device_init: GPU family: MTLGPUFamilyMetal4  (5002)
+ggml_metal_device_init: simdgroup reduction   = true
+ggml_metal_device_init: simdgroup matrix mul. = true
+ggml_metal_device_init: has unified memory    = true
+ggml_metal_device_init: has bfloat            = true
+ggml_metal_device_init: has tensor            = false
+ggml_metal_device_init: use residency sets    = true
+ggml_metal_device_init: use shared buffers    = true
+ggml_metal_device_init: recommendedMaxWorkingSetSize  =  5726.63 MB
+build: 8180 (d979f2b17) with AppleClang 15.0.0.15000309 for Darwin arm64
+system info: n_threads = 2, n_threads_batch = 2, total_threads = 6
+
+system_info: n_threads = 2 (n_threads_batch = 2) / 6 | MTL : EMBED_LIBRARY = 1 | CPU : NEON = 1 | ARM_FMA = 1 | FP16_VA = 1 | DOTPROD = 1 | LLAMAFILE = 1 | ACCELERATE = 1 | REPACK = 1 | 
+
+Running without SSL
+init: api_keys: ****40d3
+init: using 5 threads for HTTP server
+start: binding port with default address family
+main: loading model
+srv    load_model: loading model 'artifacts/python-v2/tuned-v2.Q4_0.gguf'
+common_init_result: fitting params to device memory, for bugs during this step try to reproduce them with -fit off, or provide --verbose logs if the bug only occurs with -fit on
+llama_params_fit_impl: projected to use 1297 MiB of device memory vs. 5460 MiB of free device memory
+llama_params_fit_impl: will leave 4163 >= 1024 MiB of free device memory, no changes needed
+llama_params_fit: successfully fit params to free device memory
+llama_params_fit: fitting params to free memory took 0.53 seconds
+llama_model_load_from_file_impl: using device MTL0 (Apple A18 Pro) (unknown id) - 5460 MiB free
+llama_model_loader: loaded meta data with 27 key-value pairs and 338 tensors from artifacts/python-v2/tuned-v2.Q4_0.gguf (version GGUF V3 (latest))
+llama_model_loader: Dumping metadata keys/values. Note: KV overrides do not apply in this output.
+llama_model_loader: - kv   0:                       general.architecture str              = qwen2
+llama_model_loader: - kv   1:                               general.type str              = model
+llama_model_loader: - kv   2:                     general.sampling.top_k i32              = 20
+llama_model_loader: - kv   3:                     general.sampling.top_p f32              = 0.800000
+llama_model_loader: - kv   4:                      general.sampling.temp f32              = 0.700000
+llama_model_loader: - kv   5:                               general.name str              = Checkpoint
+llama_model_loader: - kv   6:                         general.size_label str              = 1.5B
+llama_model_loader: - kv   7:                          qwen2.block_count u32              = 28
+llama_model_loader: - kv   8:                       qwen2.context_length u32              = 32768
+llama_model_loader: - kv   9:                     qwen2.embedding_length u32              = 1536
+llama_model_loader: - kv  10:                  qwen2.feed_forward_length u32              = 8960
+llama_model_loader: - kv  11:                 qwen2.attention.head_count u32              = 12
+llama_model_loader: - kv  12:              qwen2.attention.head_count_kv u32              = 2
+llama_model_loader: - kv  13:                       qwen2.rope.freq_base f32              = 1000000.000000
+llama_model_loader: - kv  14:     qwen2.attention.layer_norm_rms_epsilon f32              = 0.000001
+llama_model_loader: - kv  15:                       tokenizer.ggml.model str              = gpt2
+llama_model_loader: - kv  16:                         tokenizer.ggml.pre str              = qwen2
+llama_model_loader: - kv  17:                      tokenizer.ggml.tokens arr[str,151936]  = ["!", "\"", "#", "$", "%", "&", "'", ...
+llama_model_loader: - kv  18:                  tokenizer.ggml.token_type arr[i32,151936]  = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
+llama_model_loader: - kv  19:                      tokenizer.ggml.merges arr[str,151387]  = ["Ġ Ġ", "ĠĠ ĠĠ", "i n", "Ġ t",...
+llama_model_loader: - kv  20:                tokenizer.ggml.eos_token_id u32              = 151645
+llama_model_loader: - kv  21:            tokenizer.ggml.padding_token_id u32              = 151643
+llama_model_loader: - kv  22:                tokenizer.ggml.bos_token_id u32              = 151643
+llama_model_loader: - kv  23:               tokenizer.ggml.add_bos_token bool             = false
+llama_model_loader: - kv  24:                    tokenizer.chat_template str              = {%- if tools %}\n    {{- '<|im_start|>...
+llama_model_loader: - kv  25:               general.quantization_version u32              = 2
+llama_model_loader: - kv  26:                          general.file_type u32              = 2
+llama_model_loader: - type  f32:  141 tensors
+llama_model_loader: - type q4_0:  196 tensors
+llama_model_loader: - type q6_K:    1 tensors
+print_info: file format = GGUF V3 (latest)
+print_info: file type   = Q4_0
+print_info: file size   = 885.97 MiB (4.81 BPW) 
+load: 0 unused tokens
+load: control-looking token: 128247 '</s>' was not control-type; this is probably a bug in the model. its type will be overridden
+load: printing all EOG tokens:
+load:   - 128247 ('</s>')
+load:   - 151643 ('<|endoftext|>')
+load:   - 151645 ('<|im_end|>')
+load:   - 151662 ('<|fim_pad|>')
+load:   - 151663 ('<|repo_name|>')
+load:   - 151664 ('<|file_sep|>')
+load: special tokens cache size = 23
+load: token to piece cache size = 0.9310 MB
+print_info: arch                  = qwen2
+print_info: vocab_only            = 0
+print_info: no_alloc              = 0
+print_info: n_ctx_train           = 32768
+print_info: n_embd                = 1536
+print_info: n_embd_inp            = 1536
+print_info: n_layer               = 28
+print_info: n_head                = 12
+print_info: n_head_kv             = 2
+print_info: n_rot                 = 128
+print_info: n_swa                 = 0
+print_info: is_swa_any            = 0
+print_info: n_embd_head_k         = 128
+print_info: n_embd_head_v         = 128
+print_info: n_gqa                 = 6
+print_info: n_embd_k_gqa          = 256
+print_info: n_embd_v_gqa          = 256
+print_info: f_norm_eps            = 0.0e+00
+print_info: f_norm_rms_eps        = 1.0e-06
+print_info: f_clamp_kqv           = 0.0e+00
+print_info: f_max_alibi_bias      = 0.0e+00
+print_info: f_logit_scale         = 0.0e+00
+print_info: f_attn_scale          = 0.0e+00
+print_info: n_ff                  = 8960
+print_info: n_expert              = 0
+print_info: n_expert_used         = 0
+print_info: n_expert_groups       = 0
+print_info: n_group_used          = 0
+print_info: causal attn           = 1
+print_info: pooling type          = -1
+print_info: rope type             = 2
+print_info: rope scaling          = linear
+print_info: freq_base_train       = 1000000.0
+print_info: freq_scale_train      = 1
+print_info: n_ctx_orig_yarn       = 32768
+print_info: rope_yarn_log_mul     = 0.0000
+print_info: rope_finetuned        = unknown
+print_info: model type            = 1.5B
+print_info: model params          = 1.54 B
+print_info: general.name          = Checkpoint
+print_info: vocab type            = BPE
+print_info: n_vocab               = 151936
+print_info: n_merges              = 151387
+print_info: BOS token             = 151643 '<|endoftext|>'
+print_info: EOS token             = 151645 '<|im_end|>'
+print_info: EOT token             = 151645 '<|im_end|>'
+print_info: PAD token             = 151643 '<|endoftext|>'
+print_info: LF token              = 198 'Ċ'
+print_info: FIM PRE token         = 151659 '<|fim_prefix|>'
+print_info: FIM SUF token         = 151661 '<|fim_suffix|>'
+print_info: FIM MID token         = 151660 '<|fim_middle|>'
+print_info: FIM PAD token         = 151662 '<|fim_pad|>'
+print_info: FIM REP token         = 151663 '<|repo_name|>'
+print_info: FIM SEP token         = 151664 '<|file_sep|>'
+print_info: EOG token             = 128247 '</s>'
+print_info: EOG token             = 151643 '<|endoftext|>'
+print_info: EOG token             = 151645 '<|im_end|>'
+print_info: EOG token             = 151662 '<|fim_pad|>'
+print_info: EOG token             = 151663 '<|repo_name|>'
+print_info: EOG token             = 151664 '<|file_sep|>'
+print_info: max token length      = 256
+load_tensors: loading model tensors, this can take a while... (mmap = true, direct_io = false)
+load_tensors: offloading output layer to GPU
+load_tensors: offloading 27 repeating layers to GPU
+load_tensors: offloaded 29/29 layers to GPU
+load_tensors:   CPU_Mapped model buffer size =   182.57 MiB
+load_tensors:  MTL0_Mapped model buffer size =   885.97 MiB
+....................................................................
+common_init_result: added </s> logit bias = -inf
+common_init_result: added <|endoftext|> logit bias = -inf
+common_init_result: added <|im_end|> logit bias = -inf
+common_init_result: added <|fim_pad|> logit bias = -inf
+common_init_result: added <|repo_name|> logit bias = -inf
+common_init_result: added <|file_sep|> logit bias = -inf
+llama_context: constructing llama_context
+llama_context: n_seq_max     = 1
+llama_context: n_ctx         = 4096
+llama_context: n_ctx_seq     = 4096
+llama_context: n_batch       = 2048
+llama_context: n_ubatch      = 512
+llama_context: causal_attn   = 1
+llama_context: flash_attn    = auto
+llama_context: kv_unified    = false
+llama_context: freq_base     = 1000000.0
+llama_context: freq_scale    = 1
+llama_context: n_ctx_seq (4096) < n_ctx_train (32768) -- the full capacity of the model will not be utilized
+ggml_metal_init: allocating
+ggml_metal_init: found device: Apple A18 Pro
+ggml_metal_init: picking default device: Apple A18 Pro
+ggml_metal_init: use fusion         = true
+ggml_metal_init: use concurrency    = true
+ggml_metal_init: use graph optimize = true
+llama_context:        CPU  output buffer size =     0.58 MiB
+llama_kv_cache:       MTL0 KV buffer size =   112.00 MiB
+llama_kv_cache: size =  112.00 MiB (  4096 cells,  28 layers,  1/1 seqs), K (f16):   56.00 MiB, V (f16):   56.00 MiB
+sched_reserve: reserving ...
+sched_reserve: Flash Attention was auto, set to enabled
+sched_reserve:       MTL0 compute buffer size =   299.75 MiB
+sched_reserve:        CPU compute buffer size =    14.01 MiB
+sched_reserve: graph nodes  = 959
+sched_reserve: graph splits = 2
+sched_reserve: reserve took 4.86 ms, sched copies = 1
+common_init_from_params: warming up the model with an empty run - please wait ... (--no-warmup to disable)
+srv    load_model: initializing slots, n_slots = 1
+no implementations specified for speculative decoding
+slot   load_model: id  0 | task -1 | speculative decoding context not initialized
+slot   load_model: id  0 | task -1 | new slot, n_ctx = 4096
+srv    load_model: prompt cache is disabled - use `--cache-ram N` to enable it
+srv    load_model: for more info see https://github.com/ggml-org/llama.cpp/pull/16391
+init: chat template, example_format: '<|im_start|>system
+You are a helpful assistant<|im_end|>
+<|im_start|>user
+Hello<|im_end|>
+<|im_start|>assistant
+Hi there<|im_end|>
+<|im_start|>user
+How are you?<|im_end|>
+<|im_start|>assistant
+'
+srv          init: init: chat template, thinking = 0
+main: model loaded
+main: server is listening on http://127.0.0.1:53836
+main: starting the main loop...
+srv  update_slots: all slots are idle
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = -1
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 0 | processing task, is_child = 0
+slot update_slots: id  0 | task 0 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 145
+slot update_slots: id  0 | task 0 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 0 | init sampler, took 0.01 ms, tokens: text = 145, total = 145
+slot update_slots: id  0 | task 0 | prompt processing done, n_tokens = 145, batch.n_tokens = 145
+slot print_timing: id  0 | task 0 | 
+prompt eval time =     391.70 ms /   145 tokens (    2.70 ms per token,   370.18 tokens per second)
+       eval time =     955.41 ms /    31 tokens (   30.82 ms per token,    32.45 tokens per second)
+      total time =    1347.11 ms /   176 tokens
+slot      release: id  0 | task 0 | stop processing: n_tokens = 175, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413261277604
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 32 | processing task, is_child = 0
+slot update_slots: id  0 | task 32 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 76
+slot update_slots: id  0 | task 32 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 32 | init sampler, took 0.01 ms, tokens: text = 76, total = 76
+slot update_slots: id  0 | task 32 | prompt processing done, n_tokens = 76, batch.n_tokens = 76
+slot print_timing: id  0 | task 32 | 
+prompt eval time =     258.58 ms /    76 tokens (    3.40 ms per token,   293.91 tokens per second)
+       eval time =     600.31 ms /    25 tokens (   24.01 ms per token,    41.64 tokens per second)
+      total time =     858.89 ms /   101 tokens
+slot      release: id  0 | task 32 | stop processing: n_tokens = 100, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413262980292
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 58 | processing task, is_child = 0
+slot update_slots: id  0 | task 58 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 78
+slot update_slots: id  0 | task 58 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 58 | init sampler, took 0.01 ms, tokens: text = 78, total = 78
+slot update_slots: id  0 | task 58 | prompt processing done, n_tokens = 78, batch.n_tokens = 78
+slot print_timing: id  0 | task 58 | 
+prompt eval time =     218.46 ms /    78 tokens (    2.80 ms per token,   357.04 tokens per second)
+       eval time =    2377.78 ms /    97 tokens (   24.51 ms per token,    40.79 tokens per second)
+      total time =    2596.24 ms /   175 tokens
+slot      release: id  0 | task 58 | stop processing: n_tokens = 174, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413266092733
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 156 | processing task, is_child = 0
+slot update_slots: id  0 | task 156 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 221
+slot update_slots: id  0 | task 156 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 156 | init sampler, took 0.04 ms, tokens: text = 221, total = 221
+slot update_slots: id  0 | task 156 | prompt processing done, n_tokens = 221, batch.n_tokens = 221
+slot print_timing: id  0 | task 156 | 
+prompt eval time =     546.68 ms /   221 tokens (    2.47 ms per token,   404.26 tokens per second)
+       eval time =     445.08 ms /    20 tokens (   22.25 ms per token,    44.94 tokens per second)
+      total time =     991.77 ms /   241 tokens
+slot      release: id  0 | task 156 | stop processing: n_tokens = 240, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413267828565
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 177 | processing task, is_child = 0
+slot update_slots: id  0 | task 177 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 105
+slot update_slots: id  0 | task 177 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 177 | init sampler, took 0.02 ms, tokens: text = 105, total = 105
+slot update_slots: id  0 | task 177 | prompt processing done, n_tokens = 105, batch.n_tokens = 105
+slot print_timing: id  0 | task 177 | 
+prompt eval time =     298.78 ms /   105 tokens (    2.85 ms per token,   351.43 tokens per second)
+       eval time =     437.62 ms /    21 tokens (   20.84 ms per token,    47.99 tokens per second)
+      total time =     736.40 ms /   126 tokens
+slot      release: id  0 | task 177 | stop processing: n_tokens = 125, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413268977468
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 199 | processing task, is_child = 0
+slot update_slots: id  0 | task 199 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 154
+slot update_slots: id  0 | task 199 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 199 | init sampler, took 0.02 ms, tokens: text = 154, total = 154
+slot update_slots: id  0 | task 199 | prompt processing done, n_tokens = 154, batch.n_tokens = 154
+slot print_timing: id  0 | task 199 | 
+prompt eval time =     393.95 ms /   154 tokens (    2.56 ms per token,   390.91 tokens per second)
+       eval time =     847.28 ms /    36 tokens (   23.54 ms per token,    42.49 tokens per second)
+      total time =    1241.24 ms /   190 tokens
+slot      release: id  0 | task 199 | stop processing: n_tokens = 189, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413270469797
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 236 | processing task, is_child = 0
+slot update_slots: id  0 | task 236 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 101
+slot update_slots: id  0 | task 236 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 236 | init sampler, took 0.01 ms, tokens: text = 101, total = 101
+slot update_slots: id  0 | task 236 | prompt processing done, n_tokens = 101, batch.n_tokens = 101
+slot print_timing: id  0 | task 236 | 
+prompt eval time =     303.68 ms /   101 tokens (    3.01 ms per token,   332.59 tokens per second)
+       eval time =    2414.57 ms /    95 tokens (   25.42 ms per token,    39.34 tokens per second)
+      total time =    2718.25 ms /   196 tokens
+slot      release: id  0 | task 236 | stop processing: n_tokens = 195, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413273653517
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 332 | processing task, is_child = 0
+slot update_slots: id  0 | task 332 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 152
+slot update_slots: id  0 | task 332 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 332 | init sampler, took 0.03 ms, tokens: text = 152, total = 152
+slot update_slots: id  0 | task 332 | prompt processing done, n_tokens = 152, batch.n_tokens = 152
+slot print_timing: id  0 | task 332 | 
+prompt eval time =     445.43 ms /   152 tokens (    2.93 ms per token,   341.24 tokens per second)
+       eval time =    2347.59 ms /    97 tokens (   24.20 ms per token,    41.32 tokens per second)
+      total time =    2793.02 ms /   249 tokens
+slot      release: id  0 | task 332 | stop processing: n_tokens = 248, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413277166690
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 430 | processing task, is_child = 0
+slot update_slots: id  0 | task 430 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 43
+slot update_slots: id  0 | task 430 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 430 | init sampler, took 0.01 ms, tokens: text = 43, total = 43
+slot update_slots: id  0 | task 430 | prompt processing done, n_tokens = 43, batch.n_tokens = 43
+slot print_timing: id  0 | task 430 | 
+prompt eval time =     193.23 ms /    43 tokens (    4.49 ms per token,   222.53 tokens per second)
+       eval time =     341.00 ms /    15 tokens (   22.73 ms per token,    43.99 tokens per second)
+      total time =     534.23 ms /    58 tokens
+slot      release: id  0 | task 430 | stop processing: n_tokens = 57, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413278049453
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 446 | processing task, is_child = 0
+slot update_slots: id  0 | task 446 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 177
+slot update_slots: id  0 | task 446 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 446 | init sampler, took 0.05 ms, tokens: text = 177, total = 177
+slot update_slots: id  0 | task 446 | prompt processing done, n_tokens = 177, batch.n_tokens = 177
+slot print_timing: id  0 | task 446 | 
+prompt eval time =     487.47 ms /   177 tokens (    2.75 ms per token,   363.10 tokens per second)
+       eval time =    1570.12 ms /    63 tokens (   24.92 ms per token,    40.12 tokens per second)
+      total time =    2057.59 ms /   240 tokens
+slot      release: id  0 | task 446 | stop processing: n_tokens = 239, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413280524511
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 510 | processing task, is_child = 0
+slot update_slots: id  0 | task 510 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 67
+slot update_slots: id  0 | task 510 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 510 | init sampler, took 0.01 ms, tokens: text = 67, total = 67
+slot update_slots: id  0 | task 510 | prompt processing done, n_tokens = 67, batch.n_tokens = 67
+slot print_timing: id  0 | task 510 | 
+prompt eval time =     236.12 ms /    67 tokens (    3.52 ms per token,   283.75 tokens per second)
+       eval time =     538.80 ms /    24 tokens (   22.45 ms per token,    44.54 tokens per second)
+      total time =     774.92 ms /    91 tokens
+slot      release: id  0 | task 510 | stop processing: n_tokens = 90, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413281813579
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 535 | processing task, is_child = 0
+slot update_slots: id  0 | task 535 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 96
+slot update_slots: id  0 | task 535 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 535 | init sampler, took 0.01 ms, tokens: text = 96, total = 96
+slot update_slots: id  0 | task 535 | prompt processing done, n_tokens = 96, batch.n_tokens = 96
+slot print_timing: id  0 | task 535 | 
+prompt eval time =     290.88 ms /    96 tokens (    3.03 ms per token,   330.03 tokens per second)
+       eval time =     397.55 ms /    18 tokens (   22.09 ms per token,    45.28 tokens per second)
+      total time =     688.43 ms /   114 tokens
+slot      release: id  0 | task 535 | stop processing: n_tokens = 113, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413282807697
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 554 | processing task, is_child = 0
+slot update_slots: id  0 | task 554 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 51
+slot update_slots: id  0 | task 554 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 554 | init sampler, took 0.01 ms, tokens: text = 51, total = 51
+slot update_slots: id  0 | task 554 | prompt processing done, n_tokens = 51, batch.n_tokens = 51
+slot print_timing: id  0 | task 554 | 
+prompt eval time =     155.06 ms /    51 tokens (    3.04 ms per token,   328.89 tokens per second)
+       eval time =     169.99 ms /     8 tokens (   21.25 ms per token,    47.06 tokens per second)
+      total time =     325.06 ms /    59 tokens
+slot      release: id  0 | task 554 | stop processing: n_tokens = 58, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413283590315
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 563 | processing task, is_child = 0
+slot update_slots: id  0 | task 563 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 99
+slot update_slots: id  0 | task 563 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 563 | init sampler, took 0.01 ms, tokens: text = 99, total = 99
+slot update_slots: id  0 | task 563 | prompt processing done, n_tokens = 99, batch.n_tokens = 99
+slot print_timing: id  0 | task 563 | 
+prompt eval time =     338.94 ms /    99 tokens (    3.42 ms per token,   292.09 tokens per second)
+       eval time =     293.38 ms /    14 tokens (   20.96 ms per token,    47.72 tokens per second)
+      total time =     632.32 ms /   113 tokens
+slot      release: id  0 | task 563 | stop processing: n_tokens = 112, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413284575674
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 578 | processing task, is_child = 0
+slot update_slots: id  0 | task 578 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 121
+slot update_slots: id  0 | task 578 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 578 | init sampler, took 0.02 ms, tokens: text = 121, total = 121
+slot update_slots: id  0 | task 578 | prompt processing done, n_tokens = 121, batch.n_tokens = 121
+slot print_timing: id  0 | task 578 | 
+prompt eval time =     302.81 ms /   121 tokens (    2.50 ms per token,   399.59 tokens per second)
+       eval time =    1240.27 ms /    55 tokens (   22.55 ms per token,    44.35 tokens per second)
+      total time =    1543.07 ms /   176 tokens
+slot      release: id  0 | task 578 | stop processing: n_tokens = 175, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413286359591
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 634 | processing task, is_child = 0
+slot update_slots: id  0 | task 634 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 132
+slot update_slots: id  0 | task 634 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 634 | init sampler, took 0.02 ms, tokens: text = 132, total = 132
+slot update_slots: id  0 | task 634 | prompt processing done, n_tokens = 132, batch.n_tokens = 132
+slot print_timing: id  0 | task 634 | 
+prompt eval time =     394.83 ms /   132 tokens (    2.99 ms per token,   334.32 tokens per second)
+       eval time =     875.37 ms /    36 tokens (   24.32 ms per token,    41.13 tokens per second)
+      total time =    1270.20 ms /   168 tokens
+slot      release: id  0 | task 634 | stop processing: n_tokens = 167, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413287883817
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 671 | processing task, is_child = 0
+slot update_slots: id  0 | task 671 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 81
+slot update_slots: id  0 | task 671 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 671 | init sampler, took 0.01 ms, tokens: text = 81, total = 81
+slot update_slots: id  0 | task 671 | prompt processing done, n_tokens = 81, batch.n_tokens = 81
+slot print_timing: id  0 | task 671 | 
+prompt eval time =     250.65 ms /    81 tokens (    3.09 ms per token,   323.16 tokens per second)
+       eval time =     468.79 ms /    21 tokens (   22.32 ms per token,    44.80 tokens per second)
+      total time =     719.44 ms /   102 tokens
+slot      release: id  0 | task 671 | stop processing: n_tokens = 101, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413288950935
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 693 | processing task, is_child = 0
+slot update_slots: id  0 | task 693 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 50
+slot update_slots: id  0 | task 693 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 693 | init sampler, took 0.01 ms, tokens: text = 50, total = 50
+slot update_slots: id  0 | task 693 | prompt processing done, n_tokens = 50, batch.n_tokens = 50
+slot print_timing: id  0 | task 693 | 
+prompt eval time =     159.20 ms /    50 tokens (    3.18 ms per token,   314.06 tokens per second)
+       eval time =    1670.77 ms /    42 tokens (   39.78 ms per token,    25.14 tokens per second)
+      total time =    1829.98 ms /    92 tokens
+slot      release: id  0 | task 693 | stop processing: n_tokens = 91, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413291373222
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 736 | processing task, is_child = 0
+slot update_slots: id  0 | task 736 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 103
+slot update_slots: id  0 | task 736 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 736 | init sampler, took 0.01 ms, tokens: text = 103, total = 103
+slot update_slots: id  0 | task 736 | prompt processing done, n_tokens = 103, batch.n_tokens = 103
+slot print_timing: id  0 | task 736 | 
+prompt eval time =     319.27 ms /   103 tokens (    3.10 ms per token,   322.61 tokens per second)
+       eval time =    4735.32 ms /   140 tokens (   33.82 ms per token,    29.57 tokens per second)
+      total time =    5054.59 ms /   243 tokens
+slot      release: id  0 | task 736 | stop processing: n_tokens = 242, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413296929656
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 877 | processing task, is_child = 0
+slot update_slots: id  0 | task 877 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 157
+slot update_slots: id  0 | task 877 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 877 | init sampler, took 0.03 ms, tokens: text = 157, total = 157
+slot update_slots: id  0 | task 877 | prompt processing done, n_tokens = 157, batch.n_tokens = 157
+slot print_timing: id  0 | task 877 | 
+prompt eval time =     468.14 ms /   157 tokens (    2.98 ms per token,   335.37 tokens per second)
+       eval time =     274.53 ms /    10 tokens (   27.45 ms per token,    36.43 tokens per second)
+      total time =     742.67 ms /   167 tokens
+slot      release: id  0 | task 877 | stop processing: n_tokens = 166, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413298470029
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 888 | processing task, is_child = 0
+slot update_slots: id  0 | task 888 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 84
+slot update_slots: id  0 | task 888 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 888 | init sampler, took 0.01 ms, tokens: text = 84, total = 84
+slot update_slots: id  0 | task 888 | prompt processing done, n_tokens = 84, batch.n_tokens = 84
+slot print_timing: id  0 | task 888 | 
+prompt eval time =     237.52 ms /    84 tokens (    2.83 ms per token,   353.65 tokens per second)
+       eval time =    1738.47 ms /    56 tokens (   31.04 ms per token,    32.21 tokens per second)
+      total time =    1975.99 ms /   140 tokens
+slot      release: id  0 | task 888 | stop processing: n_tokens = 139, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413301028287
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 945 | processing task, is_child = 0
+slot update_slots: id  0 | task 945 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 163
+slot update_slots: id  0 | task 945 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 945 | init sampler, took 0.02 ms, tokens: text = 163, total = 163
+slot update_slots: id  0 | task 945 | prompt processing done, n_tokens = 163, batch.n_tokens = 163
+slot print_timing: id  0 | task 945 | 
+prompt eval time =     514.49 ms /   163 tokens (    3.16 ms per token,   316.82 tokens per second)
+       eval time =    2996.68 ms /    85 tokens (   35.26 ms per token,    28.36 tokens per second)
+      total time =    3511.17 ms /   248 tokens
+slot      release: id  0 | task 945 | stop processing: n_tokens = 247, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413305009252
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 1031 | processing task, is_child = 0
+slot update_slots: id  0 | task 1031 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 137
+slot update_slots: id  0 | task 1031 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 1031 | init sampler, took 0.03 ms, tokens: text = 137, total = 137
+slot update_slots: id  0 | task 1031 | prompt processing done, n_tokens = 137, batch.n_tokens = 137
+slot print_timing: id  0 | task 1031 | 
+prompt eval time =     378.48 ms /   137 tokens (    2.76 ms per token,   361.98 tokens per second)
+       eval time =     286.22 ms /    11 tokens (   26.02 ms per token,    38.43 tokens per second)
+      total time =     664.70 ms /   148 tokens
+slot      release: id  0 | task 1031 | stop processing: n_tokens = 147, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413306504678
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 1043 | processing task, is_child = 0
+slot update_slots: id  0 | task 1043 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 106
+slot update_slots: id  0 | task 1043 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 1043 | init sampler, took 0.01 ms, tokens: text = 106, total = 106
+slot update_slots: id  0 | task 1043 | prompt processing done, n_tokens = 106, batch.n_tokens = 106
+slot print_timing: id  0 | task 1043 | 
+prompt eval time =     316.36 ms /   106 tokens (    2.98 ms per token,   335.06 tokens per second)
+       eval time =    2455.00 ms /    88 tokens (   27.90 ms per token,    35.85 tokens per second)
+      total time =    2771.36 ms /   194 tokens
+slot      release: id  0 | task 1043 | stop processing: n_tokens = 193, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413309707052
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 1132 | processing task, is_child = 0
+slot update_slots: id  0 | task 1132 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 41
+slot update_slots: id  0 | task 1132 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 1132 | init sampler, took 0.01 ms, tokens: text = 41, total = 41
+slot update_slots: id  0 | task 1132 | prompt processing done, n_tokens = 41, batch.n_tokens = 41
+slot print_timing: id  0 | task 1132 | 
+prompt eval time =     141.47 ms /    41 tokens (    3.45 ms per token,   289.81 tokens per second)
+       eval time =     285.69 ms /    11 tokens (   25.97 ms per token,    38.50 tokens per second)
+      total time =     427.16 ms /    52 tokens
+slot      release: id  0 | task 1132 | stop processing: n_tokens = 51, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413310884084
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 1144 | processing task, is_child = 0
+slot update_slots: id  0 | task 1144 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 124
+slot update_slots: id  0 | task 1144 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 1144 | init sampler, took 0.02 ms, tokens: text = 124, total = 124
+slot update_slots: id  0 | task 1144 | prompt processing done, n_tokens = 124, batch.n_tokens = 124
+slot print_timing: id  0 | task 1144 | 
+prompt eval time =     305.17 ms /   124 tokens (    2.46 ms per token,   406.33 tokens per second)
+       eval time =    1535.76 ms /    54 tokens (   28.44 ms per token,    35.16 tokens per second)
+      total time =    1840.93 ms /   178 tokens
+slot      release: id  0 | task 1144 | stop processing: n_tokens = 177, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413313352254
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 1199 | processing task, is_child = 0
+slot update_slots: id  0 | task 1199 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 130
+slot update_slots: id  0 | task 1199 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 1199 | init sampler, took 0.02 ms, tokens: text = 130, total = 130
+slot update_slots: id  0 | task 1199 | prompt processing done, n_tokens = 130, batch.n_tokens = 130
+slot print_timing: id  0 | task 1199 | 
+prompt eval time =     424.70 ms /   130 tokens (    3.27 ms per token,   306.10 tokens per second)
+       eval time =    1128.55 ms /    41 tokens (   27.53 ms per token,    36.33 tokens per second)
+      total time =    1553.25 ms /   171 tokens
+slot      release: id  0 | task 1199 | stop processing: n_tokens = 170, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413316006121
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 1241 | processing task, is_child = 0
+slot update_slots: id  0 | task 1241 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 209
+slot update_slots: id  0 | task 1241 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 1241 | init sampler, took 0.03 ms, tokens: text = 209, total = 209
+slot update_slots: id  0 | task 1241 | prompt processing done, n_tokens = 209, batch.n_tokens = 209
+slot print_timing: id  0 | task 1241 | 
+prompt eval time =     678.10 ms /   209 tokens (    3.24 ms per token,   308.22 tokens per second)
+       eval time =    2425.92 ms /    96 tokens (   25.27 ms per token,    39.57 tokens per second)
+      total time =    3104.01 ms /   305 tokens
+slot      release: id  0 | task 1241 | stop processing: n_tokens = 304, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413320482108
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 1338 | processing task, is_child = 0
+slot update_slots: id  0 | task 1338 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 92
+slot update_slots: id  0 | task 1338 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 1338 | init sampler, took 0.01 ms, tokens: text = 92, total = 92
+slot update_slots: id  0 | task 1338 | prompt processing done, n_tokens = 92, batch.n_tokens = 92
+slot print_timing: id  0 | task 1338 | 
+prompt eval time =     255.56 ms /    92 tokens (    2.78 ms per token,   360.00 tokens per second)
+       eval time =    2474.47 ms /    89 tokens (   27.80 ms per token,    35.97 tokens per second)
+      total time =    2730.03 ms /   181 tokens
+slot      release: id  0 | task 1338 | stop processing: n_tokens = 180, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413323653385
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 1428 | processing task, is_child = 0
+slot update_slots: id  0 | task 1428 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 85
+slot update_slots: id  0 | task 1428 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 1428 | init sampler, took 0.01 ms, tokens: text = 85, total = 85
+slot update_slots: id  0 | task 1428 | prompt processing done, n_tokens = 85, batch.n_tokens = 85
+slot print_timing: id  0 | task 1428 | 
+prompt eval time =     238.14 ms /    85 tokens (    2.80 ms per token,   356.94 tokens per second)
+       eval time =     449.44 ms /    19 tokens (   23.65 ms per token,    42.27 tokens per second)
+      total time =     687.58 ms /   104 tokens
+slot      release: id  0 | task 1428 | stop processing: n_tokens = 103, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413324819240
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 1448 | processing task, is_child = 0
+slot update_slots: id  0 | task 1448 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 102
+slot update_slots: id  0 | task 1448 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 1448 | init sampler, took 0.01 ms, tokens: text = 102, total = 102
+slot update_slots: id  0 | task 1448 | prompt processing done, n_tokens = 102, batch.n_tokens = 102
+slot print_timing: id  0 | task 1448 | 
+prompt eval time =     304.09 ms /   102 tokens (    2.98 ms per token,   335.43 tokens per second)
+       eval time =     800.90 ms /    33 tokens (   24.27 ms per token,    41.20 tokens per second)
+      total time =    1104.99 ms /   135 tokens
+slot      release: id  0 | task 1448 | stop processing: n_tokens = 134, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413326448253
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 1482 | processing task, is_child = 0
+slot update_slots: id  0 | task 1482 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 104
+slot update_slots: id  0 | task 1482 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 1482 | init sampler, took 0.01 ms, tokens: text = 104, total = 104
+slot update_slots: id  0 | task 1482 | prompt processing done, n_tokens = 104, batch.n_tokens = 104
+slot print_timing: id  0 | task 1482 | 
+prompt eval time =     321.48 ms /   104 tokens (    3.09 ms per token,   323.51 tokens per second)
+       eval time =     422.67 ms /    15 tokens (   28.18 ms per token,    35.49 tokens per second)
+      total time =     744.15 ms /   119 tokens
+slot      release: id  0 | task 1482 | stop processing: n_tokens = 118, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413327811586
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 1498 | processing task, is_child = 0
+slot update_slots: id  0 | task 1498 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 65
+slot update_slots: id  0 | task 1498 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 1498 | init sampler, took 0.01 ms, tokens: text = 65, total = 65
+slot update_slots: id  0 | task 1498 | prompt processing done, n_tokens = 65, batch.n_tokens = 65
+slot print_timing: id  0 | task 1498 | 
+prompt eval time =     223.23 ms /    65 tokens (    3.43 ms per token,   291.18 tokens per second)
+       eval time =     197.76 ms /     9 tokens (   21.97 ms per token,    45.51 tokens per second)
+      total time =     420.99 ms /    74 tokens
+slot      release: id  0 | task 1498 | stop processing: n_tokens = 73, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413328935725
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 1508 | processing task, is_child = 0
+slot update_slots: id  0 | task 1508 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 49
+slot update_slots: id  0 | task 1508 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 1508 | init sampler, took 0.02 ms, tokens: text = 49, total = 49
+slot update_slots: id  0 | task 1508 | prompt processing done, n_tokens = 49, batch.n_tokens = 49
+slot print_timing: id  0 | task 1508 | 
+prompt eval time =     145.66 ms /    49 tokens (    2.97 ms per token,   336.41 tokens per second)
+       eval time =     177.84 ms /     8 tokens (   22.23 ms per token,    44.98 tokens per second)
+      total time =     323.50 ms /    57 tokens
+slot      release: id  0 | task 1508 | stop processing: n_tokens = 56, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413330064015
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 1517 | processing task, is_child = 0
+slot update_slots: id  0 | task 1517 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 166
+slot update_slots: id  0 | task 1517 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 1517 | init sampler, took 0.02 ms, tokens: text = 166, total = 166
+slot update_slots: id  0 | task 1517 | prompt processing done, n_tokens = 166, batch.n_tokens = 166
+slot print_timing: id  0 | task 1517 | 
+prompt eval time =     444.71 ms /   166 tokens (    2.68 ms per token,   373.28 tokens per second)
+       eval time =    2418.18 ms /    63 tokens (   38.38 ms per token,    26.05 tokens per second)
+      total time =    2862.90 ms /   229 tokens
+slot      release: id  0 | task 1517 | stop processing: n_tokens = 228, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413333746757
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 1581 | processing task, is_child = 0
+slot update_slots: id  0 | task 1581 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 86
+slot update_slots: id  0 | task 1581 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 1581 | init sampler, took 0.01 ms, tokens: text = 86, total = 86
+slot update_slots: id  0 | task 1581 | prompt processing done, n_tokens = 86, batch.n_tokens = 86
+slot print_timing: id  0 | task 1581 | 
+prompt eval time =     353.30 ms /    86 tokens (    4.11 ms per token,   243.42 tokens per second)
+       eval time =    1069.84 ms /    35 tokens (   30.57 ms per token,    32.72 tokens per second)
+      total time =    1423.14 ms /   121 tokens
+slot      release: id  0 | task 1581 | stop processing: n_tokens = 120, truncated = 0
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+srv  update_slots: all slots are idle
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413336667741
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 1617 | processing task, is_child = 0
+slot update_slots: id  0 | task 1617 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 72
+slot update_slots: id  0 | task 1617 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 1617 | init sampler, took 0.01 ms, tokens: text = 72, total = 72
+slot update_slots: id  0 | task 1617 | prompt processing done, n_tokens = 72, batch.n_tokens = 72
+slot print_timing: id  0 | task 1617 | 
+prompt eval time =     364.97 ms /    72 tokens (    5.07 ms per token,   197.28 tokens per second)
+       eval time =     437.69 ms /    16 tokens (   27.36 ms per token,    36.56 tokens per second)
+      total time =     802.66 ms /    88 tokens
+slot      release: id  0 | task 1617 | stop processing: n_tokens = 87, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413338727033
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 1634 | processing task, is_child = 0
+slot update_slots: id  0 | task 1634 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 111
+slot update_slots: id  0 | task 1634 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 1634 | init sampler, took 0.01 ms, tokens: text = 111, total = 111
+slot update_slots: id  0 | task 1634 | prompt processing done, n_tokens = 111, batch.n_tokens = 111
+slot print_timing: id  0 | task 1634 | 
+prompt eval time =     312.03 ms /   111 tokens (    2.81 ms per token,   355.74 tokens per second)
+       eval time =     285.67 ms /    11 tokens (   25.97 ms per token,    38.51 tokens per second)
+      total time =     597.70 ms /   122 tokens
+slot      release: id  0 | task 1634 | stop processing: n_tokens = 121, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413340335244
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 1646 | processing task, is_child = 0
+slot update_slots: id  0 | task 1646 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 76
+slot update_slots: id  0 | task 1646 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 1646 | init sampler, took 0.02 ms, tokens: text = 76, total = 76
+slot update_slots: id  0 | task 1646 | prompt processing done, n_tokens = 76, batch.n_tokens = 76
+slot print_timing: id  0 | task 1646 | 
+prompt eval time =     307.64 ms /    76 tokens (    4.05 ms per token,   247.04 tokens per second)
+       eval time =     472.44 ms /    14 tokens (   33.75 ms per token,    29.63 tokens per second)
+      total time =     780.07 ms /    90 tokens
+slot      release: id  0 | task 1646 | stop processing: n_tokens = 89, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413342473184
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 1661 | processing task, is_child = 0
+slot update_slots: id  0 | task 1661 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 153
+slot update_slots: id  0 | task 1661 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 1661 | init sampler, took 0.06 ms, tokens: text = 153, total = 153
+slot update_slots: id  0 | task 1661 | prompt processing done, n_tokens = 153, batch.n_tokens = 153
+slot print_timing: id  0 | task 1661 | 
+prompt eval time =     535.22 ms /   153 tokens (    3.50 ms per token,   285.86 tokens per second)
+       eval time =    2747.55 ms /   103 tokens (   26.68 ms per token,    37.49 tokens per second)
+      total time =    3282.77 ms /   256 tokens
+slot      release: id  0 | task 1661 | stop processing: n_tokens = 255, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413347078766
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 1765 | processing task, is_child = 0
+slot update_slots: id  0 | task 1765 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 123
+slot update_slots: id  0 | task 1765 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 1765 | init sampler, took 0.66 ms, tokens: text = 123, total = 123
+slot update_slots: id  0 | task 1765 | prompt processing done, n_tokens = 123, batch.n_tokens = 123
+slot print_timing: id  0 | task 1765 | 
+prompt eval time =     610.74 ms /   123 tokens (    4.97 ms per token,   201.39 tokens per second)
+       eval time =    1424.32 ms /    56 tokens (   25.43 ms per token,    39.32 tokens per second)
+      total time =    2035.07 ms /   179 tokens
+slot      release: id  0 | task 1765 | stop processing: n_tokens = 178, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413350913494
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 1822 | processing task, is_child = 0
+slot update_slots: id  0 | task 1822 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 137
+slot update_slots: id  0 | task 1822 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 1822 | init sampler, took 0.02 ms, tokens: text = 137, total = 137
+slot update_slots: id  0 | task 1822 | prompt processing done, n_tokens = 137, batch.n_tokens = 137
+slot print_timing: id  0 | task 1822 | 
+prompt eval time =     432.90 ms /   137 tokens (    3.16 ms per token,   316.47 tokens per second)
+       eval time =     892.13 ms /    39 tokens (   22.88 ms per token,    43.72 tokens per second)
+      total time =    1325.03 ms /   176 tokens
+slot      release: id  0 | task 1822 | stop processing: n_tokens = 175, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413353184199
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 1862 | processing task, is_child = 0
+slot update_slots: id  0 | task 1862 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 67
+slot update_slots: id  0 | task 1862 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 1862 | init sampler, took 0.01 ms, tokens: text = 67, total = 67
+slot update_slots: id  0 | task 1862 | prompt processing done, n_tokens = 67, batch.n_tokens = 67
+slot print_timing: id  0 | task 1862 | 
+prompt eval time =     483.46 ms /    67 tokens (    7.22 ms per token,   138.59 tokens per second)
+       eval time =    1044.38 ms /    42 tokens (   24.87 ms per token,    40.22 tokens per second)
+      total time =    1527.84 ms /   109 tokens
+slot      release: id  0 | task 1862 | stop processing: n_tokens = 108, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413356885381
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 1905 | processing task, is_child = 0
+slot update_slots: id  0 | task 1905 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 145
+slot update_slots: id  0 | task 1905 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 1905 | init sampler, took 0.02 ms, tokens: text = 145, total = 145
+slot update_slots: id  0 | task 1905 | prompt processing done, n_tokens = 145, batch.n_tokens = 145
+slot print_timing: id  0 | task 1905 | 
+prompt eval time =     425.56 ms /   145 tokens (    2.93 ms per token,   340.73 tokens per second)
+       eval time =    2095.77 ms /    84 tokens (   24.95 ms per token,    40.08 tokens per second)
+      total time =    2521.33 ms /   229 tokens
+slot      release: id  0 | task 1905 | stop processing: n_tokens = 228, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413359988942
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 1990 | processing task, is_child = 0
+slot update_slots: id  0 | task 1990 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 152
+slot update_slots: id  0 | task 1990 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 1990 | init sampler, took 0.02 ms, tokens: text = 152, total = 152
+slot update_slots: id  0 | task 1990 | prompt processing done, n_tokens = 152, batch.n_tokens = 152
+slot print_timing: id  0 | task 1990 | 
+prompt eval time =     420.34 ms /   152 tokens (    2.77 ms per token,   361.61 tokens per second)
+       eval time =    2082.01 ms /    59 tokens (   35.29 ms per token,    28.34 tokens per second)
+      total time =    2502.35 ms /   211 tokens
+slot      release: id  0 | task 1990 | stop processing: n_tokens = 210, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413363059418
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 2050 | processing task, is_child = 0
+slot update_slots: id  0 | task 2050 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 160
+slot update_slots: id  0 | task 2050 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 2050 | init sampler, took 0.12 ms, tokens: text = 160, total = 160
+slot update_slots: id  0 | task 2050 | prompt processing done, n_tokens = 160, batch.n_tokens = 160
+slot print_timing: id  0 | task 2050 | 
+prompt eval time =     496.32 ms /   160 tokens (    3.10 ms per token,   322.37 tokens per second)
+       eval time =     510.43 ms /    16 tokens (   31.90 ms per token,    31.35 tokens per second)
+      total time =    1006.75 ms /   176 tokens
+slot      release: id  0 | task 2050 | stop processing: n_tokens = 175, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413365272047
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 2067 | processing task, is_child = 0
+slot update_slots: id  0 | task 2067 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 230
+slot update_slots: id  0 | task 2067 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 2067 | init sampler, took 0.03 ms, tokens: text = 230, total = 230
+slot update_slots: id  0 | task 2067 | prompt processing done, n_tokens = 230, batch.n_tokens = 230
+slot print_timing: id  0 | task 2067 | 
+prompt eval time =     691.37 ms /   230 tokens (    3.01 ms per token,   332.68 tokens per second)
+       eval time =    4257.21 ms /   143 tokens (   29.77 ms per token,    33.59 tokens per second)
+      total time =    4948.57 ms /   373 tokens
+slot      release: id  0 | task 2067 | stop processing: n_tokens = 372, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 413371259780
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+slot launch_slot_: id  0 | task 2211 | processing task, is_child = 0
+slot update_slots: id  0 | task 2211 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 63
+slot update_slots: id  0 | task 2211 | n_tokens = 0, memory_seq_rm [0, end)
+slot init_sampler: id  0 | task 2211 | init sampler, took 0.01 ms, tokens: text = 63, total = 63
+slot update_slots: id  0 | task 2211 | prompt processing done, n_tokens = 63, batch.n_tokens = 63
+slot print_timing: id  0 | task 2211 | 
+prompt eval time =     167.69 ms /    63 tokens (    2.66 ms per token,   375.69 tokens per second)
+       eval time =     458.16 ms /    16 tokens (   28.63 ms per token,    34.92 tokens per second)
+      total time =     625.85 ms /    79 tokens
+slot      release: id  0 | task 2211 | stop processing: n_tokens = 78, truncated = 0
+srv  update_slots: all slots are idle
+srv  log_server_r: done request: POST /v1/completions 127.0.0.1 200
+srv    operator(): operator(): cleaning up before exit...
+llama_memory_breakdown_print: | memory breakdown [MiB]   | total   free    self   model   context   compute    unaccounted |
+llama_memory_breakdown_print: |   - MTL0 (Apple A18 Pro) |  5461 = 4162 + (1297 =   885 +     112 +     299) +           0 |
+llama_memory_breakdown_print: |   - Host                 |                  196 =   182 +       0 +      14                |
+ggml_metal_free: deallocating

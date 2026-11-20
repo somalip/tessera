@@ -1,0 +1,112 @@
+{
+  "model_sha256": "32d2643157f2ccbb487dd1ad814e7431958c0549c3fbc9c3d9f206441ef8256b",
+  "size_bytes": 941491712,
+  "mode": "greedy",
+  "settings": {
+    "temperature": 0,
+    "seed": 42,
+    "max_tokens": 512,
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    }
+  },
+  "server": "/Users/somalip/Documents/GitHub/tessera/artifacts/python-strength/serve-metal",
+  "suites": [
+    {
+      "path": "/Users/somalip/Documents/GitHub/tessera/artifacts/python-v2/heldout.jsonl",
+      "sha256": "12f9c0c9408696773da6fcc58de92f124ec145958d3e5ca1f5490dd283808432",
+      "passed": 1,
+      "total": 8,
+      "results": [
+        {
+          "id": "stable_group",
+          "finish_reason": "stop",
+          "reply": "def group_updates(updates):\n    updates_dict = {}\n    for key, value in updates:\n        if key in updates_dict:\n            updates_dict[key].append(value)\n        else:\n            updates_dict[key] = [value]\n    return sorted(updates_dict.items())",
+          "reasoning_chars": 0,
+          "tokens": 55,
+          "wall_seconds": 3.26,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "recursive_config",
+          "finish_reason": "stop",
+          "reply": "def merge_config(base, patch):\n    if isinstance(base, dict) and isinstance(patch, dict):\n        merged = {}\n        for key in base:\n            if key in patch:\n                merged[key] = merge_config(base[key], patch[key])\n            else:\n                merged[key] = base[key]\n        for key in patch:\n            if key not in base:\n                merged[key] = patch[key]\n        return merged\n    elif isinstance(base, list) and isinstance(patch, list):\n        return base + patch\n    elif patch is None:\n        return base\n    else:\n        return patch",
+          "reasoning_chars": 0,
+          "tokens": 121,
+          "wall_seconds": 6.6,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "pathlib_api",
+          "finish_reason": "stop",
+          "reply": "import pathlib\nfrom datetime import datetime\n\ndef report_paths(root):\n    # Ensure the root is a pathlib.Path object\n    root = pathlib.Path(root)\n    \n    # Filter files in the root directory that match the report pattern\n    report_files = [f for f in root.iterdir() if f.name.startswith(\"report-\") and f.name.endswith(\".csv\")]\n    \n    # Convert the report file names to datetime objects\n    report_dates = [datetime.strptime(f.name.split(\"-\")[1], \"%Y-%m-%d\") for f in report_files]\n    \n    # Sort the report files by date in ascending order\n    report_files.sort(key=lambda x: report_dates[x.name.split(\"-\")[1]])\n    \n    # Return the sorted list of (day, path) pairs\n    return [(report_dates[i].date(), report_files[i]) for i in range(len(report_files))]",
+          "reasoning_chars": 0,
+          "tokens": 180,
+          "wall_seconds": 8.82,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "legacy_cursor",
+          "finish_reason": "stop",
+          "reply": "def page_bounds(page, size, total):\n    if page <= 0 or size <= 0 or total < 0:\n        raise ValueError(\"Invalid page, size, or total\")\n    start = max(0, min(page * size, total))\n    stop = max(start, min(start + size, total))\n    return start, stop",
+          "reasoning_chars": 0,
+          "tokens": 71,
+          "wall_seconds": 5.12,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "queue_accounting",
+          "finish_reason": "stop",
+          "reply": "import collections\n\ndef summarize_jobs(jobs):\n    summary = collections.defaultdict(lambda: (0, 0))\n    for job in jobs:\n        summary[job.status] = (summary[job.status][0] + job.size, summary[job.status][1] + job.size)\n    return {status: (count, total_size) for status, (count, total_size) in summary.items() if total_size != 0}",
+          "reasoning_chars": 0,
+          "tokens": 91,
+          "wall_seconds": 5.32,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "retry",
+          "finish_reason": "stop",
+          "reply": "import time\nfrom typing import Callable, Optional\n\ndef retry_read(read: Callable[[], Optional[str]], attempts: int) -> Optional[str]:\n    if attempts < 1:\n        raise ValueError(\"attempts must be at least one\")\n    \n    for _ in range(attempts):\n        try:\n            return read()\n        except TimeoutError:\n            continue\n    return None",
+          "reasoning_chars": 0,
+          "tokens": 76,
+          "wall_seconds": 4.95,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "event_dedup",
+          "finish_reason": "stop",
+          "reply": "def iter_unique_events(events):\n    seen_ids = set()\n    for event in events:\n        if event.get('id') is not None:\n            seen_ids.add(event['id'])\n        yield event",
+          "reasoning_chars": 0,
+          "tokens": 41,
+          "wall_seconds": 4.21,
+          "passed": false,
+          "returncode": 1,
+          "timed_out": false
+        },
+        {
+          "id": "record_composition",
+          "finish_reason": "stop",
+          "reply": "import csv\n\ndef render_row(fields, record, missing=\"-\"):\n    def escape(s):\n        return s.replace(\"\\\\\", \"\\\\\\\\\").replace(\"\\t\", \"\\\\t\").replace(\"\\n\", \"\\\\n\")\n\n    def render_field(field, record):\n        if field not in record:\n            return missing\n        value = record[field]\n        if value is None:\n            return missing\n        if not value:\n            return str(value)\n        return escape(str(value))\n\n    return \"\\t\".join(render_field(field, record) for field in fields)",
+          "reasoning_chars": 0,
+          "tokens": 110,
+          "wall_seconds": 8.15,
+          "passed": true,
+          "returncode": 0,
+          "timed_out": false
+        }
+      ]
+    }
+  ]
+}
