@@ -1,11 +1,11 @@
 const aliases: Record<string, string> = {
   py: "python", ts: "typescript", tsx: "typescriptreact", js: "javascript",
-  jsx: "javascriptreact", rs: "rust", "c++": "cpp", hpp: "cpp", kt: "kotlin",
+  jsx: "javascriptreact", yml: "yaml", regexp: "regex", rs: "rust", "c++": "cpp", hpp: "cpp", kt: "kotlin",
 };
 
 export function embeddedLanguage(language: string, source: string, offset: number): string | undefined {
   const before = source.slice(0, offset);
-  if (language === "markdown") {
+  if (language === "markdown" || language === "mdx") {
     let open: { mark: string; length: number; language: string } | undefined;
     const lines = before.split(/\r?\n/);
     lines.pop();
@@ -17,7 +17,7 @@ export function embeddedLanguage(language: string, source: string, offset: numbe
       else if (marks[0] === open.mark && marks.length >= open.length
         && line.trim().replace(/[`~]/g, "") === "") open = undefined;
     }
-    return open?.language ? aliases[open.language] ?? open.language : undefined;
+    if (open) return aliases[open.language] ?? (open.language || "plaintext");
   }
   if (language === "html") {
     let region: string | undefined;

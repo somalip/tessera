@@ -54,3 +54,15 @@ export function buildFim(
   const left = back(source.slice(Math.max(0, offset - remainder), offset), remainder - Buffer.byteLength(right));
   return tokens.prefix + extras + left + tokens.suffix + right + tokens.middle;
 }
+
+
+export function buildDocumentation(source: string, offset: number): string {
+  const clean = (text: string) => text.replace(/<\|[^\r\n|]*\|>/g, "");
+  const left = clean(back(source.slice(Math.max(0, offset - 480), offset), 480));
+  const right = clean(front(source.slice(offset, offset + 96), 96));
+  return "<|im_start|>system\nComplete Markdown prose or Python docstrings. " +
+    "Output only the short text to insert at the cursor, on one line. " +
+    "Continue the existing wording. Do not repeat the surrounding text or invent commands.<|im_end|>\n" +
+    `<|im_start|>user\n${left}<CURSOR>${right}<|im_end|>\n` +
+    "<|im_start|>assistant\n<think>\n\n</think>\n\n";
+}

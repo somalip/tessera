@@ -14,6 +14,8 @@ async function main() {
         TINYCODERS_TEST_HOME: directory,
         TINYCODERS_REAL_SERVER: process.env.TINYCODERS_REAL_SERVER ?? "",
         TINYCODERS_REAL_MODEL: process.env.TINYCODERS_REAL_MODEL ?? "",
+        TINYCODERS_REAL_PARSING: process.env.TINYCODERS_REAL_PARSING ?? "",
+        TINYCODERS_REAL_DOCS: process.env.TINYCODERS_REAL_DOCS ?? "",
       },
       launchArgs: ["--disable-extensions", "--disable-workspace-trust", "--user-data-dir", directory],
     });

@@ -1,7 +1,8 @@
 import { randomBytes } from "node:crypto";
 import * as vscode from "vscode";
+import { SystemResources } from "../host/resources";
 import type { InstalledModel } from "../registry/download";
-import { dashboardHtml, renderDashboard } from "./dashboardHtml";
+import { dashboardHtml, renderDashboard, renderResources } from "./dashboardHtml";
 
 export const dashboardId = "tinycoders.dashboard";
 
@@ -46,6 +47,8 @@ export class Dashboard implements vscode.WebviewViewProvider, vscode.Disposable 
   private view?: vscode.WebviewView;
   private subscriptions: vscode.Disposable[] = [];
   private markup?: string;
+  private polling?: AbortController;
+  private nextSample?: ReturnType<typeof setTimeout>;
 
   constructor(
     private readonly state: () => DashboardState,
@@ -59,11 +62,20 @@ export class Dashboard implements vscode.WebviewViewProvider, vscode.Disposable 
     webview.options = { enableScripts: true, localResourceRoots: [] };
     this.subscriptions = [
       view.onDidDispose(() => this.dispose()),
+      view.onDidChangeVisibility(() => {
+        if (view.visible) this.monitor(view);
+        else this.stopMonitoring();
+      }),
       webview.onDidReceiveMessage((message: unknown) => {
         if (typeof message !== "string") return;
         if (message === "ready") {
           this.markup = undefined;
           this.refresh();
+          if (view.visible) this.monitor(view);
+          return;
+        }
+        if (message === "resource-limits") {
+          void vscode.commands.executeCommand("tinycoders.resourceLimits").then(undefined, this.reportError);
           return;
         }
         const action = Object.values(actions(this.state())).flat().find(item => item.id === message);
@@ -87,7 +99,29 @@ export class Dashboard implements vscode.WebviewViewProvider, vscode.Disposable 
     void this.view.webview.postMessage(markup);
   }
 
+  private monitor(view: vscode.WebviewView): void {
+    if (this.polling) return;
+    const controller = new AbortController();
+    const { signal } = controller;
+    this.polling = controller;
+    const resources = new SystemResources();
+    const poll = async () => {
+      const sample = await resources.sample(signal);
+      if (signal.aborted) return;
+      void view.webview.postMessage({ resources: renderResources(sample) });
+      this.nextSample = setTimeout(() => { void poll(); }, 2000);
+    };
+    void poll();
+  }
+
+  private stopMonitoring(): void {
+    this.polling?.abort();
+    this.polling = undefined;
+    clearTimeout(this.nextSample);
+  }
+
   dispose(): void {
+    this.stopMonitoring();
     this.view = undefined;
     this.markup = undefined;
     for (const subscription of this.subscriptions.splice(0)) subscription.dispose();

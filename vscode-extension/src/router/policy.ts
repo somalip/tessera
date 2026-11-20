@@ -24,7 +24,12 @@ export function selectModel<T extends { manifest: Manifest }>(models: readonly T
     (manifest.vscode_language_ids.includes(id) || manifest.language_ids.includes(id)));
   const byGlob = eligible.find(({ manifest }) =>
     manifest.file_globs.some(glob => matchesGlob(route.filename.replaceAll("\\", "/"), glob)));
-  return byId(route.override) ?? byLanguage(route.embedded) ?? byLanguage(route.project)
+  const explicit = byId(route.override) ?? byLanguage(route.embedded);
+  if (explicit) return explicit;
+  if (route.embedded && ["markdown", "mdx"].includes(route.language) && route.capability === "fim") {
+    return siblings[route.embedded]?.map(byLanguage).find(Boolean) ?? byId(route.generalist);
+  }
+  return byLanguage(route.project)
     ?? byLanguage(route.language) ?? byGlob
     ?? (siblings[route.project ?? route.language] ?? []).map(byLanguage).find(Boolean)
     ?? byId(route.generalist);

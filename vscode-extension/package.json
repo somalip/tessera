@@ -1,7 +1,7 @@
 {
   "name": "tinycoders",
   "displayName": "TinyCoders",
-  "version": "0.1.0",
+  "version": "0.1.4",
   "publisher": "tinycoders",
   "private": true,
   "engines": {
@@ -46,18 +46,43 @@
           "default": "llama-server",
           "description": "Path to the local llama.cpp server executable."
         },
+        "tinycoders.pythonAutocompleteModelPath": {
+          "type": "string",
+          "scope": "machine",
+          "default": "",
+          "description": "Path to the small Python autocomplete GGUF. Preferred for inline suggestions."
+        },
+        "tinycoders.parsingAutocompleteModelPath": {
+          "type": "string",
+          "scope": "machine",
+          "default": "",
+          "description": "Path to the local Qwen2.5-Coder GGUF for structured data, regex, and SQL autocomplete."
+        },
+        "tinycoders.documentationAutocompleteModelPath": {
+          "type": "string",
+          "scope": "machine",
+          "default": "",
+          "description": "Path to the local Qwen3.5 documentation GGUF for prose and Python docstring autocomplete."
+        },
         "tinycoders.pythonModelPath": {
           "type": "string",
           "scope": "machine",
           "default": "",
           "description": "Path to a local Qwen2.5-Coder GGUF for Python FIM."
         },
+        "tinycoders.cpuThreads": {
+          "type": "integer",
+          "minimum": 0,
+          "scope": "machine",
+          "default": 0,
+          "description": "Maximum inference and prompt-processing threads per model server. Zero uses llama.cpp defaults."
+        },
         "tinycoders.gpuLayers": {
           "type": "integer",
           "minimum": 0,
           "scope": "machine",
           "default": 0,
-          "description": "Number of model layers to offload to the GPU."
+          "description": "Number of model layers to offload to the GPU per server. Zero runs inference on the CPU."
         },
         "tinycoders.typescriptModelPath": {
           "type": "string",
@@ -86,7 +111,7 @@
           "type": "boolean",
           "scope": "language-overridable",
           "default": true,
-          "description": "Allow a tinycoders: instruction comment to trigger a suggestion on the next blank line when automatic suggestions are off."
+          "description": "Let a Python comment or a tinycoders: comment in other languages trigger a suggestion on the next blank line when automatic suggestions are off."
         },
         "tinycoders.maxModels": {
           "type": "integer",
@@ -147,6 +172,10 @@
       {
         "command": "tinycoders.exportMetrics",
         "title": "TinyCoders: Export Local Metrics"
+      },
+      {
+        "command": "tinycoders.resourceLimits",
+        "title": "TinyCoders: Resource Limits"
       },
       {
         "command": "tinycoders.openDashboard",

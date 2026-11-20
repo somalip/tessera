@@ -37,6 +37,7 @@ export class LlamaServer {
     private readonly gpuLayers = 0,
     private readonly minimumBuild = "local",
     private readonly paged = false,
+    private readonly cpuThreads = 0,
   ) {}
 
   get alive(): boolean {
@@ -80,6 +81,7 @@ export class LlamaServer {
       "--host", "127.0.0.1", "--port", String(port), "--model", this.modelPath,
       "--ctx-size", String(this.contextLength), "--n-gpu-layers", String(gpuLayers),
       "--parallel", "1", "--api-key", apiKey, "--cache-ram", "0",
+      ...(this.cpuThreads > 0 ? ["--threads", String(this.cpuThreads), "--threads-batch", String(this.cpuThreads)] : []),
       ...(gpuLayers === 0 ? ["--device", "none"] : []),
       ...(this.paged ? ["--no-repack", "--no-warmup"] : []),
     ], { env, stdio: ["ignore", "ignore", "pipe"], windowsHide: true });

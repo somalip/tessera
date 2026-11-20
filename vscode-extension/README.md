@@ -11,6 +11,18 @@ a Python or TypeScript Qwen2.5-Coder model. To install from a signed registry,
 configure its HTTPS URL and trusted Ed25519 public key in **Settings**, then
 choose **Install From Registry**.
 
+The dashboard's **System resources** section shows machine-wide CPU usage,
+non-free RAM (including cached memory), and per-device GPU utilization when
+available. GPU readings use macOS accelerator counters or `nvidia-smi`.
+**Resource Limits** opens the settings for TinyCoders model servers.
+
+- **Model RAM budget** uses estimated resident model memory in MiB.
+- **CPU threads** limits inference and prompt processing threads per server.
+  Zero uses the runtime defaults.
+- **GPU layers** sets the number of model layers offloaded per server.
+  Zero selects CPU-only inference.
+- **Resident models** limits how many model servers can be loaded at once.
+
 Set `tinycoders.serverPath` in **Settings** if the compatible `llama-server`
 executable is outside PATH. With the default `tinycoders.memoryMiB: 0`, a model
 that exceeds the automatic RAM target can run alone on the CPU with unlocked,

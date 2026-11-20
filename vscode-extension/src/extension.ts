@@ -30,7 +30,11 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
   const store = new ModelStore(join(context.globalStorageUri.fsPath, "models"));
   let localModels: InstalledModel[] = [];
   let installedModels: InstalledModel[] = [];
-  const models = () => [...installedModels, ...localModels];
+  const models = () => [
+    ...localModels.filter(model => model.manifest.capabilities.length === 1),
+    ...installedModels,
+    ...localModels.filter(model => model.manifest.capabilities.length > 1),
+  ];
   let lifecycle: Lifecycle;
   let projectFiles = new Set<string>();
   let projectFolder: string | undefined;
@@ -43,21 +47,33 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
     lifecycle = new Lifecycle(budget || freemem() * 0.6,
       settings.get("maxModels", 2), settings.get("idleMinutes", 5) * 60_000, stopped, budget === 0);
     localModels = [];
-    for (const language of ["python", "typescript"]) {
-      const path = settings.get<string>(`${language}ModelPath`);
+    for (const [id, setting, languages, globs, inlineOnly] of [
+      ["python-autocomplete-local", "pythonAutocompleteModelPath", ["python"], ["**/*.py", "**/*.pyi"], true],
+      ["parsing-autocomplete-local", "parsingAutocompleteModelPath",
+        ["json", "jsonc", "yaml", "toml", "sql", "regex"],
+        ["**/*.json", "**/*.jsonc", "**/*.yaml", "**/*.yml", "**/*.toml", "**/*.sql"], true],
+      ["documentation-autocomplete-local", "documentationAutocompleteModelPath",
+        ["markdown", "mdx", "restructuredtext", "asciidoc", "python-docstring"],
+        ["**/*.md", "**/*.mdx", "**/*.rst", "**/*.adoc"], true],
+      ["python-local", "pythonModelPath", ["python"], ["**/*.py", "**/*.pyi"], false],
+      ["typescript-local", "typescriptModelPath", ["typescript", "typescriptreact"],
+        ["**/*.ts", "**/*.tsx"], false],
+    ] satisfies Array<[string, string, string[], string[], boolean]>) {
+      const path = settings.get<string>(setting);
       if (!path) continue;
       try {
         const file = statSync(path);
         if (!file.isFile() || file.size === 0 || file.size >= 1_000_000_000) throw new Error("Invalid GGUF file size");
+        const contextLength = inlineOnly ? 768 : 2048;
         localModels.push({
-          path, memoryBytes: modelMemoryBytes(file.size, 2048),
+          path, memoryBytes: modelMemoryBytes(file.size, contextLength),
           manifest: {
-            schema_version: 1, id: `${language}-local`, version: "0.0.0",
-            language_ids: [language], base_model: "qwen2.5-coder", params: 500_000_000,
-            vscode_language_ids: language === "python" ? [language] : [language, "typescriptreact"],
-            file_globs: language === "python" ? ["**/*.py", "**/*.pyi"] : ["**/*.ts", "**/*.tsx"],
-            quant: "local", size_bytes: file.size, context_length: 2048,
-            capabilities: ["fim", "chat", "edit"], min_runtime: { llama_cpp_build: "local" },
+            schema_version: 1, id, version: "0.0.0",
+            language_ids: languages, vscode_language_ids: languages, file_globs: globs,
+            base_model: id === "documentation-autocomplete-local" ? "qwen3.5" : "qwen2.5-coder",
+            params: id === "documentation-autocomplete-local" ? 800_000_000 : 500_000_000,
+            quant: "local", size_bytes: file.size, context_length: contextLength,
+            capabilities: inlineOnly ? ["fim"] : ["fim", "chat", "edit"], min_runtime: { llama_cpp_build: "local" },
             prompt_formats: { fim: qwenFim, chat_template: "chatml" }, sha256: "0".repeat(64),
           },
         });
@@ -76,7 +92,7 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
     const docsKey = document.uri.toString();
     const language = document.languageId;
     let embedded: string | undefined;
-    if (["python", "markdown", "html"].includes(language)) {
+    if (["python", "markdown", "mdx", "html"].includes(language)) {
       const source = document.getText();
       const offset = document.offsetAt(position);
       embedded = language === "python" && python.available
@@ -97,12 +113,15 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
     return {
       contextLength: model.manifest.context_length,
       tokens: model.manifest.prompt_formats.fim,
+      short: model.manifest.capabilities.length === 1 && model.manifest.id.endsWith("-autocomplete-local"),
+      documentation: model.manifest.id === "documentation-autocomplete-local",
+      python: model.manifest.id === "python-autocomplete-local",
       use<T>(operation: (host: InferenceHost) => Promise<T>) {
         const settings = config();
         return active.use<T>(model.path, model.memoryBytes,
           paged => new LlamaServer(settings.get("serverPath", "llama-server"), model.path,
             model.manifest.context_length, settings.get("gpuLayers", 0),
-            model.manifest.min_runtime.llama_cpp_build, paged), operation);
+            model.manifest.min_runtime.llama_cpp_build, paged, settings.get("cpuThreads", 0)), operation);
       },
     };
   };
@@ -158,9 +177,15 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
   };
   const prewarm = () => {
     const editor = vscode.window.activeTextEditor;
-    if (!editor || !completionSettings(editor.document).automatic) return;
-    const model = editor && candidate(editor.document, editor.selection.active);
-    if (model) void endpoint(model).use(async () => undefined).catch(error => log.appendLine(String(error)));
+    if (!editor) return;
+    const { automatic, comments } = completionSettings(editor.document);
+    if (!automatic && !comments) return;
+    const model = candidate(editor.document, editor.selection.active);
+    if (!model) return;
+    const route = endpoint(model);
+    if (automatic || route.short) {
+      void route.use(async () => undefined).catch(error => log.appendLine(String(error)));
+    }
   };
   const scan = async () => {
     const generation = ++projectScan;
@@ -224,9 +249,12 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
     vscode.commands.registerCommand("tinycoders.addLocalModel", async () => {
       if (!vscode.workspace.isTrusted) return;
       const language = await vscode.window.showQuickPick([
+        { label: "Python (fast autocomplete)", setting: "pythonAutocompleteModelPath" },
+        { label: "Structured data and SQL (autocomplete)", setting: "parsingAutocompleteModelPath" },
+        { label: "Documentation (autocomplete)", setting: "documentationAutocompleteModelPath" },
         { label: "Python", setting: "pythonModelPath" },
         { label: "TypeScript", setting: "typescriptModelPath" },
-      ], { placeHolder: "Choose a language for the local Qwen2.5-Coder model" });
+      ], { placeHolder: "Choose a role for the local model" });
       if (!language) return;
       const [file] = await vscode.window.showOpenDialog({
         canSelectMany: false, canSelectFolders: false, filters: { GGUF: ["gguf"] }, openLabel: "Use Model",
@@ -260,11 +288,32 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
     vscode.window.onDidChangeWindowState(state => { if (state.focused) prewarm(); }),
     vscode.window.onDidChangeTextEditorSelection(updateStatus),
     vscode.workspace.onDidChangeConfiguration(event => {
-      if (["memoryMiB", "maxModels", "idleMinutes", "serverPath", "gpuLayers", "pythonModelPath",
-        "typescriptModelPath"].some(setting => event.affectsConfiguration(`tinycoders.${setting}`))) {
+      if (["memoryMiB", "maxModels", "idleMinutes", "serverPath", "gpuLayers", "cpuThreads", "pythonModelPath",
+        "pythonAutocompleteModelPath", "parsingAutocompleteModelPath",
+        "documentationAutocompleteModelPath", "typescriptModelPath"].some(setting => event.affectsConfiguration(`tinycoders.${setting}`))) {
         refresh();
+        prewarm();
       }
       if (event.affectsConfiguration("tinycoders")) updateStatus();
+    }),
+    vscode.commands.registerCommand("tinycoders.resourceLimits", async () => {
+      const settings = config();
+      const memory = settings.get("memoryMiB", 0);
+      const threads = settings.get("cpuThreads", 0);
+      const layers = settings.get("gpuLayers", 0);
+      const selection = await vscode.window.showQuickPick([
+        { label: "Model RAM budget", description: memory ? `${memory} MiB` : "Automatic",
+          detail: "Estimated memory for resident models", setting: "memoryMiB" },
+        { label: "CPU threads", description: threads ? String(threads) : "Automatic",
+          detail: "Inference threads per model server", setting: "cpuThreads" },
+        { label: "GPU layers", description: layers ? String(layers) : "CPU only",
+          detail: "Layers to offload per model server", setting: "gpuLayers" },
+        { label: "Resident models", description: String(settings.get("maxModels", 2)),
+          detail: "Maximum number of loaded models", setting: "maxModels" },
+      ], { placeHolder: "Choose a TinyCoders resource limit to edit" });
+      if (selection) {
+        await vscode.commands.executeCommand("workbench.action.openSettings", `@id:tinycoders.${selection.setting}`);
+      }
     }),
     vscode.commands.registerCommand("tinycoders.acceptCompletion", (id: string) => metrics.accept(id)),
     vscode.commands.registerCommand("tinycoders.exportMetrics", async () => {

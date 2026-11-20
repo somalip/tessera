@@ -4,7 +4,7 @@ export interface Message {
 }
 
 export interface InferenceHost {
-  complete(prompt: string, stop: string[], signal: AbortSignal, onFirstToken?: () => void): Promise<string>;
+  complete(prompt: string, stop: string[], signal: AbortSignal, onFirstToken?: () => void, maxTokens?: number): Promise<string>;
   chat(messages: Message[], signal: AbortSignal): AsyncIterable<string>;
 }
 
@@ -54,9 +54,9 @@ export class LlamaClient implements InferenceHost {
     return response;
   }
 
-  async complete(prompt: string, stop: string[], signal: AbortSignal, onFirstToken?: () => void): Promise<string> {
+  async complete(prompt: string, stop: string[], signal: AbortSignal, onFirstToken?: () => void, maxTokens = 96): Promise<string> {
     const response = await this.post("/v1/completions", {
-      prompt, stop, max_tokens: 96, temperature: 0, stream: true,
+      prompt, stop, max_tokens: maxTokens, temperature: 0, stream: true,
     }, signal);
     if (response.headers.get("Content-Type")?.includes("application/json")) {
       const text = ((await response.json()) as ResponseChunk).choices[0]?.text ?? "";

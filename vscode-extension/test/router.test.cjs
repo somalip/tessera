@@ -143,6 +143,16 @@ test("Python syntax trees distinguish SQL strings from comments and ordinary str
     assert.equal(regions.at("test", 1, source, source.indexOf("SELECT")), undefined);
     assert.equal(regions.at("test", 1, source, source.lastIndexOf("SELECT")), "sql");
     assert.equal(regions.at("test", 1, source, source.length), undefined);
+    for (const [source, needle, expected] of [
+      ['def f():\n    # comment\n    """Add details."""\n    pass', "details", "python-docstring"],
+      [`x = json.loads('{"ok":true}')`, "true", "json"],
+      ['x = re.compile(r"[a-z]+")', "a-z", "regex"],
+      ['x = """Regular string"""', "Regular", undefined],
+      ['def g():\n    """Describe', "Describe", "python-docstring"],
+      ['def g():\n    x = 2\n    """Temporary text', "Temporary", undefined],
+    ]) {
+      assert.equal(regions.at(source, 1, source, source.indexOf(needle)), expected);
+    }
     const editing = 'query = """SELECT * FROM a';
     assert.equal(regions.at("test", 2, editing, editing.length), "sql");
   } finally {
