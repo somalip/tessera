@@ -4,14 +4,28 @@ const http = require("node:http");
 const flag = name => process.argv[process.argv.indexOf(name) + 1];
 const server = http.createServer(async (request, response) => {
   if (request.url === "/health") return response.end("{}");
-  if (request.url !== "/v1/completions" ||
+  if (!["/v1/completions", "/v1/chat/completions"].includes(request.url) ||
       request.headers.authorization !== `Bearer ${flag("--api-key")}`) {
     response.writeHead(404).end();
     return;
   }
   let body = "";
   for await (const chunk of request) body += chunk;
-  const { prompt, stop, max_tokens } = JSON.parse(body);
+  const { prompt, stop, max_tokens, messages } = JSON.parse(body);
+  if (request.url === "/v1/chat/completions") {
+    if (messages?.[1]?.content.includes("Request: make a tui snake game") &&
+        messages[0].content.includes("complete, runnable code") &&
+        max_tokens >= 1024 && flag("--model").endsWith("/mock.gguf")) {
+      response.setHeader("Content-Type", "text/event-stream");
+      const content = "\x60\x60\x60python\nimport curses\n\ndef main(screen):\n    pass\n\ncurses.wrapper(main)\n\x60\x60\x60";
+      response.write("data: " + JSON.stringify({ choices: [{ delta: { content } }] }) + "\n\n");
+      response.write('data: {"choices":[{"finish_reason":"stop"}]}\n\n');
+      response.end("data: [DONE]\n\n");
+    } else {
+      response.writeHead(400).end();
+    }
+    return;
+  }
   if (prompt.includes("def slow()")) {
     response.writeHead(200, { "Content-Type": "text/event-stream" });
     response.write('data: {"choices":[{"text":"return"}]}\n\n');

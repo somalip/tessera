@@ -39,6 +39,12 @@ Set `tinycoders.commentCompletions` to `false` to disable this comment trigger
 while automatic suggestions are off. Keep VS Code inline suggestions enabled.
 Use **Choose Routing Model** to pin a model for the file or workspace.
 
+To generate a larger block, write a creation request such as
+`#make a tui snake game` in a Python file and press Enter. Keep the cursor on
+the next line while TinyCoders generates the suggestion. This uses a
+chat-capable model. In **Add Local GGUF**, choose **Python** to configure one.
+You can keep a separate **Python (fast autocomplete)** model for short suggestions.
+
 Run **TinyCoders: Ask** to enter a prompt and open the response beside your editor.
 For a conversation, open TinyCoders Chat from the dashboard or use
 `@tinycoders` in VS Code Chat.

@@ -136,7 +136,10 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
     const model = candidate(document, position);
     return model && endpoint(model);
   }, log, metrics, completionSettings, (document, position) => config().get("repositoryContext", true)
-    ? repository.retrieve(document, position) : Promise.resolve([]));
+    ? repository.retrieve(document, position) : Promise.resolve([]), (document, position) => {
+    const model = candidate(document, position, "chat");
+    return model && endpoint(model);
+  });
 
   const chatModel = (editor: vscode.TextEditor, capability: "chat" | "edit") => {
     const model = candidate(editor.document, editor.selection.active, capability);

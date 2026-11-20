@@ -96,8 +96,10 @@ export function registerChat(select: () => ChatModel | undefined, log: vscode.Ou
   });
 }
 
-export function fitMessages(messages: Message[], contextLength: number): Message[] {
-  let bytes = Math.max(0, contextLength - Math.min(512, Math.floor(contextLength / 4)));
+export function fitMessages(
+  messages: Message[], contextLength: number, outputTokens = Math.min(512, Math.floor(contextLength / 4)),
+): Message[] {
+  let bytes = Math.max(0, contextLength - outputTokens);
   const retained: Message[] = [];
   for (const message of [...messages].reverse()) {
     if (bytes <= 24) break;

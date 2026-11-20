@@ -25,3 +25,20 @@ test("chat decodes split UTF-8 SSE chunks and respects the output token budget",
   }
   assert.deepEqual(parts, ["café"]);
 });
+
+test("inline code generation rejects streams that hit the token limit", async t => {
+  t.mock.method(globalThis, "fetch", async (_url, options) => {
+    const body = JSON.parse(options.body);
+    assert.equal(body.max_tokens, 1536);
+    assert.equal(body.chat_template_kwargs.enable_thinking, false);
+    return new Response('data: {"choices":[{"delta":{"content":"partial code"}}]}\n\n' +
+      'data: {"choices":[{"finish_reason":"length"}]}\n\ndata: [DONE]\n\n');
+  });
+  const client = new LlamaClient("http://127.0.0.1:1234", "key", 2048);
+  await assert.rejects(async () => {
+    for await (const part of client.chat([{ role: "user", content: "Build a game" }],
+      new AbortController().signal, 1536)) {
+      assert.equal(part, "partial code");
+    }
+  }, /did not finish/);
+});

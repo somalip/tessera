@@ -5,10 +5,10 @@ export interface Message {
 
 export interface InferenceHost {
   complete(prompt: string, stop: string[], signal: AbortSignal, onFirstToken?: () => void, maxTokens?: number): Promise<string>;
-  chat(messages: Message[], signal: AbortSignal): AsyncIterable<string>;
+  chat(messages: Message[], signal: AbortSignal, codeTokens?: number): AsyncIterable<string>;
 }
 
-type ResponseChunk = { choices: Array<{ text?: string; delta?: { content?: string } }> };
+type ResponseChunk = { choices: Array<{ text?: string; delta?: { content?: string }; finish_reason?: string }> };
 
 async function* events(response: Response): AsyncIterable<ResponseChunk> {
   if (!response.body) throw new Error("llama-server returned an empty response");
@@ -72,13 +72,20 @@ export class LlamaClient implements InferenceHost {
     return text;
   }
 
-  async *chat(messages: Message[], signal: AbortSignal): AsyncIterable<string> {
+  async *chat(messages: Message[], signal: AbortSignal, codeTokens?: number): AsyncIterable<string> {
     const response = await this.post("/v1/chat/completions", {
-      messages, max_tokens: Math.min(512, Math.floor(this.contextLength / 4)), stream: true,
+      messages, max_tokens: codeTokens ?? Math.min(512, Math.floor(this.contextLength / 4)), stream: true,
+      ...(codeTokens === undefined ? {} : { temperature: 0, chat_template_kwargs: { enable_thinking: false } }),
     }, signal);
+    let finished = false;
     for await (const event of events(response)) {
-      const content = event.choices[0]?.delta?.content;
+      const choice = event.choices[0];
+      const content = choice?.delta?.content;
       if (content) yield content;
+      if (choice?.finish_reason === "stop") finished = true;
+    }
+    if (codeTokens !== undefined && !finished) {
+      throw new Error("The local model did not finish generating the inline code.");
     }
   }
 }

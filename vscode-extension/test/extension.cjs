@@ -168,9 +168,16 @@ exports.run = async function () {
         const plain = await vscode.workspace.openTextDocument({
           language: "python", content: "def answer():\n    # Return the answer\n    ",
         });
-        await config.update("pythonAutocompleteModelPath", model, global);
+        const fastModel = path.join(process.env.TINYCODERS_TEST_HOME, "fast.gguf");
+        await writeFile(fastModel, "stub");
+        await config.update("pythonAutocompleteModelPath", fastModel, global);
         try {
           assert.equal((await complete(plain, markedCursor, automatic))[0]?.insertText, "return 42");
+          const snake = await vscode.workspace.openTextDocument({
+            language: "python", content: "#make a tui snake game\n",
+          });
+          const game = await complete(snake, new vscode.Position(1, 0), automatic);
+          assert.equal(game[0]?.insertText, "import curses\n\ndef main(screen):\n    pass\n\ncurses.wrapper(main)");
           await config.update("commentCompletions", false, global);
           assert.deepEqual(await complete(plain, markedCursor, automatic), []);
         } finally {
