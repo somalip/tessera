@@ -27,6 +27,14 @@
     .sub { margin: 1.5rem 0 0; font-size: 1.25rem; color: var(--muted); max-width: 30rem; }
     .cta { display: inline-block; margin-top: 2.25rem; padding: .7rem 1.35rem; border-radius: 999px; background: var(--ink); color: #fff; font-size: .9375rem; font-weight: 500; }
     .cta:hover { opacity: .85; }
+    .hero-actions, .download-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+    .hero-actions { margin-top: 2.25rem; }
+    .hero-actions .cta { margin-top: 0; }
+    .download-button { display: inline-block; padding: .45rem .85rem; border: 1px solid var(--muted); border-radius: 999px; font-size: .875rem; font-weight: 500; }
+    .download-button:hover { background: #f4f4f4; }
+    .download-list { margin: 1rem 0; padding: 0; list-style: none; }
+    .download-list li { padding: .85rem 0; border-bottom: 1px solid var(--line); }
+    .download-list h3 { margin: 0 0 .4rem; font-size: 1rem; font-weight: 500; }
     .rows { border-top: 1px solid var(--line); }
     .row { display: grid; grid-template-columns: 10rem 1fr; gap: 1rem; padding: 1.75rem 0; border-bottom: 1px solid var(--line); }
     .row h2 { margin: 0; font-size: 1rem; font-weight: 500; }
@@ -52,7 +60,10 @@
       <div class="hero">
         <h1>Offline agentic coding, made efficient.</h1>
         <p class="sub">Small, language-specific models for VS Code. Local inference with llama.cpp.</p>
-        <a class="cta" href="#start">Get started</a>
+        <div class="hero-actions">
+          <a class="cta" href="#downloads">Downloads</a>
+          <a class="cta" href="#start">Get started</a>
+        </div>
       </div>
 
       <div class="rows">
@@ -76,11 +87,57 @@
             <p>llama.cpp renders the template before tokenization, so the specialty instructions become part of the model input. Raw completion calls that bypass the chat template skip those instructions.</p>
           </div>
         </section>
+        <section class="row" id="downloads" aria-labelledby="downloads-heading">
+          <h2 id="downloads-heading">Downloads</h2>
+          <div>
+            <p>Use GGUF weights with llama.cpp or TinyCoders. The experimental TCM packages also include the model manifest, license, and evaluation report.</p>
+            <ul class="download-list">
+              <li>
+                <h3>TinyCoders for VS Code</h3>
+                <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/tinycoders.vsix">Download VSIX</a>
+              </li>
+              <li>
+                <h3>Qwen2.5-Coder 0.5B Instruct · Q4_K_M</h3>
+                <a class="download-button" href="https://huggingface.co/Qwen/Qwen2.5-Coder-0.5B-Instruct-GGUF/resolve/main/qwen2.5-coder-0.5b-instruct-q4_k_m.gguf?download=true" aria-label="Download Qwen2.5-Coder GGUF weights">Download GGUF</a>
+              </li>
+              <li>
+                <h3>Documentation · Q8_0</h3>
+                <div class="download-actions">
+                  <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/documentation-tiny.Q8_0.gguf" aria-label="Download Documentation GGUF weights">Download GGUF</a>
+                  <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/documentation-tiny.tcm" aria-label="Download Documentation TCM package">Download TCM</a>
+                </div>
+              </li>
+              <li>
+                <h3>English editing · Q8_0</h3>
+                <div class="download-actions">
+                  <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/english-tiny.Q8_0.gguf" aria-label="Download English editing GGUF weights">Download GGUF</a>
+                  <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/english-tiny.tcm" aria-label="Download English editing TCM package">Download TCM</a>
+                </div>
+              </li>
+              <li>
+                <h3>Mermaid diagrams · Q8_0</h3>
+                <div class="download-actions">
+                  <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/diagrams-tiny.Q8_0.gguf" aria-label="Download Mermaid diagrams GGUF weights">Download GGUF</a>
+                  <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/diagrams-tiny.tcm" aria-label="Download Mermaid diagrams TCM package">Download TCM</a>
+                </div>
+              </li>
+              <li>
+                <h3>Summaries · Q8_0</h3>
+                <div class="download-actions">
+                  <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/summaries-tiny.Q8_0.gguf" aria-label="Download Summaries GGUF weights">Download GGUF</a>
+                  <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/summaries-tiny.tcm" aria-label="Download Summaries TCM package">Download TCM</a>
+                </div>
+              </li>
+            </ul>
+            <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/LICENSE">Download model license</a>
+          </div>
+        </section>
         <div class="row" id="start">
           <h2>Install</h2>
           <ol>
-            <li>Run <code>make vsix</code> and install <code>artifacts/tinycoders.vsix</code> in VS Code.</li>
-            <li>Open the TinyCoders dashboard and add a local Qwen2.5-Coder GGUF.</li>
+            <li>Download the VSIX and a GGUF from <a href="#downloads"><u>Downloads</u></a>.</li>
+            <li>In VS Code, run <strong>Extensions: Install from VSIX…</strong> and select the VSIX.</li>
+            <li>Open the TinyCoders dashboard, choose <strong>Add Local GGUF…</strong>, and select the downloaded model.</li>
           </ol>
         </div>
       </div>
