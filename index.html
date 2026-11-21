@@ -14,7 +14,7 @@
       --ink: #0d0d0d;
       --muted: #6e6e6e;
       --line: #e5e5e5;
-      --split: 3px;
+      --split: 1px;
       --mx: 0;
       --my: 0;
     }
@@ -50,34 +50,16 @@
       z-index: -1;
       pointer-events: none;
       mix-blend-mode: multiply;
+      opacity: .5;
       transition: transform .12s ease-out;
     }
     h1::before {
       color: #ff1f6b;
-      transform: translate(calc(var(--split) * -1 + var(--mx) * -4px), calc(var(--my) * -2px));
-      animation: slice-a 3.4s infinite steps(1);
+      transform: translate(calc(var(--split) * -1 + var(--mx) * -1px), calc(var(--my) * -.5px));
     }
     h1::after {
       color: #00d5ff;
-      transform: translate(calc(var(--split) * 1 + var(--mx) * 4px), calc(var(--my) * 2px));
-      animation: slice-b 2.9s infinite steps(1);
-    }
-    @keyframes slice-a {
-      0%, 88%, 100% { clip-path: inset(0 0 0 0); }
-      89% { clip-path: inset(12% 0 62% 0); translate: -14px 0; }
-      91% { clip-path: inset(58% 0 14% 0); translate: 10px 0; }
-      93% { clip-path: inset(30% 0 40% 0); translate: -8px 0; }
-      95% { clip-path: inset(0 0 0 0); translate: 0 0; }
-    }
-    @keyframes slice-b {
-      0%, 84%, 100% { clip-path: inset(0 0 0 0); }
-      85% { clip-path: inset(66% 0 8% 0); translate: 12px 0; }
-      87% { clip-path: inset(6% 0 70% 0); translate: -10px 0; }
-      90% { clip-path: inset(40% 0 30% 0); translate: 9px 0; }
-      92% { clip-path: inset(0 0 0 0); translate: 0 0; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      h1::before, h1::after { animation: none; }
+      transform: translate(calc(var(--split) + var(--mx) * 1px), calc(var(--my) * .5px));
     }
 
     .sub { margin: 1.5rem 0 0; font-size: 1.25rem; color: var(--muted); max-width: 30rem; }
@@ -251,17 +233,16 @@
       }, { passive: true });
       window.addEventListener("scroll", function () {
         var y = window.scrollY;
-        boost = Math.min(Math.abs(y - lastY) * 0.35, 14);
+        boost = Math.min(Math.abs(y - lastY) * 0.08, 2);
         lastY = y;
       }, { passive: true });
       function tick() {
         mx += (tx - mx) * 0.08;
         my += (ty - my) * 0.08;
         boost *= 0.9;
-        var base = 3 + Math.sin(performance.now() / 900) * 1.2;
         root.style.setProperty("--mx", mx.toFixed(3));
         root.style.setProperty("--my", my.toFixed(3));
-        root.style.setProperty("--split", (base + boost).toFixed(2) + "px");
+        root.style.setProperty("--split", (1 + boost).toFixed(2) + "px");
         requestAnimationFrame(tick);
       }
       requestAnimationFrame(tick);

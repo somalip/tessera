@@ -102,6 +102,19 @@ exports.run = async function () {
     dashboard.refresh();
     assert.equal(messages.length, 2);
 
+    state = { ...state, sections: ["resources"] };
+    dashboard.refresh();
+    const resourcesOnly = messages.pop();
+    assert.match(resourcesOnly, /data-resources="true"/);
+    assert.match(resourcesOnly, /data-action="customize-sidebar"/);
+    assert.doesNotMatch(resourcesOnly, /Current editor|Code actions|Installed models|Session usage|Tools/);
+    state = { ...state, advanced: true, sections: [] };
+    dashboard.refresh();
+    const emptySidebar = messages.pop();
+    assert.match(emptySidebar, /data-resources="false"/);
+    assert.match(emptySidebar, /data-action="customize-sidebar"/);
+    assert.doesNotMatch(emptySidebar, /<section/);
+
     state = { trusted: false, models: [] };
     received.fire("ready");
     assert.match(messages.at(-1), /Workspace trust required/);

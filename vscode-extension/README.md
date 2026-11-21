@@ -7,7 +7,9 @@ the model in a CPU-first llama.cpp server on loopback.
 Open **Tessera** from the Activity Bar, click its status bar item, or run
 **Tessera: Open Dashboard**. **Simple** mode shows the current model route,
 chat, and model management. **Advanced** mode adds code actions, route details,
-system resources, and diagnostics. Tessera remembers your mode selection.
+system resources, and diagnostics. Use **Customize…** in the sidebar or
+**Tessera: Customize Sidebar** from the Command Palette to choose its visible
+sections. Tessera remembers your selected mode and each mode's section choices.
 
 - **Download Models** opens the built-in Tessera catalog or a signed registry.
   The built-in catalog includes Qwen coding models for autocomplete, chat,

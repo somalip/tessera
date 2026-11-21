@@ -84,6 +84,14 @@ export class WorkflowPanel implements vscode.Disposable {
   }
 
   private async receive(action: unknown, language: unknown, value: unknown): Promise<void> {
+    if (action === "settings") {
+      await vscode.commands.executeCommand("workbench.action.openSettings", "@ext:tessera.tessera");
+      return;
+    }
+    if (action === "output") {
+      await vscode.commands.executeCommand("tessera.showOutput");
+      return;
+    }
     if (!vscode.workspace.isTrusted) throw new Error("Trust this workspace to manage models and workflows.");
     if (action === "save" || action === "reset") {
       const route = workflowLanguage(language);
@@ -171,54 +179,66 @@ function html(nonce: string): string {
   [hidden] { display: none !important; }
   body { margin: 0; padding: 0; color: var(--vscode-editor-foreground); background: var(--vscode-editor-background);
     font: var(--vscode-font-size, 13px)/1.45 var(--vscode-font-family, sans-serif); }
-  main { max-width: 1120px; padding: 0 clamp(12px, 3vw, 32px) 24px; margin: auto; }
-  header { position: sticky; top: 0; z-index: 2; padding-top: 8px; background: var(--vscode-editor-background); }
-  nav, .actions, .controls { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-  nav { gap: 14px; border-bottom: 1px solid var(--vscode-panel-border); }
-  nav button { border: 0; border-radius: 0; border-bottom: 1px solid transparent; margin-bottom: -1px;
-    padding: 6px 4px; color: var(--vscode-descriptionForeground); }
-  nav button[aria-selected="true"] { color: var(--vscode-editor-foreground);
-    border-bottom-color: var(--vscode-panelTitle-activeBorder, var(--vscode-focusBorder)); }
+  body { --divider: var(--vscode-panel-border, var(--vscode-widget-border, #80808044));
+    --surface: var(--vscode-editorWidget-background, var(--vscode-editor-background));
+    --muted: var(--vscode-descriptionForeground, var(--vscode-editor-foreground)); }
+  main { min-height: 100vh; display: grid; grid-template-columns: clamp(150px, 19vw, 208px) minmax(0, 1fr); }
+  .rail { align-self: start; position: sticky; inset-block-start: 0; padding: 21px 12px 14px;
+    min-height: 100vh; background: var(--vscode-sideBar-background, var(--surface));
+    color: var(--vscode-sideBar-foreground, inherit); border-inline-end: 1px solid var(--divider); }
+  .product { font-size: 16px; font-weight: 650; letter-spacing: -.02em; padding-inline: 9px; margin-bottom: 20px; }
+  nav, .rail-tools { display: grid; gap: 3px; }
+  .rail-tools { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--divider); }
+  .rail button { text-align: start; min-height: 32px; padding-inline: 9px; }
+  .rail button[aria-selected="true"] { font-weight: 600; background: var(--vscode-list-inactiveSelectionBackground, var(--surface));
+    color: var(--vscode-list-inactiveSelectionForeground, inherit); border-inline-start-color: var(--vscode-focusBorder); }
+  .editor { min-width: 0; width: 100%; max-width: 1200px; padding: 0 clamp(16px, 4vw, 42px) 32px; }
+  header { position: sticky; top: 0; z-index: 2; padding-top: 20px; background: var(--vscode-editor-background); }
+  h1 { font-size: 22px; letter-spacing: -.025em; line-height: 1.25; margin: 0 0 5px; font-weight: 650; }
+  .page-heading { padding: 20px 0 12px; border-bottom: 1px solid var(--divider); }
+  .actions, .controls { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
   .toolbar { min-height: 43px; display: flex; justify-content: space-between; align-items: center;
-    flex-wrap: wrap; gap: 6px 14px; padding: 6px 0; border-bottom: 1px solid var(--vscode-panel-border); }
+    flex-wrap: wrap; gap: 6px 14px; padding: 11px 0; border-bottom: 1px solid var(--vscode-panel-border); }
   .toolbar input { width: 104px; }
   .status, p { color: var(--vscode-descriptionForeground); margin: 0; }
   .error { color: var(--vscode-errorForeground); margin: 6px 0; }
   .error:empty { display: none; }
-  input, button { font: inherit; min-height: 24px; border-radius: 2px; }
+  input, button { font: inherit; min-height: 28px; border-radius: 4px; }
   input { color: var(--vscode-input-foreground); background: var(--vscode-input-background);
     border: 1px solid var(--vscode-input-border, var(--vscode-panel-border)); padding: 2px 6px; }
   button { border: 1px solid transparent; padding: 2px 7px; cursor: pointer; color: inherit; background: transparent; }
   button:hover { background: var(--vscode-toolbar-hoverBackground, var(--vscode-list-hoverBackground)); }
   button.primary { color: var(--vscode-button-foreground); background: var(--vscode-button-background);
     border-color: var(--vscode-button-border, transparent); }
+  button.secondary { border-color: var(--divider); background: var(--surface); }
   button.primary:hover { background: var(--vscode-button-hoverBackground); }
   button:disabled { opacity: .55; cursor: default; }
   :focus-visible { outline: 1px solid var(--vscode-focusBorder); outline-offset: 1px; }
   h2 { font-size: 1em; font-weight: 600; margin: 0; }
-  .browse, .section-heading { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 12px 0 6px; }
+  .browse, .section-heading { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 18px 0 8px; }
   .section-heading { justify-content: space-between; }
   .browse input { flex: 1; min-width: min(220px, 100%); }
   .rows { border-block-start: 1px solid var(--vscode-panel-border); }
   .row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(135px, .7fr) auto; align-items: center;
-    padding: 4px 6px; min-height: 31px; gap: 8px; border-bottom: 1px solid var(--vscode-panel-border); }
+    padding: 8px 10px; min-height: 44px; gap: 12px; border-bottom: 1px solid var(--vscode-panel-border); }
   .row:hover { background: var(--vscode-list-hoverBackground); }
   .row strong { font-weight: 500; overflow-wrap: anywhere; }
   .row p { font-size: .92em; }
   .row button { justify-self: end; white-space: nowrap; }
-  .graph { display: grid; grid-template-columns: minmax(115px, .85fr) 32px minmax(125px, 1fr) 26px minmax(125px, 1fr);
-    grid-template-rows: repeat(2, minmax(62px, auto)); align-items: stretch; row-gap: 12px;
-    margin: 12px 0; padding: 12px; border: 1px solid var(--vscode-panel-border);
-    background: var(--vscode-editor-background); }
+  .graph { display: grid; grid-template-columns: minmax(0, .85fr) 30px minmax(0, 1fr) 26px minmax(0, 1fr);
+    grid-template-rows: repeat(2, minmax(92px, auto)); align-items: stretch; row-gap: 12px;
+    margin: 14px 0 20px; padding: clamp(10px, 2vw, 20px); border: 1px solid var(--divider);
+    border-radius: 8px; background: var(--surface); }
   .router { grid-column: 1; grid-row: 1 / 3; align-self: center; }
   .auto { grid-column: 3 / 6; grid-row: 1; }
   .parser { grid-column: 3; grid-row: 2; }
   .generator { grid-column: 5; grid-row: 2; }
-  .node { min-width: 0; padding: 6px; border-radius: 3px;
-    border: 1px solid var(--vscode-panel-border); background: var(--vscode-editorWidget-background, var(--vscode-editor-background)); }
-  .node h2 { padding: 0 4px 4px; }
+  .node { min-width: 0; padding: 10px; border-radius: 6px;
+    border: 1px solid var(--divider); background: var(--vscode-editor-background); }
+  .node h2 { padding: 0 0 2px; }
+  .node p { font-size: .9em; margin-bottom: 7px; }
   .node button { display: flex; align-items: start; justify-content: space-between; gap: 4px;
-    text-align: start; width: 100%; overflow-wrap: anywhere; padding: 3px 4px;
+    text-align: start; width: 100%; overflow-wrap: anywhere; padding: 4px 6px; border-color: var(--divider);
     color: var(--vscode-descriptionForeground); }
   .node button::after { content: "›"; font-weight: 600; }
   .node[data-connected="true"] button { color: var(--vscode-editor-foreground); }
@@ -243,7 +263,15 @@ function html(nonce: string): string {
   details { margin: 10px 0; }
   summary { cursor: pointer; color: var(--vscode-descriptionForeground); }
   details p { margin: 5px 0; }
-  @media (max-width: 530px) {
+  @media (max-width: 690px) {
+    main { display: block; }
+    .rail { z-index: 3; min-height: auto; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px;
+      padding: 6px 12px; border-inline-end: 0; border-bottom: 1px solid var(--divider); position: static; }
+    .product { padding: 0; margin: 0; }
+    nav, .rail-tools { display: flex; flex-wrap: wrap; }
+    .rail-tools { border: 0; padding: 0; margin: 0; }
+  }
+  @media (max-width: 480px) {
     .graph { grid-template-columns: minmax(0, .85fr) 16px minmax(0, 1fr) 16px minmax(0, 1fr);
       padding: 6px; row-gap: 8px; }
     .node { padding: 3px; overflow-wrap: anywhere; }
@@ -255,11 +283,21 @@ function html(nonce: string): string {
 </head>
 <body>
 <main>
-  <header>
+  <aside class="rail" aria-label="Tessera navigation">
+    <div class="product">Tessera</div>
     <nav role="tablist" aria-label="Tessera editors">
       <button id="workflow-tab" role="tab" aria-selected="true" aria-controls="workflow">Workflow</button>
       <button id="library-tab" role="tab" aria-selected="false" aria-controls="library" tabindex="-1">Models</button>
     </nav>
+    <div class="rail-tools">
+      <button type="button" data-tool="settings">Extension settings</button>
+      <button type="button" data-tool="output">Output log</button>
+    </div>
+  </aside>
+  <div class="editor">
+  <header id="workflow-header">
+    <h1>Workflow</h1>
+    <p>Assign local models to each stage for the selected language.</p>
     <div id="workflow-toolbar" class="toolbar">
       <div class="controls">
         <label for="language">Language</label>
@@ -268,7 +306,7 @@ function html(nonce: string): string {
         <span id="status" class="status" role="status"></span>
       </div>
       <div class="actions">
-        <button id="preset" disabled>Presets…</button>
+        <button class="secondary" id="preset" disabled>Presets…</button>
         <button id="reset" disabled title="Restore automatic routing for this language">Reset</button>
         <button class="primary" id="save" disabled>Save workflow</button>
       </div>
@@ -277,14 +315,14 @@ function html(nonce: string): string {
   </header>
   <section id="workflow" role="tabpanel" aria-labelledby="workflow-tab">
     <div class="graph" aria-label="Routing graph">
-      <div class="node router"><h2>Router</h2><button id="router" disabled aria-label="Choose router model"></button></div>
+      <div class="node router"><h2>Router</h2><p>Choose the path for comments</p><button id="router" disabled aria-label="Choose router model"></button></div>
       <span id="branch" aria-hidden="true"></span>
       <span class="wire" id="to-auto" aria-hidden="true"></span>
-      <div class="node auto"><h2>Autocomplete</h2><button id="autocomplete" disabled aria-label="Choose autocomplete model"></button></div>
+      <div class="node auto"><h2>Autocomplete</h2><p>Suggest code as you type</p><button id="autocomplete" disabled aria-label="Choose autocomplete model"></button></div>
       <span class="wire" id="to-parser" aria-hidden="true"></span>
-      <div class="node parser"><h2>Comment parser</h2><button id="parser" disabled aria-label="Choose comment parser model"></button></div>
+      <div class="node parser"><h2>Comment parser</h2><p>Condense comment requests</p><button id="parser" disabled aria-label="Choose comment parser model"></button></div>
       <span class="wire" id="to-generator" aria-hidden="true"></span>
-      <div class="node generator"><h2>Generator</h2><button id="generator" disabled aria-label="Choose generator model"></button></div>
+      <div class="node generator"><h2>Generator</h2><p>Generate code, chat, and edits</p><button id="generator" disabled aria-label="Choose generator model"></button></div>
     </div>
     <details><summary>Drag installed models to nodes</summary>
       <div class="palette" id="palette" aria-label="Draggable models"></div>
@@ -295,6 +333,7 @@ function html(nonce: string): string {
     </details>
   </section>
   <section id="library" role="tabpanel" aria-labelledby="library-tab" hidden>
+    <div class="page-heading"><h1>Model library</h1><p>Find, install, and test local models.</p></div>
     <p id="library-error" class="error" role="alert"></p>
     <form id="browse" class="browse">
       <input id="model-query" aria-label="Search Hugging Face" maxlength="300"
@@ -313,6 +352,7 @@ function html(nonce: string): string {
     <div class="section-heading"><h2>Recommended downloads</h2><button id="download-all">Download all</button></div>
     <div class="rows" id="catalog"></div>
   </section>
+  </div>
 </main>
 <script nonce="${nonce}">
   const vscode = acquireVsCodeApi();
@@ -337,20 +377,22 @@ function html(nonce: string): string {
       get(id + '-tab').setAttribute('aria-selected', String(selected));
       get(id + '-tab').tabIndex = selected ? 0 : -1;
     }
-    get('workflow-toolbar').hidden = tab !== 'workflow';
-    get('workflow-error').hidden = tab !== 'workflow';
+    get('workflow-header').hidden = tab !== 'workflow';
   }
   for (const tab of tabs) {
     const button = get(tab + '-tab');
     button.addEventListener('click', () => selectTab(tab));
     button.addEventListener('keydown', event => {
-      if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+      if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(event.key)) return;
       event.preventDefault();
       const next = event.key === 'Home' ? tabs[0] : event.key === 'End' ? tabs.at(-1) : tabs.find(id => id !== tab);
       selectTab(next);
       get(next + '-tab').focus();
     });
   }
+  document.querySelectorAll('[data-tool]').forEach(button => button.addEventListener('click', () => {
+    vscode.postMessage({ action: button.dataset.tool });
+  }));
   function modelRow(model, button) {
     const div = document.createElement('div');
     div.className = 'row';

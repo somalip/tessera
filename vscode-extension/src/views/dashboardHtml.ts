@@ -3,6 +3,8 @@ import type { ResourceSample } from "../host/resources";
 import type { InlineRoute } from "../providers/inlineCompletion";
 import type { DashboardState } from "./dashboard";
 
+import { visibleSections } from "./sidebarSections";
+
 interface Action {
   id: string;
   label: string;
@@ -32,7 +34,8 @@ export function inlineRouteName(route: InlineRoute): string {
   return "No matching model";
 }
 
-export function renderDashboard({ trusted, advanced, language, active, lastInline, models, usage }: DashboardState, groups: Groups): string {
+export function renderDashboard({ trusted, advanced, language, active, lastInline, models, usage, sections }: DashboardState, groups: Groups): string {
+  const visible = visibleSections(advanced, sections);
   const routed = lastInline?.model ?? active;
   const routing = !trusted ? "Workspace trust required" : (advanced && lastInline ? inlineRouteName(lastInline) : routed?.manifest.id) ??
     (language ? "No matching model" : "Open a source file");
@@ -55,11 +58,12 @@ export function renderDashboard({ trusted, advanced, language, active, lastInlin
     </li>`;
   }).join("");
 
-  return `<div class="mode-picker" role="group" aria-label="Dashboard mode">
+  return `<div class="mode-picker" role="group" aria-label="Sidebar controls" data-resources="${visible.includes("resources")}">
     <button type="button" data-action="simple" aria-pressed="${!advanced}">Simple</button>
     <button type="button" data-action="advanced" aria-pressed="${advanced}">Advanced</button>
+    <button type="button" data-action="customize-sidebar" title="Choose visible sidebar sections">Customize…</button>
   </div>
-  <section aria-labelledby="routing-heading">
+  ${visible.includes("routing") ? `<section aria-labelledby="routing-heading">
     <h2 id="routing-heading">Current editor</h2>
     <div class="section-content">
       <div class="routing-heading">
@@ -71,19 +75,19 @@ export function renderDashboard({ trusted, advanced, language, active, lastInlin
       ${trusted && advanced && lastInline?.parser ? `<p class="muted" title="${escapeHtml(lastInline.parser.path)}">Parsed by ${escapeHtml(basename(lastInline.parser.path))}</p>` : ""}
       ${buttons(groups.routing)}
     </div>
-  </section>
+  </section>` : ""}
   ${groups.editor.length ? `<section aria-labelledby="editor-heading">
     <h2 id="editor-heading">Code actions</h2>
     <div class="section-content">${buttons(groups.editor, "ask")}</div>
   </section>` : ""}
-  ${models.length || groups.models.length ? `<section aria-labelledby="models-heading">
+  ${visible.includes("models") && (models.length || groups.models.length) ? `<section aria-labelledby="models-heading">
     <h2 id="models-heading">Installed models</h2>
     <div class="section-content">
       ${modelRows ? `<ul aria-labelledby="models-heading">${modelRows}</ul>` : '<p class="muted">No models installed.</p>'}
       ${groups.models.length ? `<div class="model-actions">${buttons(groups.models, "workflow")}</div>` : ""}
     </div>
   </section>` : ""}
-  ${renderUsage(usage, advanced)}
+  ${visible.includes("usage") ? renderUsage(usage, advanced) : ""}
   ${groups.tools.length ? `<section aria-labelledby="tools-heading">
     <h2 id="tools-heading">Tools</h2>
     <div class="section-content">${buttons(groups.tools)}</div>
@@ -153,7 +157,7 @@ export function dashboardHtml(markup: string, nonce: string): string {
     }
     .mode-picker {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
       margin: 6px 12px 12px;
       gap: 2px;
       background: var(--vscode-editorWidget-background);
@@ -166,7 +170,7 @@ export function dashboardHtml(markup: string, nonce: string): string {
       background: var(--vscode-button-secondaryBackground);
       color: var(--vscode-button-secondaryForeground);
     }
-    main:not(:has([data-action="advanced"][aria-pressed="true"])) #resources { display: none; }
+    main:not(:has([data-resources="true"])) #resources { display: none; }
     h2 {
       margin: 0;
       padding: 5px 16px;

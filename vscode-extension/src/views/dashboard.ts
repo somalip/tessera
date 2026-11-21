@@ -6,11 +6,14 @@ import type { InlineRoute } from "../providers/inlineCompletion";
 import type { LocalMetrics } from "../telemetry";
 import { dashboardHtml, renderDashboard, renderResources } from "./dashboardHtml";
 
+import { visibleSections, type SidebarSection } from "./sidebarSections";
+
 export const dashboardId = "tessera.dashboard";
 
 export interface DashboardState {
   trusted: boolean;
   advanced: boolean;
+  sections?: readonly SidebarSection[];
   language?: string;
   active?: InstalledModel;
   lastInline?: InlineRoute;
@@ -27,19 +30,20 @@ const editorActions = [
   { id: "test", label: "Write Tests", command: "tessera.writeTests" },
 ];
 
-function actions({ trusted, language, advanced }: DashboardState) {
+function actions({ trusted, language, advanced, sections }: DashboardState) {
+  const visible = visibleSections(advanced, sections);
   return {
-    routing: !trusted
+    routing: !visible.includes("routing") ? [] : !trusted
       ? [{ id: "trust", label: "Manage Workspace Trust…", command: "workbench.trust.manage" }]
       : language ? [{ id: "route", label: "Choose Model…", command: "tessera.pickModel" }] : [],
-    editor: trusted ? (advanced && language ? editorActions : editorActions.slice(0, 2)) : [],
-    models: trusted ? [
+    editor: trusted && visible.includes("editor") ? (advanced && language ? editorActions : editorActions.slice(0, 2)) : [],
+    models: trusted && visible.includes("models") ? [
       { id: "workflow", label: "Models & Workflow", command: "tessera.openWorkflow" },
       { id: "install", label: "Download Models…", command: "tessera.installModel" },
       { id: "manage", label: "Manage Models…", command: "tessera.manageModels" },
       { id: "add", label: "Add Local GGUF…", command: "tessera.addLocalModel" },
     ] : [],
-    tools: advanced ? [
+    tools: visible.includes("tools") ? [
       { id: "settings", label: "Settings", command: "workbench.action.openSettings",
         args: ["@ext:tessera.tessera"] },
       { id: "output", label: "Show Output", command: "tessera.showOutput" },
@@ -84,11 +88,16 @@ export class Dashboard implements vscode.WebviewViewProvider, vscode.Disposable 
           void this.setAdvanced(message === "advanced").then(() => this.refresh(), this.reportError);
           return;
         }
-        if (message === "resource-limits" && this.state().advanced) {
+        if (message === "customize-sidebar") {
+          void vscode.commands.executeCommand("tessera.customizeSidebar").then(undefined, this.reportError);
+          return;
+        }
+        const state = this.state();
+        if (message === "resource-limits" && visibleSections(state.advanced, state.sections).includes("resources")) {
           void vscode.commands.executeCommand("tessera.resourceLimits").then(undefined, this.reportError);
           return;
         }
-        const action = Object.values(actions(this.state())).flat().find(item => item.id === message);
+        const action = Object.values(actions(state)).flat().find(item => item.id === message);
         if (action) {
           const args = "args" in action ? action.args : [];
           void vscode.commands.executeCommand(action.command, ...(args ?? [])).then(undefined, this.reportError);
@@ -104,7 +113,7 @@ export class Dashboard implements vscode.WebviewViewProvider, vscode.Disposable 
     if (!this.view) return;
     const state = this.state();
     const markup = renderDashboard(state, actions(state));
-    if (!state.advanced) this.stopMonitoring();
+    if (!visibleSections(state.advanced, state.sections).includes("resources")) this.stopMonitoring();
     else if (this.view.visible) this.monitor(this.view);
     if (markup === this.markup) return;
     this.markup = markup;
@@ -112,7 +121,8 @@ export class Dashboard implements vscode.WebviewViewProvider, vscode.Disposable 
   }
 
   private monitor(view: vscode.WebviewView): void {
-    if (this.polling || !this.state().advanced) return;
+    const state = this.state();
+    if (this.polling || !visibleSections(state.advanced, state.sections).includes("resources")) return;
     const controller = new AbortController();
     const { signal } = controller;
     this.polling = controller;

@@ -1,7 +1,7 @@
 {
   "name": "tessera",
   "displayName": "Tessera",
-  "version": "0.3.2",
+  "version": "0.3.4",
   "publisher": "tessera",
   "private": true,
   "engines": {
@@ -203,6 +203,10 @@
       {
         "command": "tessera.openWorkflow",
         "title": "Tessera: Models & Workflow"
+      },
+      {
+        "command": "tessera.customizeSidebar",
+        "title": "Tessera: Customize Sidebar"
       },
       {
         "command": "tessera.openDashboard",

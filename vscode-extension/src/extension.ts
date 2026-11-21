@@ -22,6 +22,7 @@ import { selectModel } from "./router/policy";
 import { PythonRegions } from "./router/pythonRegions";
 import { byCapability, validateWorkflow, workflowLanguage, workflowForLanguage, workflowKey, type Workflows } from "./router/workflow";
 import { LocalMetrics } from "./telemetry";
+import { sidebarSections, visibleSections, type SidebarSection } from "./views/sidebarSections";
 import { Dashboard, dashboardId } from "./views/dashboard";
 import { inlineRouteName } from "./views/dashboardHtml";
 import { cppFineTunedAutocomplete, WorkflowPanel } from "./views/workflow";
@@ -228,11 +229,14 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
     log.appendLine(String(error));
     void vscode.window.showErrorMessage(`Tessera: ${String(error)}`);
   };
+  const advancedDashboard = () => context.globalState.get("advancedDashboard", false);
+  const sidebarSectionsKey = (advanced: boolean) => advanced ? "sidebar.advancedSections" : "sidebar.simpleSections";
   const dashboard = new Dashboard(() => {
     const editor = vscode.window.activeTextEditor;
     return {
       trusted: vscode.workspace.isTrusted,
-      advanced: context.globalState.get("advancedDashboard", false),
+      advanced: advancedDashboard(),
+      sections: context.globalState.get<SidebarSection[]>(sidebarSectionsKey(advancedDashboard())),
       language: editor?.document.languageId,
       active: editor && (candidate(editor.document, editor.selection.active) ??
         candidate(editor.document, editor.selection.active, "chat")),
@@ -434,6 +438,21 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
     vscode.workspace.onDidGrantWorkspaceTrust(() => {
       updateStatus();
       void scan().catch(showError);
+    }),
+    vscode.commands.registerCommand("tessera.customizeSidebar", async () => {
+      const advanced = advancedDashboard();
+      const key = sidebarSectionsKey(advanced);
+      const visible = visibleSections(advanced, context.globalState.get<SidebarSection[]>(key));
+      const picked = await vscode.window.showQuickPick(sidebarSections.map(section => ({
+        ...section, picked: visible.includes(section.id),
+      })), {
+        title: `Tessera · ${advanced ? "Advanced" : "Simple"} sidebar`,
+        placeHolder: "Check the sections to show, then press Enter",
+        canPickMany: true,
+      });
+      if (picked === undefined) return;
+      await context.globalState.update(key, picked.map(section => section.id));
+      dashboard.refresh();
     }),
     vscode.commands.registerCommand("tessera.openDashboard",
       () => vscode.commands.executeCommand(`${dashboardId}.focus`)),
