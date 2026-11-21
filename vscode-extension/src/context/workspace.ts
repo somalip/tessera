@@ -39,8 +39,10 @@ export class WorkspaceContext implements vscode.Disposable {
         this.recent.delete(key);
         this.recent.set(key, {
           uri: document.uri,
-          snippet: { path: vscode.workspace.asRelativePath(document.uri, false),
-            text: document.getText(new vscode.Range(first, 0, end, 0)).slice(0, 512) },
+          snippet: {
+            path: vscode.workspace.asRelativePath(document.uri, false),
+            text: document.getText(new vscode.Range(first, 0, end, 0)).slice(0, 512)
+          },
         });
         if (this.recent.size > 12) this.recent.delete(this.recent.keys().next().value!);
       }),
@@ -96,7 +98,7 @@ export class WorkspaceContext implements vscode.Disposable {
     const uri = "targetUri" in location ? location.targetUri : location.uri;
     const range = "targetRange" in location ? location.targetRange : location.range;
     if (uri.toString() === document.uri.toString() ||
-        vscode.workspace.getWorkspaceFolder(uri)?.uri.toString() !== folder.uri.toString()) return;
+      vscode.workspace.getWorkspaceFolder(uri)?.uri.toString() !== folder.uri.toString()) return;
     const metadata = await vscode.workspace.fs.stat(uri);
     if (metadata.type !== vscode.FileType.File || metadata.size > maxFileBytes) return;
     const targetDocument = await vscode.workspace.openTextDocument(uri);
