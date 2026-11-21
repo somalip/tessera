@@ -45,9 +45,9 @@ export class PythonRegions {
           const firstArgument = argument?.type === "argument_list" && argument.firstNamedChild?.equals(node);
           const language = docstring && !/^[bf]/i.test(start.text) ? "python-docstring"
             : firstArgument && callee === "json.loads" ? "json"
-            : firstArgument && /^re\.(?:compile|search|match|fullmatch|findall|finditer|split|sub|subn)$/.test(callee ?? "") ? "regex"
-            : sql.test(source.slice(start.endIndex, start.endIndex + 96)) ? "sql"
-            : undefined;
+              : firstArgument && /^re\.(?:compile|search|match|fullmatch|findall|finditer|split|sub|subn)$/.test(callee ?? "") ? "regex"
+                : sql.test(source.slice(start.endIndex, start.endIndex + 96)) ? "sql"
+                  : undefined;
           if (language) regions.push({ first: start.endIndex, last: end?.startIndex ?? node.endIndex, language });
         }
         // A live editor may contain an opening triple quote without its closing delimiter.
@@ -87,7 +87,7 @@ export class PythonRegions {
       const body = entryPoint?.childForFieldName("body");
       if (body && body.namedChildren.every(node => !node || node.type === "comment" ||
         node.type === "pass_statement" || (node.type === "expression_statement" &&
-        ["string", "ellipsis"].includes(node.firstNamedChild?.type ?? "")))) {
+          ["string", "ellipsis"].includes(node.firstNamedChild?.type ?? "")))) {
         return "The previous answer left main unimplemented.";
       }
       if (statements.every(node => ["comment", "import_statement", "import_from_statement", "pass_statement"]
