@@ -191,7 +191,7 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
     if (workflow) {
       const model = role === "comment-parser" ? byCapability(models(), workflow.parser, "fim")
         : role === "router" ? byCapability(models(), workflow.router, "chat")
-        : candidate(document, position, role ? "chat" : "fim");
+          : candidate(document, position, role ? "chat" : "fim");
       return model && endpoint(model);
     }
     const localId = role === "comment-parser" ? "parsing-autocomplete-local"
@@ -201,13 +201,13 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
     return model && endpoint(model);
   }, log, metrics, completionSettings, (document, position) => config().get("repositoryContext", true)
     ? repository.retrieve(document, position) : Promise.resolve([]), (document, route) => {
-    const key = document.uri.toString();
-    const previous = inlineRoutes.get(key);
-    if (previous?.mode === route.mode && previous.model === route.model && previous.parser === route.parser) return;
-    inlineRoutes.set(key, route);
-    log.appendLine(`${route.mode} → ${route.model?.path ?? inlineRouteName(route)}`);
-    if (vscode.window.activeTextEditor?.document === document) updateStatus();
-  }, (code, newFile) => python.projectProblem(code, newFile), workflowFor);
+      const key = document.uri.toString();
+      const previous = inlineRoutes.get(key);
+      if (previous?.mode === route.mode && previous.model === route.model && previous.parser === route.parser) return;
+      inlineRoutes.set(key, route);
+      log.appendLine(`${route.mode} → ${route.model?.path ?? inlineRouteName(route)}`);
+      if (vscode.window.activeTextEditor?.document === document) updateStatus();
+    }, (code, newFile) => python.projectProblem(code, newFile), workflowFor);
 
   const chatModel = (editor: vscode.TextEditor, capability: "chat" | "edit") => {
     const model = candidate(editor.document, editor.selection.active, capability);
@@ -269,7 +269,7 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
     status.text = `$(chip) ${lastInline ? inlineRouteName(lastInline) : model?.manifest.id ?? "Tessera"}`;
     status.tooltip = lastInline
       ? [`Last inline request · ${lastInline.mode}`, model?.manifest.id, model?.path,
-        lastInline.parser && `Parsed by ${lastInline.parser.path}`].filter(Boolean).join("\n")
+      lastInline.parser && `Parsed by ${lastInline.parser.path}`].filter(Boolean).join("\n")
       : "Open the Tessera sidebar";
     dashboard.refresh();
     panel.refresh(editor?.document.languageId);
@@ -370,39 +370,43 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
   };
 
   const installEntries = async (selected: readonly CatalogEntry[]) => {
-  await vscode.window.withProgress({
-    location: vscode.ProgressLocation.Notification, title: "Installing Tessera models", cancellable: true,
-  }, async (progress, token) => {
-    const controller = new AbortController();
-    const cancellation = token.onCancellationRequested(() => controller.abort());
-    if (token.isCancellationRequested) controller.abort();
-    try {
-      for (const entry of selected) {
-        const label = entry.label ?? entry.id;
-        if (controller.signal.aborted) break;
-        let reported = 0;
-        progress.report({ message: `Downloading ${label}…` });
-        await store.install(entry, AbortSignal.any([controller.signal, AbortSignal.timeout(900_000)]),
-          { upstreamManifest: entry.upstreamManifest, progress: bytes => {
-            const percent = Math.floor(100 * bytes / entry.size_bytes);
-            if (percent === reported) return;
-            progress.report({ increment: (percent - reported) / selected.length,
-              message: percent === 100 ? `Verifying ${label}…` : `${label} · ${percent}% downloaded` });
-            reported = percent;
-          } });
-        inlineRoutes.clear();
-        await loadInstalled();
-        prewarm();
+    await vscode.window.withProgress({
+      location: vscode.ProgressLocation.Notification, title: "Installing Tessera models", cancellable: true,
+    }, async (progress, token) => {
+      const controller = new AbortController();
+      const cancellation = token.onCancellationRequested(() => controller.abort());
+      if (token.isCancellationRequested) controller.abort();
+      try {
+        for (const entry of selected) {
+          const label = entry.label ?? entry.id;
+          if (controller.signal.aborted) break;
+          let reported = 0;
+          progress.report({ message: `Downloading ${label}…` });
+          await store.install(entry, AbortSignal.any([controller.signal, AbortSignal.timeout(900_000)]),
+            {
+              upstreamManifest: entry.upstreamManifest, progress: bytes => {
+                const percent = Math.floor(100 * bytes / entry.size_bytes);
+                if (percent === reported) return;
+                progress.report({
+                  increment: (percent - reported) / selected.length,
+                  message: percent === 100 ? `Verifying ${label}…` : `${label} · ${percent}% downloaded`
+                });
+                reported = percent;
+              }
+            });
+          inlineRoutes.clear();
+          await loadInstalled();
+          prewarm();
+        }
+        if (!controller.signal.aborted) {
+          void vscode.window.showInformationMessage(`Installed ${selected.length} Tessera model(s).`);
+        }
+      } catch (error) {
+        if (!controller.signal.aborted) throw error;
+      } finally {
+        cancellation.dispose();
       }
-      if (!controller.signal.aborted) {
-        void vscode.window.showInformationMessage(`Installed ${selected.length} Tessera model(s).`);
-      }
-    } catch (error) {
-      if (!controller.signal.aborted) throw error;
-    } finally {
-      cancellation.dispose();
-    }
-  });
+    });
   };
 
   const chooseStoredModel = async (includeLocal: boolean) => {
@@ -515,7 +519,7 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
       try {
         const model = await vscode.workspace.fs.stat(file);
         if (!(model.type & vscode.FileType.File) || model.size === 0 || model.size >= modelSizeLimit ||
-            !file.fsPath.toLowerCase().endsWith(".gguf")) {
+          !file.fsPath.toLowerCase().endsWith(".gguf")) {
           throw new Error("Choose a nonempty local GGUF file smaller than 1 GB.");
         }
         await config().update(language.setting, file.fsPath, vscode.ConfigurationTarget.Global);
@@ -575,14 +579,22 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
       const threads = settings.get("cpuThreads", 0);
       const layers = settings.get("gpuLayers", 0);
       const selection = await vscode.window.showQuickPick([
-        { label: "Model RAM budget", description: memory ? `${memory} MiB` : "Automatic",
-          detail: "Estimated memory for resident models", setting: "memoryMiB" },
-        { label: "CPU threads", description: threads ? String(threads) : "Automatic",
-          detail: "Inference threads per model server", setting: "cpuThreads" },
-        { label: "GPU layers", description: layers ? String(layers) : "CPU only",
-          detail: "Layers to offload per model server", setting: "gpuLayers" },
-        { label: "Resident models", description: String(settings.get("maxModels", 2)),
-          detail: "Maximum number of loaded models", setting: "maxModels" },
+        {
+          label: "Model RAM budget", description: memory ? `${memory} MiB` : "Automatic",
+          detail: "Estimated memory for resident models", setting: "memoryMiB"
+        },
+        {
+          label: "CPU threads", description: threads ? String(threads) : "Automatic",
+          detail: "Inference threads per model server", setting: "cpuThreads"
+        },
+        {
+          label: "GPU layers", description: layers ? String(layers) : "CPU only",
+          detail: "Layers to offload per model server", setting: "gpuLayers"
+        },
+        {
+          label: "Resident models", description: String(settings.get("maxModels", 2)),
+          detail: "Maximum number of loaded models", setting: "maxModels"
+        },
       ], { placeHolder: "Choose a Tessera resource limit to edit" });
       if (selection) {
         await vscode.commands.executeCommand("workbench.action.openSettings", `@id:tessera.${selection.setting}`);
