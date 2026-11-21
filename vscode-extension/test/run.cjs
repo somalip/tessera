@@ -12,8 +12,10 @@ async function main() {
       const data = Buffer.from("stub");
       const sha256 = createHash("sha256").update(data).digest("hex");
       for (const { upstreamManifest } of builtInModels) {
-        const manifest = { ...upstreamManifest, language_ids: ["cpp"], vscode_language_ids: ["cpp"],
-          file_globs: ["**/*.cpp"], size_bytes: data.length, sha256 };
+        const manifest = {
+          ...upstreamManifest, language_ids: ["cpp"], vscode_language_ids: ["cpp"],
+          file_globs: ["**/*.cpp"], size_bytes: data.length, sha256
+        };
         const modelRoot = path.join(directory, "User", "globalStorage", "tessera.tessera", "models", manifest.id);
         const version = path.join(modelRoot, manifest.version);
         await mkdir(version, { recursive: true });
