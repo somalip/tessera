@@ -1,4 +1,5 @@
 """Load explicitly inherited training settings."""
+
 from pathlib import Path
 from typing import Any
 
