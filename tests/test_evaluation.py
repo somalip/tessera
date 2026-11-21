@@ -17,12 +17,12 @@ class EvaluationTests(unittest.TestCase):
             file = Path(directory) / "sample.jsonl"
             file.write_text(
                 json.dumps(
-                    dict(
-                        task_id="example",
-                        prompt="def f():\n",
-                        test="def check(f): assert f() == 42",
-                        entry_point="f",
-                    )
+                    {
+                        "task_id": "example",
+                        "prompt": "def f():\n",
+                        "test": "def check(f): assert f() == 42",
+                        "entry_point": "f",
+                    }
                 ),
                 encoding="utf8",
             )
