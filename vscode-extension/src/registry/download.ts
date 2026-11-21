@@ -47,11 +47,11 @@ async function download(url: string, maxBytes: number, signal: AbortSignal, upst
     response = await fetch(asset, { signal, redirect: "error" });
   }
   if (!response.ok || !response.body) throw new Error(`Download returned HTTP ${response.status}`);
-  return Readable.from((async function* () {
+  return Readable.from((async function*() {
     const reader = response.body!.getReader();
     let length = 0;
     try {
-      for (;;) {
+      for (; ;) {
         const { done, value } = await reader.read();
         if (done) break;
         length += value.byteLength;
@@ -129,7 +129,7 @@ async function extract(archive: string, target: string, signal: AbortSignal): Pr
 async function modelAt(directory: string, id: string, version: string): Promise<InstalledModel> {
   const manifest: unknown = JSON.parse(await readFile(join(directory, "manifest.json"), "utf8"));
   if (!isManifest(manifest) || manifest.id !== id || manifest.version !== version ||
-      !/^[A-Za-z0-9_-]+$/.test(manifest.quant)) throw new Error("Invalid model manifest");
+    !/^[A-Za-z0-9_-]+$/.test(manifest.quant)) throw new Error("Invalid model manifest");
   const path = join(directory, `model.${manifest.quant}.gguf`);
   const file = await stat(path);
   if (!file.isFile() || file.size !== manifest.size_bytes) throw new Error("Invalid model size");
@@ -137,7 +137,7 @@ async function modelAt(directory: string, id: string, version: string): Promise<
 }
 
 export class ModelStore {
-  constructor(private readonly root: string) {}
+  constructor(private readonly root: string) { }
 
   private modelRoot(id: string): string {
     if (!idPattern.test(id)) throw new Error("Invalid model ID");
@@ -216,11 +216,11 @@ export class ModelStore {
       const unpacked = join(staging, "package");
       await mkdir(unpacked);
       if (upstreamManifest && (!isManifest(upstreamManifest) || !/^[A-Za-z0-9_-]+$/.test(upstreamManifest.quant) ||
-          new URL(entry.url).origin !== "https://huggingface.co")) throw new Error("Invalid upstream model metadata");
+        new URL(entry.url).origin !== "https://huggingface.co")) throw new Error("Invalid upstream model metadata");
       const payload = upstreamManifest ? join(unpacked, `model.${upstreamManifest.quant}.gguf`) : join(staging, "model.tcm");
       let received = 0;
       await pipeline(await download(entry.url, entry.size_bytes, signal, Boolean(upstreamManifest)),
-        async function* (source: AsyncIterable<Buffer>) {
+        async function*(source: AsyncIterable<Buffer>) {
           for await (const chunk of source) {
             received += chunk.length;
             progress?.(received);
@@ -243,8 +243,8 @@ export class ModelStore {
       } else await extract(payload, unpacked, signal);
       const model = await modelAt(unpacked, entry.id, entry.version);
       if ((upstreamManifest ? entry.sha256 : await sha256(model.path)) !== model.manifest.sha256 ||
-          JSON.stringify([...model.manifest.language_ids].sort()) !==
-          JSON.stringify([...entry.language_ids].sort())) {
+        JSON.stringify([...model.manifest.language_ids].sort()) !==
+        JSON.stringify([...entry.language_ids].sort())) {
         throw new Error("Model weights or languages do not match the signed package");
       }
       signal.throwIfAborted();
