@@ -154,7 +154,9 @@ def main() -> None:
                 "dataset_sha256": sha,
                 **score(
                     tasks,
-                    lambda prompt: client.complete(prompt, extra_stop=stop),
+                    lambda prompt, extra_stop=stop: client.complete(
+                        prompt, extra_stop=extra_stop
+                    ),
                     verifier(args.lang, args.docker),
                 ),
             }
