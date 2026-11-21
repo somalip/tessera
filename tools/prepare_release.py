@@ -25,10 +25,14 @@ def verify_model(gguf: Path, tcm: Path, license_file: Path, model_id: str) -> No
         if sum(entry.file_size for entry in archive.infolist()) >= LIMIT:
             raise ValueError(f"{tcm} exceeds the unpacked model size ceiling")
         expected = {"manifest.json", "eval_report.json", "LICENSE", "model.Q8_0.gguf"}
-        if set(archive.namelist()) != expected or len(archive.infolist()) != len(expected):
+        if set(archive.namelist()) != expected or len(archive.infolist()) != len(
+            expected
+        ):
             raise ValueError(f"{tcm} has unexpected archive contents")
         manifest = json.loads(archive.read("manifest.json"))
-        Draft202012Validator(json.loads((SCHEMAS / "manifest.json").read_text())).validate(manifest)
+        Draft202012Validator(
+            json.loads((SCHEMAS / "manifest.json").read_text())
+        ).validate(manifest)
         report = json.loads(archive.read("eval_report.json"))
         model_hash = digest(gguf)
         packaged_hash = hashlib.sha256()
@@ -46,7 +50,9 @@ def verify_model(gguf: Path, tcm: Path, license_file: Path, model_id: str) -> No
             or report.get("training_examples") != 0
             or archive.read("LICENSE") != license_file.read_bytes()
         ):
-            raise ValueError(f"{tcm} does not match the weights, license, or experimental report")
+            raise ValueError(
+                f"{tcm} does not match the weights, license, or experimental report"
+            )
 
 
 def main() -> None:
@@ -75,7 +81,9 @@ def main() -> None:
         assets.extend((gguf, tcm))
 
     checksums = args.artifacts / "SHA256SUMS.txt"
-    checksums.write_text("".join(f"{digest(asset)}  {asset.name}\n" for asset in assets))
+    checksums.write_text(
+        "".join(f"{digest(asset)}  {asset.name}\n" for asset in assets)
+    )
     for asset in [*assets, checksums]:
         print(asset)
 
