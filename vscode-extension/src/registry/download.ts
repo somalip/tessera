@@ -12,7 +12,7 @@ import { modelMemoryBytes } from "../host/memory";
 const validator = new Ajv();
 const isRegistry = validator.compile<Registry>(registrySchema);
 const isManifest = validator.compile<Manifest>(manifestSchema);
-const limit = 1_000_000_000;
+export const modelSizeLimit = 1_000_000_000;
 const maxMetadata = 1_000_000;
 const versionPattern = /^\d+\.\d+\.\d+$/;
 const idPattern = /^[a-z0-9][a-z0-9-]*$/;
@@ -105,7 +105,7 @@ async function extract(archive: string, target: string, signal: AbortSignal): Pr
       const name = entry.fileName;
       const model = /^model\.[A-Za-z0-9_-]+\.gguf$/.test(name);
       total += entry.uncompressedSize;
-      if (seen.has(name) || total >= limit || (!model &&
+      if (seen.has(name) || total >= modelSizeLimit || (!model &&
         (!["manifest.json", "eval_report.json", "LICENSE", "NOTICE"].includes(name)
           || entry.uncompressedSize > maxMetadata))) {
         reject(new Error("Invalid model package entry"));
@@ -208,7 +208,7 @@ export class ModelStore {
   ): Promise<void> {
     const { upstreamManifest, progress } = options;
     if (!versionPattern.test(entry.version) || !Number.isSafeInteger(entry.size_bytes)
-      || entry.size_bytes <= 0 || entry.size_bytes >= limit) throw new Error("Invalid registry entry");
+      || entry.size_bytes <= 0 || entry.size_bytes >= modelSizeLimit) throw new Error("Invalid registry entry");
     const root = this.modelRoot(entry.id);
     await mkdir(root, { recursive: true });
     const staging = await mkdtemp(join(root, ".install-"));

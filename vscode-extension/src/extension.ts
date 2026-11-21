@@ -15,7 +15,7 @@ import { registerCodeActions } from "./providers/codeActions";
 import { InlineCompletion, type InlineRoute } from "./providers/inlineCompletion";
 import { builtInModels, type CatalogEntry } from "./registry/catalog";
 import { repositoryFiles, repositoryFromInput, searchRepositories } from "./registry/huggingFace";
-import { fetchIndex, ModelStore, type InstalledModel } from "./registry/download";
+import { fetchIndex, modelSizeLimit, ModelStore, type InstalledModel } from "./registry/download";
 import { embeddedLanguage, projectLanguage } from "./router/detector";
 import { Lifecycle } from "./router/lifecycle";
 import { selectModel } from "./router/policy";
@@ -91,7 +91,7 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
       if (!path) continue;
       try {
         const file = statSync(path);
-        if (!file.isFile() || file.size === 0 || file.size >= 1_000_000_000) throw new Error("Invalid GGUF file size");
+        if (!file.isFile() || file.size === 0 || file.size >= modelSizeLimit) throw new Error("Invalid GGUF file size");
         const contextLength = inlineOnly ? 768 : ["python-local", "cpp-local"].includes(id) ? 4096 : 2048;
         localModels.push({
           path, memoryBytes: modelMemoryBytes(file.size, contextLength),
@@ -112,7 +112,7 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
     linkedModels = linked().flatMap(({ id, path, capabilities }) => {
       try {
         const file = statSync(path);
-        if (!file.isFile() || file.size === 0 || file.size >= 1_000_000_000) return [];
+        if (!file.isFile() || file.size === 0 || file.size >= modelSizeLimit) return [];
         const contextLength = basename(path) === cppFineTunedAutocomplete ? 768 : capabilities.includes("chat") ? 4096 : 2048;
         return [{
           path, memoryBytes: modelMemoryBytes(file.size, contextLength),
@@ -354,7 +354,7 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
         const metadata = await handle.stat();
         const header = Buffer.alloc(4);
         await handle.read(header, 0, 4, 0);
-        if (!metadata.isFile() || metadata.size >= 1_000_000_000 || header.toString() !== "GGUF") {
+        if (!metadata.isFile() || metadata.size >= modelSizeLimit || header.toString() !== "GGUF") {
           throw new Error(`${basename(file.fsPath)} must be a GGUF file smaller than 1 GB.`);
         }
         const id = "linked-" + createHash("sha256").update(file.fsPath).digest("hex").slice(0, 24);
@@ -514,7 +514,7 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
       if (!file || file.scheme !== "file") return;
       try {
         const model = await vscode.workspace.fs.stat(file);
-        if (!(model.type & vscode.FileType.File) || model.size === 0 || model.size >= 1_000_000_000 ||
+        if (!(model.type & vscode.FileType.File) || model.size === 0 || model.size >= modelSizeLimit ||
             !file.fsPath.toLowerCase().endsWith(".gguf")) {
           throw new Error("Choose a nonempty local GGUF file smaller than 1 GB.");
         }
