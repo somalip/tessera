@@ -1,4 +1,5 @@
 """Build licensed, decontaminated per-language CPT shards."""
+
 import argparse
 import hashlib
 import json
@@ -10,7 +11,14 @@ from typing import cast
 
 from tokenizers import Tokenizer  # type: ignore[import-untyped]
 
-from data.pipelines.filtering import AUTOGEN, SECRET, Contamination, Dedupe, records, tokens
+from data.pipelines.filtering import (
+    AUTOGEN,
+    SECRET,
+    Contamination,
+    Dedupe,
+    records,
+    tokens,
+)
 from data.pipelines.grammars import GRAMMARS, parser_for
 from data.sources.licensing import licenses
 
@@ -34,11 +42,20 @@ def encode(text: str, tokenizer: Tokenizer, rng: random.Random) -> list[int]:
     return cast(list[int], tokenizer.encode(text + EOS, add_special_tokens=False).ids)
 
 
-def build(source: Path, benchmarks: list[Path], tokenizer_path: Path,
-          output: Path, sample: float, shard_size: int, seed: int,
-          language: str = "python") -> Counter[str]:
+def build(
+    source: Path,
+    benchmarks: list[Path],
+    tokenizer_path: Path,
+    output: Path,
+    sample: float,
+    shard_size: int,
+    seed: int,
+    language: str = "python",
+) -> Counter[str]:
     if not 0 < sample <= 1 or shard_size < 1 or output.exists():
-        raise ValueError("Use a fresh output directory, a sample in (0,1], and positive shard size")
+        raise ValueError(
+            "Use a fresh output directory, a sample in (0,1], and positive shard size"
+        )
     decontamination = Contamination(benchmarks)
     tokenizer = Tokenizer.from_file(str(tokenizer_path))
     if any(tokenizer.token_to_id(token) is None for token in (*FIM, EOS)):
@@ -60,14 +77,19 @@ def build(source: Path, benchmarks: list[Path], tokenizer_path: Path,
             if not shard:
                 return
             (target / f"shard-{counters['shards']:06d}.jsonl").write_text(
-                "".join(json.dumps(row) + "\n" for row in shard), encoding="utf8")
+                "".join(json.dumps(row) + "\n" for row in shard), encoding="utf8"
+            )
             counters["shards"] += 1
             shard.clear()
 
         for row in records(source):
             counters["input"] += 1
             text = row["text"]
-            if not isinstance(text, str) or not isinstance(row.get("path"), str) or not row.get("repo"):
+            if (
+                not isinstance(text, str)
+                or not isinstance(row.get("path"), str)
+                or not row.get("repo")
+            ):
                 raise ValueError("Source records require text, repo, and path")
             identity = f"{seed}:{row['repo']}:{row['path']}"
             bucket = int.from_bytes(hashlib.sha256(identity.encode()).digest()[:8])
@@ -84,8 +106,12 @@ def build(source: Path, benchmarks: list[Path], tokenizer_path: Path,
                 continue
             raw = text.encode()
             parts = tokens(text)
-            if (not parts or len(raw) > MAX_SOURCE_BYTES or AUTOGEN.search(text[:512])
-                    or max(map(len, text.splitlines()), default=0) > 500):
+            if (
+                not parts
+                or len(raw) > MAX_SOURCE_BYTES
+                or AUTOGEN.search(text[:512])
+                or max(map(len, text.splitlines()), default=0) > 500
+            ):
                 counters["quality"] += 1
                 continue
             if SECRET.search(text) or any(token in text for token in (*FIM, EOS)):
@@ -103,33 +129,49 @@ def build(source: Path, benchmarks: list[Path], tokenizer_path: Path,
                 continue
             if decontamination.overlaps(text, parts):
                 raise RuntimeError("Contamination audit failed")
-            token_ids = (encode(text, tokenizer, rng) if dialect != "text" else
-                         tokenizer.encode(text + EOS, add_special_tokens=False).ids)
+            token_ids = (
+                encode(text, tokenizer, rng)
+                if dialect != "text"
+                else tokenizer.encode(text + EOS, add_special_tokens=False).ids
+            )
             row_language = language if dialect in parsers else "text"
             counters["accepted"] += 1
             counters[f"{row_language}_tokens"] += len(token_ids)
-            shard.append({
-                "input_ids": token_ids, "license": row["license"], "language": row_language,
-                "repo": row["repo"], "path": row["path"], "sha256": hashlib.sha256(raw).hexdigest(),
-            })
+            shard.append(
+                {
+                    "input_ids": token_ids,
+                    "license": row["license"],
+                    "language": row_language,
+                    "repo": row["repo"],
+                    "path": row["path"],
+                    "sha256": hashlib.sha256(raw).hexdigest(),
+                }
+            )
             if len(shard) == shard_size:
                 flush()
         flush()
         counters["accepted_overlap"] = 0
         if not counters["accepted"]:
             raise ValueError(f"No eligible source records: {dict(counters)}")
-        statistics = {**counters,
-                      "tokenizer_sha256": hashlib.sha256(tokenizer_path.read_bytes()).hexdigest(),
-                      "benchmarks": sorted(hashlib.sha256(path.read_bytes()).hexdigest()
-                                           for path in benchmarks)}
-        (target / "stats.json").write_text(json.dumps(statistics, indent=2) + "\n", encoding="utf8")
+        statistics = {
+            **counters,
+            "tokenizer_sha256": hashlib.sha256(tokenizer_path.read_bytes()).hexdigest(),
+            "benchmarks": sorted(
+                hashlib.sha256(path.read_bytes()).hexdigest() for path in benchmarks
+            ),
+        }
+        (target / "stats.json").write_text(
+            json.dumps(statistics, indent=2) + "\n", encoding="utf8"
+        )
         target.rename(output)
     return counters
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--language", choices=sorted(set(GRAMMARS) - {"tsx"}), default="python")
+    parser.add_argument(
+        "--language", choices=sorted(set(GRAMMARS) - {"tsx"}), default="python"
+    )
     parser.add_argument("--source", type=Path, required=True)
     parser.add_argument("--benchmark", type=Path, action="append", required=True)
     parser.add_argument("--tokenizer", type=Path, required=True)
@@ -138,8 +180,21 @@ def main() -> None:
     parser.add_argument("--shard-size", type=int, default=2048)
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
-    print(json.dumps(build(args.source, args.benchmark, args.tokenizer, args.output,
-                           args.sample, args.shard_size, args.seed, args.language), indent=2))
+    print(
+        json.dumps(
+            build(
+                args.source,
+                args.benchmark,
+                args.tokenizer,
+                args.output,
+                args.sample,
+                args.shard_size,
+                args.seed,
+                args.language,
+            ),
+            indent=2,
+        )
+    )
 
 
 if __name__ == "__main__":
