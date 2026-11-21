@@ -87,24 +87,28 @@ export function projectMessages(instruction: string, before = "", after = "", co
     contextLength >= 4096 && Buffer.byteLength(instruction) <= 768;
   const guidance = liveInput
     ? " For a live terminal program with no requested library, use curses.wrapper(main). " +
-      "Keep the loop and its mutable state inside one main function without nested functions. " +
-      "Enable screen.keypad(True), call screen.timeout(120), and read one key per frame. Render and refresh " +
-      "before reading input. Handle q immediately. For grid movement use nonnegative (row, col) positions " +
-      "and map key codes to (dr, dc) tuples. Use screen.getmaxyx() for safe bounds, reserve the top row " +
-      "for status, and avoid the last column. Check the next position before updating or drawing it. " +
-      "Spawn collectibles only on free cells. In a game, display the score and a clear end state."
+    "Keep the loop and its mutable state inside one main function without nested functions. " +
+    "Enable screen.keypad(True), call screen.timeout(120), and read one key per frame. Render and refresh " +
+    "before reading input. Handle q immediately. For grid movement use nonnegative (row, col) positions " +
+    "and map key codes to (dr, dc) tuples. Use screen.getmaxyx() for safe bounds, reserve the top row " +
+    "for status, and avoid the last column. Check the next position before updating or drawing it. " +
+    "Spawn collectibles only on free cells. In a game, display the score and a clear end state."
     : " Implement the full input/output flow, including argument parsing and input validation where applicable.";
   return [
-    { role: "system", content: "Write complete, runnable Python 3 code. Output code only. " +
-      "Use a single file and the standard library by default. Import what you use, define all needed behavior, " +
-      "and call main under the __main__ guard for a standalone program. " +
-      "Honor all explicit requirements. If the user leaves the interface open, choose a terminal interface." },
-    { role: "user", content: useSnakeExample
-      ? `Example of the classic growing-tail terminal game with standard rules:\n\n${snakeExample}\n` +
+    {
+      role: "system", content: "Write complete, runnable Python 3 code. Output code only. " +
+        "Use a single file and the standard library by default. Import what you use, define all needed behavior, " +
+        "and call main under the __main__ guard for a standalone program. " +
+        "Honor all explicit requirements. If the user leaves the interface open, choose a terminal interface."
+    },
+    {
+      role: "user", content: useSnakeExample
+        ? `Example of the classic growing-tail terminal game with standard rules:\n\n${snakeExample}\n` +
         `Actual request: ${instruction}\nReturn a complete Python implementation. Follow the example's working ` +
         "defaults for unspecified details. Keep the head and body movement, distinct food, growth, score, and collision checks."
-      : `Request: ${instruction}\n` +
-      (before || after ? `Existing code before the cursor:\n${before}\nExisting code after the cursor:\n${after}\n` : "") +
-      `Implement the requested program.${guidance}` },
+        : `Request: ${instruction}\n` +
+        (before || after ? `Existing code before the cursor:\n${before}\nExisting code after the cursor:\n${after}\n` : "") +
+        `Implement the requested program.${guidance}`
+    },
   ];
 }
