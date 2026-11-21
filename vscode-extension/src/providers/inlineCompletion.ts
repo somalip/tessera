@@ -55,7 +55,7 @@ function inlineInstruction(document: vscode.TextDocument, position: vscode.Posit
     .replace(/\s*(?:\*\/|-->)$/, "").trim();
   if (document.languageId === "cpp") return undefined;
   if (document.languageId === "python" ||
-      /^(?:make|build|create|implement|write|generate)\s+\S/i.test(instruction)) return instruction;
+    /^(?:make|build|create|implement|write|generate)\s+\S/i.test(instruction)) return instruction;
 }
 
 function pythonProjectComment(document: vscode.TextDocument, position: vscode.Position) {
@@ -129,10 +129,10 @@ async function condenseInstruction(model: CompletionModel, instruction: string, 
   const briefLiterals: string[] = brief.match(literals) ?? [];
   const briefMarkers = markers(brief);
   if (brief && !/[\r\n]/.test(brief) && Buffer.byteLength(brief) < Buffer.byteLength(request) &&
-      sourceLiterals.every(literal => briefLiterals.includes(literal)) &&
-      briefLiterals.every(literal => sourceLiterals.includes(literal)) &&
-      requestMarkers.every(marker => briefMarkers.includes(marker)) &&
-      (!/\b(?:no|not|never|without)\b/i.test(request) || /\b(?:no|not|never|without)\b/i.test(brief))) return brief;
+    sourceLiterals.every(literal => briefLiterals.includes(literal)) &&
+    briefLiterals.every(literal => sourceLiterals.includes(literal)) &&
+    requestMarkers.every(marker => briefMarkers.includes(marker)) &&
+    (!/\b(?:no|not|never|without)\b/i.test(request) || /\b(?:no|not|never|without)\b/i.test(brief))) return brief;
   return request.replace(/^(?:could you\s+)?(?:please\s+)?(?:make|build|create|implement|write|generate)\s+an?\s+(?=\S)/i, "");
 }
 
@@ -152,21 +152,25 @@ async function generateCode(
   const terminal = document.languageId === "python" && /\b(?:tui|terminal ui|text user interface)\b/i.test(instruction);
   const guidance = terminal
     ? "\nUse Python curses. Define main(stdscr) with initialization and the entire timed event loop. " +
-      "Call curses.wrapper(main) once under the __main__ guard. Avoid nested functions. " +
-      "Use stdscr.keypad(True), stdscr.timeout(120), and getch(). Handle q before updating state. " +
-      "For grid movement, represent positions and direction as (row, column) pairs, with a key-to-direction map. " +
-      "For games, implement the core mechanics, collisions, score, and game over."
+    "Call curses.wrapper(main) once under the __main__ guard. Avoid nested functions. " +
+    "Use stdscr.keypad(True), stdscr.timeout(120), and getch(). Handle q before updating state. " +
+    "For grid movement, represent positions and direction as (row, column) pairs, with a key-to-direction map. " +
+    "For games, implement the core mechanics, collisions, score, and game over."
     : "";
   const contextual = Boolean(before.trim() || after.trim());
   const cppKind = cppAnswerKind(instruction, contextual);
   const messages = project ? projectMessages(instruction, before, after, model.contextLength) : [
-    { role: "system" as const, content: cpp ? cppSystemPrompt(cppKind) : "Return only complete, runnable code for insertion at the cursor. " +
-      "Use the file language and honor the request. Do not include explanations, placeholders, or repeat existing code. " +
-      "Prefer standard library APIs unless the request requires a dependency. Indent relative to column zero. " +
-      "Define everything the code uses and include a runnable entry point for a standalone program. " +
-      "For interactive programs, implement input handling, state updates, rendering, and a clean exit." },
-    { role: "user" as const, content: `Language: ${document.languageId}\nRequest: ${instruction}` +
-      (cpp && !contextual ? "" : `\nBefore cursor:\n${before}\nAfter cursor:\n${after}${guidance}`) },
+    {
+      role: "system" as const, content: cpp ? cppSystemPrompt(cppKind) : "Return only complete, runnable code for insertion at the cursor. " +
+        "Use the file language and honor the request. Do not include explanations, placeholders, or repeat existing code. " +
+        "Prefer standard library APIs unless the request requires a dependency. Indent relative to column zero. " +
+        "Define everything the code uses and include a runnable entry point for a standalone program. " +
+        "For interactive programs, implement input handling, state updates, rendering, and a clean exit."
+    },
+    {
+      role: "user" as const, content: `Language: ${document.languageId}\nRequest: ${instruction}` +
+        (cpp && !contextual ? "" : `\nBefore cursor:\n${before}\nAfter cursor:\n${after}${guidance}`)
+    },
   ];
   const promptBytes = messages.reduce((bytes, message) => bytes + Buffer.byteLength(message.content) + 24, 0);
   const tokens = cpp ? 768 : project ? Math.min(2304, Math.floor(model.contextLength * 0.625), model.contextLength - promptBytes - 64)
@@ -230,7 +234,7 @@ export class InlineCompletion implements vscode.InlineCompletionItemProvider, vs
     private readonly reportRoute?: (document: vscode.TextDocument, route: InlineRoute) => void,
     private readonly validateProject?: (code: string, newFile: boolean) => string | undefined,
     private readonly workflow?: (document: vscode.TextDocument) => Workflow | undefined,
-  ) {}
+  ) { }
 
   async provideInlineCompletionItems(
     document: vscode.TextDocument, position: vscode.Position,
@@ -245,7 +249,7 @@ export class InlineCompletion implements vscode.InlineCompletionItemProvider, vs
     if (!vscode.workspace.isTrusted || token.isCancellationRequested) return [];
     const model = this.select(document, position);
     if (automaticRequest && model?.python && document.languageId === "python" &&
-        !afterComment && !document.lineAt(position.line).text.trim()) {
+      !afterComment && !document.lineAt(position.line).text.trim()) {
       const previous = position.line > 0 ? document.lineAt(position.line - 1).text.trimEnd() : "";
       // An empty line after a complete statement is a stopping point. New
       // blocks and explicit continuations still need their first line.
@@ -254,7 +258,7 @@ export class InlineCompletion implements vscode.InlineCompletionItemProvider, vs
     const cpp = document.languageId === "cpp";
     const line = document.lineAt(position.line).text;
     if (cpp && automaticRequest && !afterComment && !line.trim() &&
-        (!position.line || !cppShouldContinue(document.lineAt(position.line - 1).text))) return [];
+      (!position.line || !cppShouldContinue(document.lineAt(position.line - 1).text))) return [];
     const project = !afterComment ? undefined : !cpp ? pythonProjectComment(document, position)
       : position.character === line.length ? cppProjectComment(document, position) : undefined;
     const instruction = project?.instruction ?? (afterComment && position.character === document.lineAt(position.line).text.length
@@ -270,12 +274,14 @@ export class InlineCompletion implements vscode.InlineCompletionItemProvider, vs
     const routerUnavailable = needsRouter && !router;
     if (instruction && (!chat || parserUnavailable || routerUnavailable)) {
       const missing = routerUnavailable ? "router" : parserUnavailable ? "parser" : "generator";
-      this.reportRoute?.(document, { mode: routerUnavailable ? "Comment routing"
-        : parserUnavailable ? "Comment parsing" : "Inline generation" });
+      this.reportRoute?.(document, {
+        mode: routerUnavailable ? "Comment routing"
+          : parserUnavailable ? "Comment parsing" : "Inline generation"
+      });
       const message = configured ? `Connect an available ${missing} in the Tessera workflow.` : parserUnavailable
         ? "Set tessera.parsingAutocompleteModelPath to parse Python comment requests."
         : pythonComment ? "Set tessera.pythonModelPath to generate code from Python comment requests."
-        : "Set up a Tessera chat-capable model for inline code generation.";
+          : "Set up a Tessera chat-capable model for inline code generation.";
       this.log.appendLine(message);
       if (!automaticRequest) void vscode.window.showInformationMessage(message);
       return [];
@@ -344,7 +350,7 @@ export class InlineCompletion implements vscode.InlineCompletionItemProvider, vs
     result: string, firstToken: number | undefined, requested: number,
   ): vscode.InlineCompletionItem[] {
     if (signal.aborted || document.version !== version || !result.trim() ||
-        (document.languageId === "cpp" && foreignCppSnippet(result))) return [];
+      (document.languageId === "cpp" && foreignCppSnippet(result))) return [];
     const item = new vscode.InlineCompletionItem(result, new vscode.Range(position, position));
     item.command = {
       title: "Record accepted Tessera suggestion", command: "tessera.acceptCompletion",
