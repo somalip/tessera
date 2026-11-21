@@ -1,4 +1,5 @@
 """Profile first-token latency, throughput, and resident memory on a local CPU."""
+
 import argparse
 import json
 import math
@@ -21,10 +22,18 @@ def profile_request(client: Client, prompt: str, cache: bool) -> dict[str, Any]:
     start = time.perf_counter()
     first = None
     measurements = None
-    with client.open("/completion", {
-        "prompt": prompt, "n_predict": 32, "stream": True, "seed": 0,
-        "temperature": 0, "cache_prompt": cache, "ignore_eos": True,
-    }) as stream:
+    with client.open(
+        "/completion",
+        {
+            "prompt": prompt,
+            "n_predict": 32,
+            "stream": True,
+            "seed": 0,
+            "temperature": 0,
+            "cache_prompt": cache,
+            "ignore_eos": True,
+        },
+    ) as stream:
         for line in stream:
             if not line.startswith(b"data:"):
                 continue
@@ -35,8 +44,12 @@ def profile_request(client: Client, prompt: str, cache: bool) -> dict[str, Any]:
                 measurements = event["timings"]
     if first is None or not measurements:
         raise RuntimeError("Runtime did not provide content and timing events")
-    return {"first_token_ms": first, "tokens_per_second": measurements["predicted_per_second"],
-            "prompt_tokens": measurements["prompt_n"] + measurements.get("cache_n", 0), "generated_tokens": measurements["predicted_n"]}
+    return {
+        "first_token_ms": first,
+        "tokens_per_second": measurements["predicted_per_second"],
+        "prompt_tokens": measurements["prompt_n"] + measurements.get("cache_n", 0),
+        "generated_tokens": measurements["predicted_n"],
+    }
 
 
 def main() -> None:
@@ -71,7 +84,9 @@ def main() -> None:
         monitor.start()
         try:
             warm = args.mode == "warm"
-            lines = "".join(f"    items.append(({value}, {value}))\n" for value in range(110))
+            lines = "".join(
+                f"    items.append(({value}, {value}))\n" for value in range(110)
+            )
 
             def run(index: int) -> dict[str, Any]:
                 name = "values" if warm else f"values_{index}"
@@ -97,14 +112,25 @@ def main() -> None:
         "resident_memory": memory[0] <= budget,
     }
     report = {
-        "host": platform.platform(), "machine": platform.machine(), "mode": args.mode,
+        "host": platform.platform(),
+        "machine": platform.machine(),
+        "mode": args.mode,
         "model_sha256": digest(args.model),
-        "load_ms": load_ms, "first_token_p95_ms": p95, "median_tokens_per_second": throughput,
-        "peak_rss_bytes": memory[0], "memory_budget_bytes": budget, "gates": gates, "runs": runs,
+        "load_ms": load_ms,
+        "first_token_p95_ms": p95,
+        "median_tokens_per_second": throughput,
+        "peak_rss_bytes": memory[0],
+        "memory_budget_bytes": budget,
+        "gates": gates,
+        "runs": runs,
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf8")
-    print(json.dumps({key: value for key, value in report.items() if key != "runs"}, indent=2))
+    print(
+        json.dumps(
+            {key: value for key, value in report.items() if key != "runs"}, indent=2
+        )
+    )
     if args.enforce and not all(gates.values()):
         raise SystemExit(1)
 
