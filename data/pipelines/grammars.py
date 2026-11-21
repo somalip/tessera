@@ -1,4 +1,5 @@
 """Select pinned local tree-sitter grammars per source language."""
+
 import importlib
 
 from tree_sitter import Language, Parser
