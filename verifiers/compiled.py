@@ -1,4 +1,5 @@
 """Fixed offline compile and test commands for language verifiers."""
+
 from collections.abc import Callable
 from functools import partial
 
@@ -36,11 +37,18 @@ COMPILERS = {
 LANGUAGES = ("python", *COMPILERS)
 
 
-def verify_compiled(language: str, source: str, tests: str,
-                    timeout: float = 45, docker: str = "docker") -> Outcome:
+def verify_compiled(
+    language: str, source: str, tests: str, timeout: float = 45, docker: str = "docker"
+) -> Outcome:
     image, script = COMPILERS[language]
-    return run_container(image, ["/bin/sh", "-ec", script], f"{source}\n\n{tests}\n",
-                         timeout=timeout, docker=docker, executable_scratch=True)
+    return run_container(
+        image,
+        ["/bin/sh", "-ec", script],
+        f"{source}\n\n{tests}\n",
+        timeout=timeout,
+        docker=docker,
+        executable_scratch=True,
+    )
 
 
 def verifier(language: str, docker: str = "docker") -> Callable[[str, str], Outcome]:
