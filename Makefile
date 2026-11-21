@@ -4,6 +4,7 @@ PYTHON ?= python3
 check:
 	$(PYTHON) tools/generate_contracts.py --check
 	$(PYTHON) -m ruff check .
+	$(PYTHON) -m ruff format --check .
 	$(PYTHON) -m mypy tools tests data eval verifiers package train ci
 	$(PYTHON) -m unittest discover -s tests
 	npm --prefix vscode-extension run check

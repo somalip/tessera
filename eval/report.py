@@ -7,6 +7,7 @@ import time
 from collections.abc import Callable
 from dataclasses import asdict
 from difflib import SequenceMatcher
+from functools import partial
 from pathlib import Path
 from typing import Any
 
@@ -154,9 +155,7 @@ def main() -> None:
                 "dataset_sha256": sha,
                 **score(
                     tasks,
-                    lambda prompt, extra_stop=stop: client.complete(
-                        prompt, extra_stop=extra_stop
-                    ),
+                    partial(client.complete, extra_stop=stop),
                     verifier(args.lang, args.docker),
                 ),
             }
