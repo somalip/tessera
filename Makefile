@@ -31,7 +31,13 @@ train:
 	$(PYTHON) -m train.run --lang "$(LANGUAGE)" --config "$(CONFIG)"
 
 package:
-	$(PYTHON) -m package.build_manifest --gguf "$(BUILD_DIR)/model.$(QUANT).gguf" 	  --metadata "$(BUILD_DIR)/metadata.json" --report "$(BUILD_DIR)/eval_report.json" 	  --license-file "$(LICENSE_FILE)" --license-id "$(LICENSE_ID)" 	  --output "$(BUILD_DIR)/$(LANGUAGE).tcm"
+	$(PYTHON) -m package.build_manifest \
+		--gguf "$(BUILD_DIR)/model.$(QUANT).gguf" \
+		--metadata "$(BUILD_DIR)/metadata.json" \
+		--report "$(BUILD_DIR)/eval_report.json" \
+		--license-file "$(LICENSE_FILE)" \
+		--license-id "$(LICENSE_ID)" \
+		--output "$(BUILD_DIR)/$(LANGUAGE).tcm"
 
 .PHONY: vsix
 vsix:
