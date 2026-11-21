@@ -32,24 +32,56 @@ class CorpusTests(unittest.TestCase):
                     source = "def invalid(:"
                 elif index % 5 == 3:
                     source = "print(90000)\n"
-                rows.append(dict(repo="fixture", path=f"{index}.py", text=source, license=license_id))
-            (root / "source.jsonl").write_text("".join(json.dumps(row) + "\n" for row in rows))
-            stats = build(root / "source.jsonl", [root / "eval.jsonl"], root / "tokenizer.json",
-                          root / "out", 0.01, 3, 42)
+                rows.append(
+                    dict(
+                        repo="fixture",
+                        path=f"{index}.py",
+                        text=source,
+                        license=license_id,
+                    )
+                )
+            (root / "source.jsonl").write_text(
+                "".join(json.dumps(row) + "\n" for row in rows)
+            )
+            stats = build(
+                root / "source.jsonl",
+                [root / "eval.jsonl"],
+                root / "tokenizer.json",
+                root / "out",
+                0.01,
+                3,
+                42,
+            )
             self.assertEqual(stats["input"], 6000)
-            for count in ("contamination", "license", "parse", "exact_duplicate", "accepted"):
+            for count in (
+                "contamination",
+                "license",
+                "parse",
+                "exact_duplicate",
+                "accepted",
+            ):
                 self.assertGreater(stats[count], 0)
             self.assertEqual(stats["accepted_overlap"], 0)
             shards = list((root / "out").glob("shard-*.jsonl"))
             self.assertEqual(len(shards), stats["shards"])
-            accepted = [json.loads(line) for path in shards for line in path.read_text().splitlines()]
+            accepted = [
+                json.loads(line)
+                for path in shards
+                for line in path.read_text().splitlines()
+            ]
             self.assertEqual(len(accepted), stats["accepted"])
-            self.assertTrue(all(row["license"] == "MIT" and row["input_ids"][-1] == vocab[EOS]
-                                for row in accepted))
+            self.assertTrue(
+                all(
+                    row["license"] == "MIT" and row["input_ids"][-1] == vocab[EOS]
+                    for row in accepted
+                )
+            )
 
     def test_minhash_near_duplicate(self) -> None:
         dedupe = Dedupe()
         source = "\n".join(f"variable{i} = {i}" for i in range(50))
         self.assertIsNone(dedupe.seen(tokens(source)))
-        self.assertEqual(dedupe.seen(tokens(source.replace("variable20", "replacement"))),
-                         "near_duplicate")
+        self.assertEqual(
+            dedupe.seen(tokens(source.replace("variable20", "replacement"))),
+            "near_duplicate",
+        )
