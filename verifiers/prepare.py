@@ -1,4 +1,5 @@
 """Install pinned verifier toolchains before an offline evaluation run."""
+
 import argparse
 import subprocess
 from pathlib import Path
@@ -16,8 +17,16 @@ def main() -> None:
     images = set()
     for language in targets:
         if language == "typescript":
-            subprocess.run([args.docker, "build", "--tag", COMPILERS[language][0],
-                            str(Path(__file__).with_name("typescript"))], check=True)
+            subprocess.run(
+                [
+                    args.docker,
+                    "build",
+                    "--tag",
+                    COMPILERS[language][0],
+                    str(Path(__file__).with_name("typescript")),
+                ],
+                check=True,
+            )
         else:
             image = IMAGE if language == "python" else COMPILERS[language][0]
             if image not in images:
