@@ -81,15 +81,19 @@ def gate(
             continue
         for metric, thresholds in metrics.items():
 
-            def get(report: dict[str, Any]) -> float | None:
-                value = report.get(suite, {}).get("metrics", {}).get(metric)
+            def get(
+                report: dict[str, Any], suite_name: str, metric_name: str
+            ) -> float | None:
+                value = report.get(suite_name, {}).get("metrics", {}).get(metric_name)
                 return (
                     float(value)
                     if isinstance(value, (float, int)) and 0 <= value <= 1
                     else None
                 )
 
-            actual, base, alternate = get(suites), get(baseline), get(competitor)
+            actual, base, alternate = (
+                get(report, suite, metric) for report in (suites, baseline, competitor)
+            )
             if actual is None or base is None or alternate is None:
                 failures.append(f"{suite}.{metric}: missing comparable metrics")
             elif actual + 1e-12 < max(
