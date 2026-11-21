@@ -4,7 +4,7 @@ const path = require("node:path");
 const { setTimeout: delay } = require("node:timers/promises");
 const vscode = require("vscode");
 
-exports.run = async function () {
+exports.run = async function() {
   const config = vscode.workspace.getConfiguration("tessera");
   const global = vscode.ConfigurationTarget.Global;
   const real = Boolean(process.env.TESSERA_REAL_SERVER && process.env.TESSERA_REAL_MODEL);
@@ -30,8 +30,10 @@ exports.run = async function () {
   await vscode.commands.executeCommand("tessera.openDashboard");
 
   const installed = {
-    manifest: { id: "python-tiny", quant: "Q4_K_M", version: "1.0.0",
-      language_ids: ["python"], capabilities: ["fim", "chat"], size_bytes: 490000000 },
+    manifest: {
+      id: "python-tiny", quant: "Q4_K_M", version: "1.0.0",
+      language_ids: ["python"], capabilities: ["fim", "chat"], size_bytes: 490000000
+    },
   };
   const { LocalMetrics } = require("../dist/telemetry");
   const metrics = new LocalMetrics();
@@ -48,7 +50,7 @@ exports.run = async function () {
   try {
     dashboard.resolveWebviewView({
       webview, visible: false, onDidDispose: disposed.event,
-      onDidChangeVisibility: () => new vscode.Disposable(() => {}),
+      onDidChangeVisibility: () => new vscode.Disposable(() => { }),
     });
     assert.match(webview.html, /System resources/);
     assert.match(webview.html, /Usage appears after your first completed model request/);
@@ -84,8 +86,10 @@ exports.run = async function () {
 
     state = {
       ...state,
-      lastInline: { mode: "Inline generation", model: { ...installed, path: "/models/chat<&>.gguf" },
-        parser: { ...installed, path: "/models/parsing.gguf" } },
+      lastInline: {
+        mode: "Inline generation", model: { ...installed, path: "/models/chat<&>.gguf" },
+        parser: { ...installed, path: "/models/parsing.gguf" }
+      },
     };
     dashboard.refresh();
     assert.match(messages.at(-1), /Last inline request · Inline generation/);
