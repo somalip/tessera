@@ -62,7 +62,7 @@ def run_container(
             timeout=timeout,
             check=False,
         )
-    except subprocess.TimeoutExpired:
+    except subprocess.TimeoutExpired as timeout_error:
         try:
             cleanup = subprocess.run(
                 [docker, "rm", "-f", name],
@@ -74,7 +74,9 @@ def run_container(
         except (OSError, subprocess.TimeoutExpired) as error:
             raise VerifierError(f"Could not clean up sandbox {name}") from error
         if cleanup.returncode:
-            raise VerifierError(f"Could not confirm sandbox cleanup for {name}")
+            raise VerifierError(
+                f"Could not confirm sandbox cleanup for {name}"
+            ) from timeout_error
         return Outcome(False, 124, timed_out=True)
     except OSError as error:
         raise VerifierError(f"Could not launch the Docker client: {error}") from error
