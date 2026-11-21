@@ -8,7 +8,16 @@ The manifest SHA-256 covers the GGUF bytes. The registry entry SHA-256 covers
 the entire .tcm ZIP. Registry signatures cover the raw UTF-8 index bytes.
 Model packages have a strict decimal 1 GB limit.
 
-Milestones M0 through M9 and their acceptance criteria are defined in the README.
+The [project milestones](../README.md#project-milestones) define the acceptance
+criteria for M0 through M9.
+
+## Manifest and registry contracts
+
+The [JSON schemas](../schemas/) are the source for the generated Python and
+TypeScript types. Any schema change requires an explicit version bump. After
+editing the schemas, run `.venv/bin/python tools/generate_contracts.py` from the
+repository root and include both generated files in the same change.
+`make check` detects stale generated files.
 
 ## Model selection and residency
 
