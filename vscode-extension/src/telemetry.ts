@@ -22,7 +22,7 @@ export class LocalMetrics {
   private outputTokens: number | null = null;
   private latestSpeed?: { model: string; tokensPerSecond: number };
 
-  constructor(private readonly onChange?: () => void) {}
+  constructor(private readonly onChange?: () => void) { }
 
   recordInference(model: string, { outputTokens, tokensPerSecond }: InferenceUsage): void {
     this.requests += 1;
@@ -37,8 +37,10 @@ export class LocalMetrics {
     for (const [model, requests] of this.modelRequests) {
       if (!mostUsed || requests > mostUsed.requests) mostUsed = { model, requests };
     }
-    return { requests: this.requests, outputTokens: this.outputTokens, latestSpeed: this.latestSpeed,
-      mostUsed, completions: this.export() };
+    return {
+      requests: this.requests, outputTokens: this.outputTokens, latestSpeed: this.latestSpeed,
+      mostUsed, completions: this.export()
+    };
   }
 
   record(firstTokenMs: number | undefined, completedMs: number): string {
