@@ -154,3 +154,71 @@ html:has(.landing) { background: #fafaf8; }
 .landing li + li { margin-top: .35rem; }
 .landing summary { cursor: pointer; }
 .landing footer { margin-top: 2.5rem; border-color: var(--rule); }
+
+.paper-page { width: min(49rem, calc(100% - 2.5rem)); }
+.paper-page .paper { padding-bottom: 3rem; }
+.paper-page .paper h1 { max-width: 22ch; }
+.paper-page .eyebrow { color: var(--secondary); }
+.paper-page .paper ol { padding-left: 1.4rem; }
+.paper-page .paper th, .paper-page .paper td {
+  border-color: var(--rule);
+  vertical-align: top;
+}
+.paper-page .paper table { min-width: 36rem; }
+.paper-page .paper h3 { margin-top: 1.45rem; font-size: 1.15rem; letter-spacing: normal; }
+.paper-page .paper h4 { margin: 0; font-size: 1rem; }
+.paper-contents {
+  margin-block: 1.5rem;
+  padding-block: .65rem;
+  border-block: 1px solid var(--rule);
+}
+.paper-page .paper-figure { margin-block: 1.5rem; }
+.paper-page .paper-figure figcaption { margin-top: .65rem; }
+.paper-page .routing-flow, .result-panels {
+  display: grid;
+  gap: .85rem;
+  padding: .85rem;
+  border: 1px solid var(--rule);
+  background: #f3f3ee;
+}
+.paper-page .routing-flow {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  list-style: none;
+  padding: .85rem;
+  counter-reset: route-step;
+}
+.paper-page .routing-flow li {
+  margin: 0;
+  padding: .55rem .75rem;
+  border-left: 2px solid var(--link);
+  counter-increment: route-step;
+}
+.routing-flow strong::before { content: counter(route-step) ". "; }
+.routing-flow span { display: block; color: var(--secondary); font-size: .9375rem; }
+.result-panels { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.result-bars { margin: .65rem 0 0; font-size: .9375rem; }
+.result-bars dd {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 4ch;
+  align-items: center;
+  gap: .75rem;
+  margin: 0 0 .45rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.result-bars meter { width: 100%; accent-color: var(--link); }
+.result-bars meter::-webkit-meter-optimum-value { background: var(--link); }
+.result-bars meter::-moz-meter-bar { background: var(--link); }
+@media (max-width: 38rem) {
+  .paper-page .routing-flow, .result-panels { grid-template-columns: 1fr; }
+}
+
+@media print {
+  .paper-page { width: 100%; background: #fff; }
+  .paper-page .project-header, .paper-page .skip-link { display: none; }
+  .paper-page .paper { max-width: none; padding: 0; }
+  .paper-page .paper h1 { max-width: none; font-size: 30pt; }
+  .paper-page .paper table { min-width: 0; }
+  .paper-figure { break-inside: avoid; }
+  .paper-contents { display: none; }
+}

@@ -15,6 +15,7 @@
       <a href="#downloads">Downloads</a>
       <a href="#start">Setup</a>
       <a href="docs/research-paper.html">Research</a>
+      <a href="#security">Security</a>
       <a href="https://github.com/somalip/tessera">GitHub</a>
     </nav>
   </header>
@@ -59,6 +60,17 @@
         <summary>Experimental specialty models</summary>
         <p>The documentation, English editing, Mermaid, and summary variants share the Qwen3.5-0.8B Q8_0 weights and tokenizer. Each adds specialty instructions through its GGUF chat template. Raw completion calls that bypass the template skip those instructions.</p>
       </details>
+    </section>
+    <section id="security" aria-labelledby="security-heading">
+      <h2 id="security-heading">Security policy</h2>
+      <p>This policy covers the Tessera VS Code extension, its local model runtime, and model packages and downloads distributed by Tessera.</p>
+
+      <h3>Report a vulnerability privately</h3>
+      <p>Open <a href="https://github.com/somalip/tessera/security/advisories">Tessera’s GitHub Security Advisories</a> and select <strong>Report a vulnerability</strong> if the option is available. If the private form is unavailable, contact the maintainers through an established private channel and keep the details out of public issues and pull requests.</p>
+      <p>Include the affected version, operating system, model or download source if relevant, steps to reproduce the issue, and the potential impact. Before sharing logs or examples, remove credentials, personal paths, and private code. Please coordinate public disclosure with the maintainers so users have time to update.</p>
+
+      <h3>Local inference and download integrity</h3>
+      <p>The extension sends prompts and editor context to its local inference server on the same machine. Extension usage metrics stay local. Registry lookups and model downloads connect to their configured sources. Tessera verifies signatures on remote registry indexes and checks downloaded model files against their expected SHA-256 hashes.</p>
     </section>
   </main>
 
