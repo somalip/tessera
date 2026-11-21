@@ -88,3 +88,69 @@ footer { border-top: 1px solid var(--line); padding-block: 1.5rem; }
   .paper h2 { break-after: avoid; }
   .paper tr { break-inside: avoid; }
 }
+
+/* Project homepage */
+.landing {
+  color-scheme: light;
+  --background: #fafaf8;
+  --text: #242420;
+  --secondary: #53534b;
+  --rule: #d5d5cc;
+  --link: #294978;
+  width: min(43rem, calc(100% - 2.5rem));
+  margin-inline: auto;
+  color: var(--text);
+  background: var(--background);
+  font-size: 1.0625rem;
+  line-height: 1.65;
+}
+html:has(.landing) { background: #fafaf8; }
+.landing a { color: var(--link); text-decoration: underline; }
+.landing a:hover { text-decoration-thickness: 2px; }
+.landing a:focus-visible, .landing summary:focus-visible { outline-color: var(--link); }
+.landing .skip-link {
+  position: absolute;
+  top: .5rem;
+  left: 1rem;
+  padding: .4rem .75rem;
+  background: var(--background);
+  transform: translateY(-200%);
+}
+.landing .skip-link:focus { transform: none; }
+.landing .project-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: .6rem 1.5rem;
+  padding: 1.35rem 0 1rem;
+  border-bottom: 1px solid var(--rule);
+}
+.landing .project-name { color: var(--text); font-weight: 700; text-decoration: none; }
+.landing nav { gap: .35rem 1.1rem; }
+.landing nav a { font-size: .9375rem; }
+.landing main { padding: clamp(2.5rem, 6vw, 4rem) 0 0; }
+.landing h1, .landing h2 {
+  font-family: Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -.025em;
+}
+.landing h1 { max-width: 16ch; font-size: clamp(2.45rem, 6vw, 3.5rem); }
+.landing h2 { font-size: 1.65rem; }
+.landing section { margin-top: 2.5rem; scroll-margin-top: 1.25rem; }
+.landing p { margin: .75rem 0; }
+.landing h1 + p { margin-top: 1.15rem; }
+.landing figure { margin: 1rem 0; }
+.landing pre {
+  margin: 0;
+  padding: .75rem 1rem;
+  background: #efefea;
+  border-left: 2px solid var(--rule);
+  overflow-x: auto;
+  font-size: .9rem;
+}
+.landing figcaption { margin-top: .35rem; color: var(--secondary); font-size: .875rem; }
+.landing ol { margin: .5rem 0 0; padding-left: 1.4rem; }
+.landing li + li { margin-top: .35rem; }
+.landing summary { cursor: pointer; }
+.landing footer { margin-top: 2.5rem; border-color: var(--rule); }

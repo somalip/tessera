@@ -3,280 +3,71 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Small coding models that run locally in VS Code.">
-  <title>Tessera</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@900&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #fff;
-      --ink: #0d0d0d;
-      --muted: #6e6e6e;
-      --line: #e5e5e5;
-      --split: 1px;
-      --mx: 0;
-      --my: 0;
-    }
-    * { box-sizing: border-box; }
-    html { font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Inter", "Helvetica Neue", Arial, sans-serif; color: var(--ink); background: var(--bg); -webkit-font-smoothing: antialiased; }
-    body { margin: 0; }
-    a { color: inherit; text-decoration: none; }
-    a:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; border-radius: 4px; }
-    .wrap { width: min(44rem, calc(100% - 3rem)); margin-inline: auto; }
-    header { display: flex; justify-content: space-between; align-items: center; padding: 1.75rem 0; font-size: .9375rem; }
-    .brand { font-weight: 600; letter-spacing: -.01em; }
-    header a:not(.brand) { color: var(--muted); }
-    header a:not(.brand):hover { color: var(--ink); }
-    .hero { padding: clamp(5rem, 18vh, 10rem) 0 clamp(3rem, 10vh, 6rem); }
-
-    h1 {
-      margin: 0;
-      font-family: "Unbounded", "Arial Black", Impact, -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
-      font-weight: 900;
-      font-size: clamp(1.9rem, 5.6vw, 3.4rem);
-      line-height: 1.08;
-      letter-spacing: -.045em;
-      text-transform: uppercase;
-      text-wrap: balance;
-      position: relative;
-      isolation: isolate;
-    }
-
-    /* Chromatic aberration: two tinted copies behind the ink text */
-    h1::before, h1::after {
-      content: attr(data-text);
-      position: absolute; inset: 0;
-      z-index: -1;
-      pointer-events: none;
-      mix-blend-mode: multiply;
-      opacity: .5;
-      transition: transform .12s ease-out;
-    }
-    h1::before {
-      color: #ff1f6b;
-      transform: translate(calc(var(--split) * -1 + var(--mx) * -1px), calc(var(--my) * -.5px));
-    }
-    h1::after {
-      color: #00d5ff;
-      transform: translate(calc(var(--split) + var(--mx) * 1px), calc(var(--my) * .5px));
-    }
-
-    .sub { margin: 1.5rem 0 0; font-size: 1.25rem; color: var(--muted); max-width: 30rem; }
-    .cta { display: inline-block; margin-top: 2.25rem; padding: .7rem 1.35rem; border-radius: 999px; background: var(--ink); color: #fff; font-size: .9375rem; font-weight: 500; }
-    .cta:hover { opacity: .85; }
-    .hero-actions, .download-actions, .download-primary { display: flex; flex-wrap: wrap; gap: .5rem; }
-    .hero-actions { margin-top: 2.25rem; }
-    .hero-actions .cta { margin-top: 0; }
-    .download-button { display: inline-block; padding: .45rem .85rem; border: 1px solid var(--muted); border-radius: 999px; font-size: .875rem; font-weight: 500; }
-    .download-button:hover { background: #f4f4f4; }
-    .download-primary { margin-bottom: .75rem; }
-    .download-more { border-top: 1px solid var(--line); }
-    .download-more summary {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      padding: .7rem 0;
-      font-size: .9375rem;
-      font-weight: 500;
-      cursor: pointer;
-      list-style: none;
-    }
-    .download-more summary::-webkit-details-marker { display: none; }
-    .download-more summary::after {
-      content: "";
-      flex: none;
-      width: .45rem;
-      height: .45rem;
-      margin-right: .35rem;
-      border: solid currentColor;
-      border-width: 0 1px 1px 0;
-      rotate: 45deg;
-    }
-    .download-more[open] summary::after { rotate: 225deg; }
-    .download-list { margin: .5rem 0 .75rem; padding: 0; list-style: none; }
-    .download-list li {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: .5rem 1rem;
-      padding: .55rem 0;
-      border-bottom: 1px solid var(--line);
-    }
-    .download-list h3 { margin: 0; font-size: .9375rem; font-weight: 500; }
-    .download-license { color: var(--muted); font-size: .875rem; text-decoration: underline; }
-    .rows { border-top: 1px solid var(--line); }
-    .row { display: grid; grid-template-columns: 10rem 1fr; gap: 1rem; padding: 1.75rem 0; border-bottom: 1px solid var(--line); }
-    .row h2 { margin: 0; font-size: 1rem; font-weight: 500; }
-    .row p, .row ol { margin: 0; color: var(--muted); }
-    .row p + p { margin-top: .75rem; }
-    .row ol { padding-left: 1.1rem; }
-    code { font: .875em ui-monospace, SFMono-Regular, Menlo, monospace; background: #f4f4f4; padding: .1em .35em; border-radius: 4px; color: var(--ink); }
-    .site-footer {
-      margin-bottom: 1.75rem;
-      font-size: .875rem;
-      color: var(--muted);
-    }
-    .footer-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
-    .site-footer .brand { color: var(--ink); font-size: 1rem; }
-    .site-footer p { margin: .3rem 0 0; }
-    .site-footer h2 { margin: 0 0 .3rem; color: var(--ink); font-size: inherit; font-weight: 600; }
-    .site-footer ul { display: grid; gap: .15rem; margin: 0; padding: 0; list-style: none; }
-    .site-footer li a { display: inline-block; padding: .15rem 0; }
-    .site-footer a:hover { color: var(--ink); text-decoration: underline; text-underline-offset: .2em; }
-    @media (max-width: 36rem) {
-      .row { grid-template-columns: 1fr; gap: .4rem; }
-      .site-footer { gap: 1rem; }
-    }
-  </style>
+  <meta name="description" content="Tessera brings local code completion and chat to VS Code with compact models selected for the language at your cursor.">
+  <title>Tessera · Local coding models for VS Code</title>
+  <link rel="stylesheet" href="site.css">
 </head>
-<body>
-  <div class="wrap">
-    <header>
-      <a class="brand" href="#">Tessera</a>
+<body class="landing" id="top">
+  <a class="skip-link" href="#content">Skip to content</a>
+  <header class="project-header">
+    <a class="project-name" href="#top">Tessera</a>
+    <nav aria-label="Main navigation">
+      <a href="#downloads">Downloads</a>
+      <a href="#start">Setup</a>
+      <a href="docs/research-paper.html">Research</a>
       <a href="https://github.com/somalip/tessera">GitHub</a>
-    </header>
+    </nav>
+  </header>
 
-    <main>
-      <div class="hero">
-        <h1 data-text="Offline agentic coding, made efficient.">Offline agentic coding, made efficient.</h1>
-        <p class="sub">Small, language-specific models for VS Code. Local inference with llama.cpp.</p>
-        <div class="hero-actions">
-          <a class="cta" href="#downloads">Downloads</a>
-          <a class="cta" href="#start">Get started</a>
-        </div>
-      </div>
+  <main id="content" tabindex="-1">
+    <h1>Local coding models for VS Code</h1>
+    <p>Tessera is a VS Code extension for inline completions and chat. It runs models on your machine with llama.cpp and picks one based on the language at your cursor.</p>
 
-      <div class="rows">
-        <div class="row">
-          <h2>Local</h2>
-          <p>Completions and chat run in a local model process. Models stay under 1 GB.</p>
-        </div>
-        <div class="row">
-          <h2>Per language</h2>
-          <p>The router picks a model based on the language at your cursor. Python first, then TypeScript and more.</p>
-        </div>
-        <div class="row">
-          <h2>Early</h2>
-          <p>Built on Qwen2.5-Coder-0.5B. Whether the Python fine-tune beats the base model is not yet verified.</p>
-        </div>
-        <section class="row" aria-labelledby="general-models">
-          <h2 id="general-models">General-purpose variants</h2>
-          <div>
-            <p>The documentation, English editing, Mermaid, and summary variants use the original Qwen3.5-0.8B Q8_0 weight tensors and tokenizer. Their GGUF metadata sets <code>general.name</code> and <code>general.description</code> for each specialty.</p>
-            <p>Each variant adds a Jinja preamble to <code>tokenizer.chat_template</code>. It creates a system message with the specialty instructions or prepends them to an existing system message, then runs the original Qwen template.</p>
-            <p>llama.cpp renders the template before tokenization, so the specialty instructions become part of the model input. Raw completion calls that bypass the chat template skip those instructions.</p>
-          </div>
-        </section>
-        <section class="row" id="downloads" aria-labelledby="downloads-heading">
-          <h2 id="downloads-heading">Downloads</h2>
-          <!-- <div>
-            <div class="download-primary">
-              <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/tessera.vsix">Tessera for VS Code (.vsix)</a>
-              <a class="download-button" href="https://huggingface.co/Qwen/Qwen2.5-Coder-0.5B-Instruct-GGUF/resolve/main/qwen2.5-coder-0.5b-instruct-q4_k_m.gguf?download=true" aria-label="Download Qwen2.5-Coder 0.5B Instruct Q4_K_M GGUF weights">Qwen2.5-Coder 0.5B (.gguf)</a>
-            </div>
-            <details class="download-more">
-              <summary>Experimental specialty models</summary>
-              <p>Use GGUF with llama.cpp or TinyCoders. TCM packages include a manifest, license, and evaluation report.</p>
-              <ul class="download-list">
-                <li>
-                  <h3>Documentation · Q8_0</h3>
-                  <div class="download-actions">
-                    <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/documentation-tiny.Q8_0.gguf" aria-label="Download Documentation GGUF weights">GGUF</a>
-                    <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/documentation-tiny.tcm" aria-label="Download Documentation TCM package">TCM</a>
-                  </div>
-                </li>
-                <li>
-                  <h3>English editing · Q8_0</h3>
-                  <div class="download-actions">
-                    <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/english-tiny.Q8_0.gguf" aria-label="Download English editing GGUF weights">GGUF</a>
-                    <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/english-tiny.tcm" aria-label="Download English editing TCM package">TCM</a>
-                  </div>
-                </li>
-                <li>
-                  <h3>Mermaid diagrams · Q8_0</h3>
-                  <div class="download-actions">
-                    <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/diagrams-tiny.Q8_0.gguf" aria-label="Download Mermaid diagrams GGUF weights">GGUF</a>
-                    <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/diagrams-tiny.tcm" aria-label="Download Mermaid diagrams TCM package">TCM</a>
-                  </div>
-                </li>
-                <li>
-                  <h3>Summaries · Q8_0</h3>
-                  <div class="download-actions">
-                    <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/summaries-tiny.Q8_0.gguf" aria-label="Download Summaries GGUF weights">GGUF</a>
-                    <a class="download-button" href="https://github.com/somalip/tessera/releases/download/tinycoders-downloads-v1/summaries-tiny.tcm" aria-label="Download Summaries TCM package">TCM</a>
-                  </div>
-                </li>
-              </ul>
-            </details>
-          </div> -->
-          <p>Coming Soon!</p>
-        </section>
-        <div class="row" id="start">
-          <h2>Install</h2>
-          <ol>
-            <li>Download the VSIX and a GGUF from <a href="#downloads"><u>Downloads</u></a>.</li>
-            <li>In VS Code, run <strong>Extensions: Install from VSIX…</strong> and select the VSIX.</li>
-            <li>Open the TinyCoders dashboard, choose <strong>Add Local GGUF…</strong>, and select the downloaded model.</li>
-          </ol>
-        </div>
-      </div>
-    </main>
+    <section aria-labelledby="routing-heading">
+      <h2 id="routing-heading">How model selection works</h2>
+      <p>In a Python file like this, Tessera can use a SQL model while you edit the query and a Python model elsewhere in the file.</p>
+      <figure>
+        <pre><code>query = """
+    SELECT name, stock
+    FROM inventory
+    WHERE stock &lt; 10
+"""</code></pre>
+        <figcaption>SQL inside <code>inventory.py</code></figcaption>
+      </figure>
+      <p>You can pin a model to a file or workspace. Tessera’s model packages are under 1 GB each. Running a model also uses memory for its context and runtime buffers.</p>
+    </section>
 
-    <footer class="row site-footer">
-      <div class="footer-overview">
-        <a class="brand" href="#">Tessera</a>
-        <p>Language-specific coding models for VS Code.</p>
-      </div>
-      <div class="footer-links">
-        <nav aria-labelledby="footer-project">
-          <h2 id="footer-project">Project</h2>
-          <ul>
-            <li><a href="#downloads">Downloads</a></li>
-            <li><a href="#start">Installation</a></li>
-            <li><a href="https://github.com/somalip/tessera">GitHub</a></li>
-          </ul>
-        </nav>
-        <nav aria-labelledby="footer-documentation">
-          <h2 id="footer-documentation">Documentation</h2>
-          <ul>
-            <li><a href="https://github.com/somalip/tessera/blob/main/docs/ARCHITECTURE.md">Architecture</a></li>
-            <li><a href="https://github.com/somalip/tessera/blob/main/train/README.md">Training</a></li>
-            <li><a href="https://github.com/somalip/tessera/blob/main/eval/README.md">Evaluation</a></li>
-          </ul>
-        </nav>
-      </div>
-    </footer>
-  </div>
+    <section id="downloads" aria-labelledby="downloads-heading">
+      <h2 id="downloads-heading">Downloads</h2>
+      <p>The VS Code installer and model packages are coming soon. Check <a href="https://github.com/somalip/tessera/releases">GitHub Releases</a> for updates.</p>
+    </section>
 
-  <script>
-    // Hero title aberration: follows the cursor and widens briefly on fast scrolls.
-    (function () {
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-      var root = document.documentElement;
-      var mx = 0, my = 0, tx = 0, ty = 0, boost = 0, lastY = window.scrollY;
-      window.addEventListener("pointermove", function (e) {
-        tx = (e.clientX / window.innerWidth) * 2 - 1;
-        ty = (e.clientY / window.innerHeight) * 2 - 1;
-      }, { passive: true });
-      window.addEventListener("scroll", function () {
-        var y = window.scrollY;
-        boost = Math.min(Math.abs(y - lastY) * 0.08, 2);
-        lastY = y;
-      }, { passive: true });
-      function tick() {
-        mx += (tx - mx) * 0.08;
-        my += (ty - my) * 0.08;
-        boost *= 0.9;
-        root.style.setProperty("--mx", mx.toFixed(3));
-        root.style.setProperty("--my", my.toFixed(3));
-        root.style.setProperty("--split", (1 + boost).toFixed(2) + "px");
-        requestAnimationFrame(tick);
-      }
-      requestAnimationFrame(tick);
-    })();
-  </script>
+    <section id="start" aria-labelledby="start-heading">
+      <h2 id="start-heading">Set up in VS Code</h2>
+      <p>Once you have the VSIX installer and a compatible GGUF model:</p>
+      <ol>
+        <li>Run <strong>Extensions: Install from VSIX…</strong> from the Command Palette and select the installer.</li>
+        <li>Run <strong>Tessera: Open Dashboard</strong>.</li>
+        <li>Choose <strong>Add Local GGUF</strong>, select a model role, and open the GGUF file.</li>
+      </ol>
+    </section>
+
+    <section aria-labelledby="research-heading">
+      <h2 id="research-heading">Research and model notes</h2>
+      <p>The <a href="docs/research-paper.html">research paper</a> describes how Tessera routes requests and what the early Python evaluations measured.</p>
+      <details>
+        <summary>Experimental specialty models</summary>
+        <p>The documentation, English editing, Mermaid, and summary variants share the Qwen3.5-0.8B Q8_0 weights and tokenizer. Each adds specialty instructions through its GGUF chat template. Raw completion calls that bypass the template skip those instructions.</p>
+      </details>
+    </section>
+  </main>
+
+  <footer>
+    <nav aria-label="Project documentation">
+      <a href="https://github.com/somalip/tessera/blob/main/docs/ARCHITECTURE.md">Architecture</a>
+      <a href="https://github.com/somalip/tessera/blob/main/train/README.md">Training</a>
+      <a href="https://github.com/somalip/tessera/blob/main/eval/README.md">Evaluation</a>
+    </nav>
+  </footer>
 </body>
 </html>
