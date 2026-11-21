@@ -70,10 +70,10 @@ export async function repositoryFiles(repository: string, revisionHint?: string)
     const { rfilename: name, size } = file;
     const sha256 = lfs.sha256;
     if (typeof name !== "string" || !/\.gguf$/i.test(name) ||
-        name.split("/").some(part => !part || part === "." || part === ".." || part.includes("\\")) ||
-        /(?:^|\/)(?:mmproj|mtp[-_.])|\d{5}-of-\d{5}\.gguf$/i.test(name) ||
-        typeof size !== "number" || !Number.isSafeInteger(size) || size <= 0 || size >= modelSizeLimit ||
-        lfs.size !== size || typeof sha256 !== "string" || !/^[a-f0-9]{64}$/.test(sha256)) return [];
+      name.split("/").some(part => !part || part === "." || part === ".." || part.includes("\\")) ||
+      /(?:^|\/)(?:mmproj|mtp[-_.])|\d{5}-of-\d{5}\.gguf$/i.test(name) ||
+      typeof size !== "number" || !Number.isSafeInteger(size) || size <= 0 || size >= modelSizeLimit ||
+      lfs.size !== size || typeof sha256 !== "string" || !/^[a-f0-9]{64}$/.test(sha256)) return [];
     const slug = name.split("/").at(-1)!.toLowerCase().replace(/\.gguf$/, "").replace(/[^a-z0-9]+/g, "-").slice(0, 54);
     const suffix = createHash("sha256").update(`${repository}/${revision}/${name}`).digest("hex").slice(0, 12);
     return [{
