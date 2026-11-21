@@ -1,3 +1,6 @@
+[tool.ruff.format]
+exclude = ["tools/contracts.py"]
+
 [tool.mypy]
 strict = true
 explicit_package_bases = true
