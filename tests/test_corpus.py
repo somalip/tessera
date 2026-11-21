@@ -33,12 +33,12 @@ class CorpusTests(unittest.TestCase):
                 elif index % 5 == 3:
                     source = "print(90000)\n"
                 rows.append(
-                    dict(
-                        repo="fixture",
-                        path=f"{index}.py",
-                        text=source,
-                        license=license_id,
-                    )
+                    {
+                        "repo": "fixture",
+                        "path": f"{index}.py",
+                        "text": source,
+                        "license": license_id,
+                    }
                 )
             (root / "source.jsonl").write_text(
                 "".join(json.dumps(row) + "\n" for row in rows)
