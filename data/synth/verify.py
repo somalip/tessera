@@ -1,4 +1,5 @@
 """Filter teacher-provided triples before supervised training."""
+
 import argparse
 import json
 from pathlib import Path
@@ -23,9 +24,12 @@ def main() -> None:
     with args.output.open("x", encoding="utf8") as output:
         for row in records(args.input):
             source = "\n".join(row[field] for field in ("prompt", "solution", "tests"))
-            if (row.get("license") in allowed and not SECRET.search(source)
-                    and not contamination.overlaps(source, tokens(source))
-                    and verify(row["solution"], row["tests"]).passed):
+            if (
+                row.get("license") in allowed
+                and not SECRET.search(source)
+                and not contamination.overlaps(source, tokens(source))
+                and verify(row["solution"], row["tests"]).passed
+            ):
                 output.write(json.dumps(row) + "\n")
 
 
