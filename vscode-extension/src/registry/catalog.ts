@@ -29,8 +29,10 @@ export function upstreamModel(details: {
 function qwenModel(
   id: string, source: string, size: number, sha256: string, capabilities: Manifest["capabilities"],
 ): CatalogEntry {
-  const entry = upstreamModel({ id, source, size, sha256, capabilities, base: "Qwen2.5-Coder-0.5B",
-    params: 500_000_000, quant: "Q4_K_M", automaticCoding: true });
+  const entry = upstreamModel({
+    id, source, size, sha256, capabilities, base: "Qwen2.5-Coder-0.5B",
+    params: 500_000_000, quant: "Q4_K_M", automaticCoding: true
+  });
   // Preserve the metadata already used by installed Qwen Coder versions.
   if (entry.upstreamManifest) entry.upstreamManifest.prompt_formats.chat_template = "chatml";
   return entry;
@@ -44,12 +46,16 @@ export const builtInModels = [
   qwenModel("qwen-coder-chat",
     "Qwen/Qwen2.5-Coder-0.5B-Instruct-GGUF/resolve/ebb2015119c907b064c512bf053e945850b5875f/qwen2.5-coder-0.5b-instruct-q4_k_m.gguf",
     491_400_064, "1d9614638d18024d0fbb36575a15f1302a3adf044df10345688ec4f6e1c4ff32", ["chat", "edit"]),
-  upstreamModel({ id: "smollm2-router", label: "SmolLM2 360M Instruct",
+  upstreamModel({
+    id: "smollm2-router", label: "SmolLM2 360M Instruct",
     source: "bartowski/SmolLM2-360M-Instruct-GGUF/resolve/7be6f65f1db715fe5dc5a4634c0d459b4eed42ec/SmolLM2-360M-Instruct-Q4_K_M.gguf",
     size: 270_590_880, sha256: "2fa3f013dcdd7b99f9b237717fa0b12d75bbb89984cc1274be1471a465bac9c2",
-    capabilities: ["chat"], base: "HuggingFaceTB/SmolLM2-360M-Instruct", params: 361_821_120, quant: "Q4_K_M" }),
-  upstreamModel({ id: "qwen3-small", label: "Qwen3 0.6B",
+    capabilities: ["chat"], base: "HuggingFaceTB/SmolLM2-360M-Instruct", params: 361_821_120, quant: "Q4_K_M"
+  }),
+  upstreamModel({
+    id: "qwen3-small", label: "Qwen3 0.6B",
     source: "Qwen/Qwen3-0.6B-GGUF/resolve/23749fefcc72300e3a2ad315e1317431b06b590a/Qwen3-0.6B-Q8_0.gguf",
     size: 639_446_688, sha256: "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031",
-    capabilities: ["chat", "edit"], base: "Qwen/Qwen3-0.6B", params: 596_049_920, quant: "Q8_0" }),
+    capabilities: ["chat", "edit"], base: "Qwen/Qwen3-0.6B", params: 596_049_920, quant: "Q8_0"
+  }),
 ];
