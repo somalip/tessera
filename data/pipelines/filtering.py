@@ -1,4 +1,5 @@
 """Filtering, fuzzy deduplication, and benchmark overlap detection."""
+
 import gzip
 import hashlib
 import json
@@ -15,11 +16,15 @@ SECRET = re.compile(
     r"|\b(?:api_key|access_token|password)\s*=\s*['\"][^'\"]{12,}['\"]",
     re.IGNORECASE,
 )
-AUTOGEN = re.compile(r"generated (?:automatically|by)|do not edit|@generated", re.IGNORECASE)
+AUTOGEN = re.compile(
+    r"generated (?:automatically|by)|do not edit|@generated", re.IGNORECASE
+)
 PRIME = 4_294_967_311
 PERMUTATIONS = tuple(
-    (int.from_bytes(hashlib.sha256(f"a{i}".encode()).digest()[:4]) or 1,
-     int.from_bytes(hashlib.sha256(f"b{i}".encode()).digest()[:4]))
+    (
+        int.from_bytes(hashlib.sha256(f"a{i}".encode()).digest()[:4]) or 1,
+        int.from_bytes(hashlib.sha256(f"b{i}".encode()).digest()[:4]),
+    )
     for i in range(48)
 )
 
@@ -38,7 +43,9 @@ def tokens(text: str) -> list[str]:
 
 def shingles(parts: list[str], size: int) -> set[bytes]:
     return {
-        hashlib.blake2b(" ".join(parts[index:index + size]).encode(), digest_size=8).digest()
+        hashlib.blake2b(
+            " ".join(parts[index : index + size]).encode(), digest_size=8
+        ).digest()
         for index in range(len(parts) - size + 1)
     }
 
@@ -48,7 +55,9 @@ class Contamination:
         self.by_length: dict[int, set[bytes]] = defaultdict(set)
         self.source_hashes: set[str] = set()
         if not sources:
-            raise ValueError("Supply a decontamination snapshot for every evaluation suite")
+            raise ValueError(
+                "Supply a decontamination snapshot for every evaluation suite"
+            )
         for path in sources:
             loaded = False
             for row in records(path):
@@ -56,7 +65,10 @@ class Contamination:
                     self.source_hashes.add(row["source_sha256"])
                 prompt = row.get("prompt", "")
                 expected = row.get("canonical_solution") or row.get("expected", "")
-                fields = [row.get(key, "") for key in ("text", "code", "test", "tests", "suffix")]
+                fields = [
+                    row.get(key, "")
+                    for key in ("text", "code", "test", "tests", "suffix")
+                ]
                 fields += [prompt, expected, prompt + expected + row.get("suffix", "")]
                 for text in fields:
                     if isinstance(text, list):
@@ -73,7 +85,8 @@ class Contamination:
 
     def overlaps(self, text: str, parts: list[str]) -> bool:
         return hashlib.sha256(text.encode()).hexdigest() in self.source_hashes or any(
-            forbidden & shingles(parts, length) for length, forbidden in self.by_length.items()
+            forbidden & shingles(parts, length)
+            for length, forbidden in self.by_length.items()
         )
 
 
@@ -89,8 +102,10 @@ class Dedupe:
             return "exact_duplicate"
         features = shingles(parts, min(5, len(parts)))
         keys = {int.from_bytes(item[:4], "big") for item in features}
-        signature = tuple(min((a * key + b) % PRIME for key in keys) for a, b in PERMUTATIONS)
-        bands = [(i, signature[i:i + 4]) for i in range(0, len(signature), 4)]
+        signature = tuple(
+            min((a * key + b) % PRIME for key in keys) for a, b in PERMUTATIONS
+        )
+        bands = [(i, signature[i : i + 4]) for i in range(0, len(signature), 4)]
         for index in set().union(*(self.bands[key] for key in bands)):
             other = self.rows[index]
             if len(other & features) / len(other | features) >= 0.8:
