@@ -39,7 +39,7 @@ export class LlamaServer {
     private readonly paged = false,
     private readonly cpuThreads = 0,
     private readonly onUsage?: (usage: InferenceUsage) => void,
-  ) {}
+  ) { }
 
   get alive(): boolean {
     return this.healthy && !this.abort.signal.aborted
