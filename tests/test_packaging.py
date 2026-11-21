@@ -14,17 +14,31 @@ class PackageTests(unittest.TestCase):
     def test_gate_and_size_are_required(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            model, report, license_file = [root / name for name in ("model.gguf", "report.json", "LICENSE")]
+            model, report, license_file = [
+                root / name for name in ("model.gguf", "report.json", "LICENSE")
+            ]
             model.write_bytes(b"GGUFtest")
             license_file.write_text("fixture license")
             package = root / "model.tcm"
-            metadata = dict(id="python-tiny", version="0.1.0", language_ids=["python"],
-                            vscode_language_ids=["python"], file_globs=["**/*.py"],
-                            base_model="qwen", params=1, quant="Q4_K_M", context_length=2048,
-                            prompt_formats=dict(fim=dict(prefix="P", suffix="S", middle="M"),
-                                                chat_template="chatml"),
-                            capabilities=["fim"], min_runtime=dict(llama_cpp_build="b8180"))
-            evaluation = dict(language="python", model_sha256=digest(model), gate_passed=False)
+            metadata = dict(
+                id="python-tiny",
+                version="0.1.0",
+                language_ids=["python"],
+                vscode_language_ids=["python"],
+                file_globs=["**/*.py"],
+                base_model="qwen",
+                params=1,
+                quant="Q4_K_M",
+                context_length=2048,
+                prompt_formats=dict(
+                    fim=dict(prefix="P", suffix="S", middle="M"), chat_template="chatml"
+                ),
+                capabilities=["fim"],
+                min_runtime=dict(llama_cpp_build="b8180"),
+            )
+            evaluation = dict(
+                language="python", model_sha256=digest(model), gate_passed=False
+            )
             report.write_text(json.dumps(evaluation))
             with self.assertRaisesRegex(ValueError, "passing evaluation"):
                 build(model, metadata, report, license_file, "MIT", package)
