@@ -30,6 +30,8 @@ See the [runtime guide](runtime-bin/README.md) for supported platforms, GPU sett
 
 - Run `make check PYTHON=.venv/bin/python` for lint, type checks, and unit tests.
 - Run `make test-ext` for the VS Code integration test with a mock inference server.
+  The test runner downloads VS Code by default. To use an existing installation, run
+  `make test-ext VSCODE_EXECUTABLE="/path/to/vscode-executable"`.
 - Read the [architecture guide](docs/ARCHITECTURE.md) for routing, memory management, and the release process.
 - See [AGENTS.md](AGENTS.md) for contributor rules.
 
