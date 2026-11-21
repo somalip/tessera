@@ -1,4 +1,5 @@
 """Import licensed HumanEval, MultiPL-E, or held-out JSONL fixtures."""
+
 import gzip
 import json
 from dataclasses import dataclass
@@ -20,11 +21,15 @@ class Task:
     license: str
 
 
-def load_tasks(path: Path, suite: str, language: str, source_license: str | None) -> list[Task]:
+def load_tasks(
+    path: Path, suite: str, language: str, source_license: str | None
+) -> list[Task]:
     allowlist = licenses()
     opener = gzip.open if path.suffix == ".gz" else open
     with opener(path, "rt", encoding="utf8") as stream:
-        records: list[dict[str, Any]] = [json.loads(line) for line in stream if line.strip()]
+        records: list[dict[str, Any]] = [
+            json.loads(line) for line in stream if line.strip()
+        ]
     tasks = []
     for record in records:
         license_id = record.get("license", source_license)
@@ -40,8 +45,13 @@ def load_tasks(path: Path, suite: str, language: str, source_license: str | None
             tests = record.get("tests", "")
         task = Task(
             id=str(record.get("task_id") or record.get("name") or record["id"]),
-            suite=suite, language=language, prompt=record["prompt"], tests=tests,
-            expected=record.get("expected"), suffix=record.get("suffix", ""), license=license_id,
+            suite=suite,
+            language=language,
+            prompt=record["prompt"],
+            tests=tests,
+            expected=record.get("expected"),
+            suffix=record.get("suffix", ""),
+            license=license_id,
         )
         if not (task.tests or task.expected is not None):
             raise ValueError(f"No expected output or execution tests: {task.id}")
