@@ -7,8 +7,8 @@ import re
 import zipfile
 from pathlib import Path
 
-from cryptography.hazmat.primitives.serialization import load_pem_private_key
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+from cryptography.hazmat.primitives.serialization import load_pem_private_key
 from jsonschema import Draft202012Validator  # type: ignore[import-untyped]
 
 from eval.report import digest
