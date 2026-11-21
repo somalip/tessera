@@ -44,8 +44,10 @@ function actions({ trusted, language, advanced, sections }: DashboardState) {
       { id: "add", label: "Add Local GGUF…", command: "tessera.addLocalModel" },
     ] : [],
     tools: visible.includes("tools") ? [
-      { id: "settings", label: "Settings", command: "workbench.action.openSettings",
-        args: ["@ext:tessera.tessera"] },
+      {
+        id: "settings", label: "Settings", command: "workbench.action.openSettings",
+        args: ["@ext:tessera.tessera"]
+      },
       { id: "output", label: "Show Output", command: "tessera.showOutput" },
       { id: "metrics", label: "Export Local Metrics…", command: "tessera.exportMetrics" },
     ] : [],
@@ -63,7 +65,7 @@ export class Dashboard implements vscode.WebviewViewProvider, vscode.Disposable 
     private readonly state: () => DashboardState,
     private readonly reportError: (error: unknown) => void,
     private readonly setAdvanced: (advanced: boolean) => PromiseLike<void>,
-  ) {}
+  ) { }
 
   resolveWebviewView(view: vscode.WebviewView): void {
     this.dispose();
