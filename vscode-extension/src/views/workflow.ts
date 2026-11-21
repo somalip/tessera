@@ -22,17 +22,29 @@ function modelLabel({ manifest, path }: Pick<InstalledModel, "manifest" | "path"
 export const cppFineTunedAutocomplete = "cpp-autocomplete.IQ4_NL.gguf";
 
 const presets: Array<{ id: string; label: string; detail: string; workflow: Workflow }> = [
-  { id: "coding", label: "Coding pair", detail: "Qwen Coder autocomplete and code generation.",
-    workflow: { router: "", autocomplete: "qwen-coder-autocomplete", parser: "", generator: "qwen-coder-chat" } },
-  { id: "routed", label: "Routed coding", detail: "SmolLM2 routes comments through a Qwen Coder parser when needed.",
-    workflow: { router: "smollm2-router", autocomplete: "qwen-coder-autocomplete",
-      parser: "qwen-coder-autocomplete", generator: "qwen-coder-chat" } },
-  { id: "chat", label: "General writing and chat", detail: "Qwen3 handles chat and text editing.",
-    workflow: { router: "", autocomplete: "", parser: "", generator: "qwen3-small" } },
-  { id: "cpp", label: "C++ generation with Qwen autocomplete", detail: "Use your linked C++ generator with Qwen Coder autocomplete.",
-    workflow: { router: "", autocomplete: "qwen-coder-autocomplete", parser: "", generator: "cpp-local" } },
-  { id: "cpp-pair", label: "Fine-tuned C++ pair", detail: "Link the fine-tuned C++ autocomplete GGUF and pair it with your C++ generator.",
-    workflow: { router: "", autocomplete: "", parser: "", generator: "cpp-local" } },
+  {
+    id: "coding", label: "Coding pair", detail: "Qwen Coder autocomplete and code generation.",
+    workflow: { router: "", autocomplete: "qwen-coder-autocomplete", parser: "", generator: "qwen-coder-chat" }
+  },
+  {
+    id: "routed", label: "Routed coding", detail: "SmolLM2 routes comments through a Qwen Coder parser when needed.",
+    workflow: {
+      router: "smollm2-router", autocomplete: "qwen-coder-autocomplete",
+      parser: "qwen-coder-autocomplete", generator: "qwen-coder-chat"
+    }
+  },
+  {
+    id: "chat", label: "General writing and chat", detail: "Qwen3 handles chat and text editing.",
+    workflow: { router: "", autocomplete: "", parser: "", generator: "qwen3-small" }
+  },
+  {
+    id: "cpp", label: "C++ generation with Qwen autocomplete", detail: "Use your linked C++ generator with Qwen Coder autocomplete.",
+    workflow: { router: "", autocomplete: "qwen-coder-autocomplete", parser: "", generator: "cpp-local" }
+  },
+  {
+    id: "cpp-pair", label: "Fine-tuned C++ pair", detail: "Link the fine-tuned C++ autocomplete GGUF and pair it with your C++ generator.",
+    workflow: { router: "", autocomplete: "", parser: "", generator: "cpp-local" }
+  },
 ];
 
 export class WorkflowPanel implements vscode.Disposable {
@@ -42,7 +54,7 @@ export class WorkflowPanel implements vscode.Disposable {
     private readonly models: () => readonly InstalledModel[],
     private readonly workflows: () => Workflows,
     private readonly save: (language: string, value: unknown) => Promise<void>,
-  ) {}
+  ) { }
 
   open(): void {
     if (this.panel) {
@@ -77,9 +89,13 @@ export class WorkflowPanel implements vscode.Disposable {
       languages: manifest.vscode_language_ids,
     }));
     void this.panel.webview.postMessage({
-      state: { models, language, workflows: this.workflows(), trusted: vscode.workspace.isTrusted,
-        catalog: builtInModels.map(model => ({ id: model.id, label: model.label, size: Math.ceil(model.size_bytes / 1_000_000),
-          capabilities: model.upstreamManifest?.capabilities ?? [] })) },
+      state: {
+        models, language, workflows: this.workflows(), trusted: vscode.workspace.isTrusted,
+        catalog: builtInModels.map(model => ({
+          id: model.id, label: model.label, size: Math.ceil(model.size_bytes / 1_000_000),
+          capabilities: model.upstreamManifest?.capabilities ?? []
+        }))
+      },
     });
   }
 
@@ -130,9 +146,11 @@ export class WorkflowPanel implements vscode.Disposable {
         const required = new Set(Object.values(preset.workflow).filter(Boolean));
         const downloads = builtInModels.filter(model => required.has(model.id) && !installed.has(model.id));
         const size = Math.ceil(downloads.reduce((bytes, entry) => bytes + entry.size_bytes, 0) / 1_000_000);
-        return { label: preset.label, detail: preset.detail,
+        return {
+          label: preset.label, detail: preset.detail,
           description: size ? `Download ${size} MB` : preset.id === "cpp-pair" && !cppAutocomplete()
-            ? "Link local GGUF" : "Ready to preview", preset, downloads };
+            ? "Link local GGUF" : "Ready to preview", preset, downloads
+        };
       });
       const choice = await vscode.window.showQuickPick(items, {
         title: "Tessera · Workflow presets", placeHolder: "Choose a starting point", matchOnDetail: true,
@@ -147,8 +165,10 @@ export class WorkflowPanel implements vscode.Disposable {
       if (choice?.preset.id === "cpp-pair") {
         if (!cppAutocomplete()) await vscode.commands.executeCommand("tessera.linkCppPresetModel");
         const model = cppAutocomplete();
-        void this.panel?.webview.postMessage({ action, language: "cpp",
-          preset: model && { ...choice.preset.workflow, autocomplete: model.manifest.id } });
+        void this.panel?.webview.postMessage({
+          action, language: "cpp",
+          preset: model && { ...choice.preset.workflow, autocomplete: model.manifest.id }
+        });
         return;
       }
       void this.panel?.webview.postMessage({ action, preset: choice?.preset.workflow, language: route });
