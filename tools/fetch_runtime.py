@@ -1,4 +1,5 @@
 """Install a checksum-pinned llama.cpp runtime and optional Python starter GGUF."""
+
 import argparse
 import hashlib
 import json
@@ -12,7 +13,10 @@ ASSETS = Path(__file__).resolve().parents[1] / "runtime-bin" / "assets.json"
 
 
 def fetch(url: str, destination: Path, expected: str, limit: int) -> None:
-    with urllib.request.urlopen(url, timeout=30) as response, destination.open("xb") as output:
+    with (
+        urllib.request.urlopen(url, timeout=30) as response,
+        destination.open("xb") as output,
+    ):
         if not response.url.startswith("https://"):
             raise ValueError("Runtime and model downloads require HTTPS")
         checksum = hashlib.sha256()
@@ -43,13 +47,23 @@ def main() -> None:
     if output.exists():
         parser.error(f"Output already exists: {output}")
     output.parent.mkdir(parents=True, exist_ok=True)
-    with tempfile.TemporaryDirectory(prefix=".runtime-", dir=output.parent) as temporary:
+    with tempfile.TemporaryDirectory(
+        prefix=".runtime-", dir=output.parent
+    ) as temporary:
         staging = Path(temporary)
         archive = staging / asset["name"]
-        fetch(f"https://github.com/ggml-org/llama.cpp/releases/download/{assets['build']}/{asset['name']}",
-              archive, asset["sha256"], 250_000_000)
+        fetch(
+            f"https://github.com/ggml-org/llama.cpp/releases/download/{assets['build']}/{asset['name']}",
+            archive,
+            asset["sha256"],
+            250_000_000,
+        )
         unpacked = staging / "runtime"
-        shutil.unpack_archive(archive, unpacked, filter="data" if archive.name.endswith(".tar.gz") else None)
+        shutil.unpack_archive(
+            archive,
+            unpacked,
+            filter="data" if archive.name.endswith(".tar.gz") else None,
+        )
         executable = "llama-server.exe" if system == "windows" else "llama-server"
         matches = list(unpacked.rglob(executable))
         if len(matches) != 1:
@@ -57,8 +71,12 @@ def main() -> None:
         relative_server = matches[0].relative_to(unpacked)
         if args.starter:
             starter = assets["starter"]
-            fetch(starter["url"], unpacked / "python-starter.gguf",
-                  starter["sha256"], starter["size_bytes"])
+            fetch(
+                starter["url"],
+                unpacked / "python-starter.gguf",
+                starter["sha256"],
+                starter["size_bytes"],
+            )
         unpacked.rename(output)
     print(f"tessera.serverPath = {output / relative_server}")
     if args.starter:
