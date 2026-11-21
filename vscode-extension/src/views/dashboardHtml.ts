@@ -41,9 +41,9 @@ export function renderDashboard({ trusted, advanced, language, active, lastInlin
     (language ? "No matching model" : "Open a source file");
   const routingDetail = !trusted ? "Trust this workspace to use local models and code actions."
     : advanced && lastInline ? `Last inline request · ${lastInline.mode}`
-    : active ? "Automatic routing for this editor."
-    : language ? "Download a compatible model or choose an installed one."
-    : "Routing follows the language at your cursor.";
+      : active ? "Automatic routing for this editor."
+        : language ? "Download a compatible model or choose an installed one."
+          : "Routing follows the language at your cursor.";
   const modelRows = models.map(model => {
     const { manifest } = model;
     const details = [
@@ -112,7 +112,7 @@ function renderUsage(usage: DashboardState["usage"], advanced: boolean): string 
         ${row("Reported output tokens", outputTokens === null ? "Unavailable" : count(outputTokens))}
         ${row("Inline acceptance", acceptance)}
         ${advanced ? row("Inline first token (p95)", latency(completions.first_token_p95_ms)) +
-          row("Inline completion latency (p95)", latency(completions.completed_request_p95_ms)) : ""}
+        row("Inline completion latency (p95)", latency(completions.completed_request_p95_ms)) : ""}
       </dl>` : '<p class="muted">Usage appears after your first completed model request.</p>'}
     </div>
   </section>`;
