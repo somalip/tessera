@@ -8,7 +8,7 @@ export interface InferenceHost {
   chat(messages: Message[], signal: AbortSignal, codeTokens?: number): AsyncIterable<string>;
 }
 
-export class IncompleteCodeError extends Error {}
+export class IncompleteCodeError extends Error { }
 
 export interface InferenceUsage {
   outputTokens?: number;
@@ -37,7 +37,7 @@ async function* events(response: Response): AsyncIterable<ResponseChunk> {
   const decoder = new TextDecoder();
   let buffer = "";
   try {
-    for (;;) {
+    for (; ;) {
       const { value, done } = await reader.read();
       buffer += decoder.decode(value, { stream: !done });
       const lines = buffer.split("\n");
@@ -64,7 +64,7 @@ export class LlamaClient implements InferenceHost {
     private readonly origin: string, private readonly apiKey: string,
     private readonly contextLength: number,
     private readonly onUsage?: (usage: InferenceUsage) => void,
-  ) {}
+  ) { }
 
   private async post(path: string, body: object, signal: AbortSignal) {
     const response = await fetch(this.origin + path, {
