@@ -1,4 +1,5 @@
 """Shared conservative SPDX allowlist for training and evaluation inputs."""
+
 from pathlib import Path
 
 import yaml
