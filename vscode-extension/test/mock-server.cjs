@@ -5,7 +5,7 @@ const flag = name => process.argv[process.argv.indexOf(name) + 1];
 const server = http.createServer(async (request, response) => {
   if (request.url === "/health") return response.end("{}");
   if (!["/v1/completions", "/v1/chat/completions"].includes(request.url) ||
-      request.headers.authorization !== `Bearer ${flag("--api-key")}`) {
+    request.headers.authorization !== `Bearer ${flag("--api-key")}`) {
     response.writeHead(404).end();
     return;
   }
@@ -14,7 +14,7 @@ const server = http.createServer(async (request, response) => {
   const { prompt, stop, max_tokens, messages } = JSON.parse(body);
   if (request.url === "/v1/chat/completions") {
     if (messages?.[0]?.content.startsWith("Classify this coding request.") && max_tokens === 8 &&
-        flag("--model").includes("/qwen-coder-chat/")) {
+      flag("--model").includes("/qwen-coder-chat/")) {
       response.setHeader("Content-Type", "text/event-stream");
       response.end('data: {"choices":[{"delta":{"content":"PARSE"},"finish_reason":"stop"}]}\n\ndata: [DONE]\n\n');
       return;
@@ -23,8 +23,8 @@ const server = http.createServer(async (request, response) => {
     if (task === "write a for loop") {
       const user = messages[1].content;
       if (!flag("--model").endsWith("/cpp-chat.gguf") || max_tokens !== 768 ||
-          !messages[0].content.startsWith("Return only C++20 source code.") ||
-          !user.includes("Print the loop index.") || user.includes("Before cursor:")) {
+        !messages[0].content.startsWith("Return only C++20 source code.") ||
+        !user.includes("Print the loop index.") || user.includes("Before cursor:")) {
         response.writeHead(400).end();
         return;
       }
@@ -54,11 +54,11 @@ const server = http.createServer(async (request, response) => {
     const partial = task === "make a tui snake game" && !retry;
     const code = task === "make a tui snake game" ? (retry ? "print('Game ready')" : "def main():")
       : task === "loop" ? "for i in range(10):\n    print(i)"
-      : task === "Build a command-line Pomodoro timer that handles Ctrl-C." ? "print('Pomodoro timer')"
-      : multiline ? "print('JSON export')"
-      : task === "return answer" ? "return 42" : undefined;
+        : task === "Build a command-line Pomodoro timer that handles Ctrl-C." ? "print('Pomodoro timer')"
+          : multiline ? "print('JSON export')"
+            : task === "return answer" ? "return 42" : undefined;
     if (code && messages[0].content.includes(project ? "complete, runnable Python" : "complete, runnable code") &&
-        max_tokens >= 1024 && flag("--model").endsWith("/mock.gguf")) {
+      max_tokens >= 1024 && flag("--model").endsWith("/mock.gguf")) {
       response.setHeader("Content-Type", "text/event-stream");
       const content = "\x60\x60\x60python\n" + code + "\n\x60\x60\x60";
       response.write("data: " + JSON.stringify({ choices: [{ delta: { content } }] }) + "\n\n");
@@ -94,8 +94,8 @@ const server = http.createServer(async (request, response) => {
       prompt.includes("Install the extension by <CURSOR>") ? "docs"
       : model.endsWith("/parsing.gguf") && prompt.startsWith("<|fim_prefix|>") &&
         prompt.includes("WHERE active = <|fim_suffix|>") ? "parsing"
-      : model.endsWith("/mock.gguf") && prompt.startsWith("<|fim_prefix|>") &&
-        prompt.includes("    <|fim_suffix|>") && max_tokens === 32 ? "python" : "";
+        : model.endsWith("/mock.gguf") && prompt.startsWith("<|fim_prefix|>") &&
+          prompt.includes("    <|fim_suffix|>") && max_tokens === 32 ? "python" : "";
     response.setHeader("Content-Type", "application/json");
     response.end(JSON.stringify({ choices: [{ text }] }));
     return;
