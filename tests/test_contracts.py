@@ -15,11 +15,23 @@ class ContractTests(unittest.TestCase):
     def test_registry_rejects_unsafe_entries(self) -> None:
         schema = json.loads((SCHEMAS / "registry.json").read_text())
         validator = Draft202012Validator(schema)
-        entry = dict(id="python-tiny", version="0.1.0", url="https://example.org/python.tcm",
-                     sha256="0" * 64, size_bytes=100, language_ids=["python"])
+        entry = dict(
+            id="python-tiny",
+            version="0.1.0",
+            url="https://example.org/python.tcm",
+            sha256="0" * 64,
+            size_bytes=100,
+            language_ids=["python"],
+        )
         self.assertTrue(validator.is_valid(dict(schema_version=1, models=[entry])))
-        for field, value in [("id", "../python"), ("url", "file:///tmp/model"),
-                             ("size_bytes", 1_000_000_000), ("sha256", "invalid")]:
+        for field, value in [
+            ("id", "../python"),
+            ("url", "file:///tmp/model"),
+            ("size_bytes", 1_000_000_000),
+            ("sha256", "invalid"),
+        ]:
             with self.subTest(field=field):
                 changed = {**entry, field: value}
-                self.assertFalse(validator.is_valid(dict(schema_version=1, models=[changed])))
+                self.assertFalse(
+                    validator.is_valid(dict(schema_version=1, models=[changed]))
+                )
