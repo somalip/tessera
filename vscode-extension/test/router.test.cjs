@@ -5,10 +5,12 @@ const { selectModel } = require("../dist/router/policy");
 const { Lifecycle } = require("../dist/router/lifecycle");
 const ids = ["python", "typescript", "javascript", "c", "cpp", "kotlin", "sql", "rust",
   "css", "go", "general"];
-const models = ids.map(id => ({ manifest: {
-  id, language_ids: [id], vscode_language_ids: id === "typescript" ? [id, "typescriptreact"] : [id],
-  file_globs: id === "python" ? ["**/*.py"] : [], capabilities: ["fim"],
-} }));
+const models = ids.map(id => ({
+  manifest: {
+    id, language_ids: [id], vscode_language_ids: id === "typescript" ? [id, "typescriptreact"] : [id],
+    file_globs: id === "python" ? ["**/*.py"] : [], capabilities: ["fim"],
+  }
+}));
 const cases = [
   ...ids.filter(id => id !== "general").map(id => [id, "", {}, id]),
   ["typescriptreact", "", {}, "typescript"],
@@ -91,7 +93,7 @@ test("eviction waits for shutdown and a crashed host is restarted", async () => 
       running = false;
     },
   });
-  const useFirst = () => lifecycle.use("first", 10, first, async () => {});
+  const useFirst = () => lifecycle.use("first", 10, first, async () => { });
   try {
     await useFirst();
     running = false;
@@ -99,7 +101,7 @@ test("eviction waits for shutdown and a crashed host is restarted", async () => 
     assert.equal(started, 2);
     const next = lifecycle.use("next", 10, () => {
       assert.equal(running, false);
-      return { alive: true, start: async () => ({}), dispose() {} };
+      return { alive: true, start: async () => ({}), dispose() { } };
     }, async () => true);
     await new Promise(resolve => setImmediate(resolve));
     assert.equal(typeof release, "function");
@@ -114,7 +116,7 @@ test("eviction waits for shutdown and a crashed host is restarted", async () => 
 test("the automatic budget admits a paged model alone and protects its active lease", async () => {
   const lifecycle = new Lifecycle(10, 2, 5000, Promise.resolve(), true);
   const events = [];
-  const use = (key, bytes, operation = async () => {}) => lifecycle.use(key, bytes, paged => ({
+  const use = (key, bytes, operation = async () => { }) => lifecycle.use(key, bytes, paged => ({
     alive: true,
     start: async () => { events.push([key, paged]); return {}; },
     dispose: () => events.push(["disposed", key]),
