@@ -1,5 +1,6 @@
 """Run candidate code only inside preinstalled, isolated Docker images."""
 
+import os
 import subprocess
 import uuid
 from dataclasses import dataclass
@@ -24,14 +25,18 @@ def run_container(
     docker: str = "docker",
     *,
     executable_scratch: bool = False,
+    run_id: str | None = None,
 ) -> Outcome:
     name = f"tessera-{uuid.uuid4().hex}"
     mode = "exec" if executable_scratch else "noexec"
+    run_id = run_id or os.environ.get("TESSERA_VERIFIER_RUN_ID")
+    label = ["--label", f"tessera.verifier-run={run_id}"] if run_id else []
     args = [
         docker,
         "run",
         "--rm",
         "--pull=never",
+        *label,
         "--name",
         name,
         "--interactive",
