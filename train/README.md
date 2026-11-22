@@ -45,11 +45,17 @@ passing evaluation report for the exact candidate GGUF.
 Run from the repository root on the Mac with the existing C++ competency
 experiment under `artifacts/cpp-models`, its Qwen 1.5B snapshot and predecessor
 corpus, and the local llama.cpp b12244 binaries. These are local experiment
-inputs. Keep Docker Desktop running with the pinned verifier images already
-present. The runner uses no Copilot, Codex API, or remote teacher.
+inputs. Keep Docker Desktop running. Run the prerequisite check first and use
+any printed `docker pull` commands to install missing verifier images. The
+training run uses no Copilot, Codex API, or remote teacher.
 
 ```sh
 .venv/bin/python -m train.cpp_overnight --check
+```
+
+Once the check passes, start the run.
+
+```sh
 run="artifacts/cpp-overnight/$(date +%Y%m%d-%H%M%S)"
 caffeinate -is .venv/bin/python -m train.cpp_overnight --hours 8 --output "$run"
 ```
@@ -76,3 +82,28 @@ fresh `--output` and `--reuse-training /path/to/previous-run` to skip the
 fine-tune. The six-case suite provides local experimental evidence. Release
 packaging and registry publication use the
 existing release evaluation, hardware profiles, and package checks.
+
+The streamed fine-tune runs on CPU. The launcher defaults to the available
+logical CPU count for PyTorch and llama.cpp's build steps. Use `--threads N`
+to tune that count. On Apple silicon, code calibration defaults to Metal.
+Use `--calibration-gpu-layers 0` for CPU calibration. The default benchmark
+server already uses Metal. Resource use varies by stage.
+
+### Six-hour recursive search
+
+```sh
+cd /Users/somalip/Documents/GitHub/tessera
+caffeinate -is /Users/somalip/Documents/GitHub/tessera/.venv/bin/python \
+  -m train.cpp_overnight --continuous --hours 6 \
+  --output "/Users/somalip/Documents/GitHub/tessera/artifacts/cpp-overnight/search-$(date +%Y%m%d-%H%M%S)"
+```
+
+Each round trains from the best retained full-precision checkpoint and measures
+its quantized candidates against the current incumbent. Later rounds lower the
+learning rate. Promotion retains all incumbent passes and normal stops, requires
+at least one passing case and a 5% latency improvement, and enforces the 1 GB
+GGUF ceiling. The search preserves reports and winning checkpoints and removes
+unselected weights generated inside its round directories. Its root
+`summary.json` identifies the best model found on the six-case development
+benchmark. Repeated selection on this suite calls for a separate release
+evaluation.

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Meet Tessera, Rusk’s local coding assistant for VS Code.">
+  <title>Products · Rusk</title>
+  <link rel="stylesheet" href="site.css">
+  <style>
+    .landing nav [aria-current="page"] {
+      color: var(--text);
+      font-weight: 700;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body class="landing" id="top">
+  <a class="skip-link" href="#content">Skip to content</a>
+  <header class="project-header">
+    <a class="project-name" href="./">Rusk</a>
+    <nav aria-label="Main navigation">
+      <a href="./">Home</a>
+      <a href="products.html" aria-current="page">Products</a>
+      <a href="company.html">Company</a>
+    </nav>
+  </header>
+
+  <main id="content" tabindex="-1">
+    <h1>Products</h1>
+    <p>Tessera is Rusk’s first product.</p>
+
+    <section aria-labelledby="tessera-heading">
+      <h2 id="tessera-heading">Tessera</h2>
+      <p>A VS Code extension for inline code completions and chat. Tessera selects a model using the file and the language at your cursor, then runs inference on your machine. Each Tessera model package is under 1 GB.</p>
+      <figure>
+        <pre><code>query = """
+    SELECT name, stock
+    FROM inventory
+    WHERE stock &lt; 10
+"""</code></pre>
+        <figcaption>Tessera can use a SQL model inside the query and a Python model elsewhere in the file.</figcaption>
+      </figure>
+      <p><a href="https://github.com/somalip/tessera/releases">Download Tessera</a> or <a href="https://github.com/somalip/tessera/blob/main/docs/ARCHITECTURE.md">read the architecture</a>.</p>
+    </section>
+  </main>
+
+  <footer>
+    <span>Rusk</span>
+    <nav aria-label="Footer navigation">
+      <a href="products.html">Products</a>
+      <a href="company.html">About Rusk</a>
+      <a href="https://github.com/somalip/tessera">Tessera on GitHub</a>
+    </nav>
+  </footer>
+</body>
+</html>

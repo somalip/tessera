@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Rusk builds developer tools that run on your machine. Tessera is our first product.">
+  <title>Rusk · Local developer tools</title>
+  <link rel="stylesheet" href="site.css">
+  <style>
+    html { container-type: inline-size; }
+    .landing { isolation: isolate; position: relative; }
+    .landing .donuts {
+      position: absolute;
+      z-index: -1;
+      inset: 0 calc(50% - 50cqw);
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: center;
+      overflow: hidden;
+      pointer-events: none;
+      mask-image: linear-gradient(90deg, #000 5%, #0003 38%, #0003 62%, #000 95%);
+    }
+    .landing .donuts pre {
+      margin: 0;
+      padding: 0;
+      overflow: visible;
+      border: 0;
+      background: none;
+      font: 600 clamp(.7rem, 1.85vw, 2.3rem)/1.1 ui-monospace, monospace;
+      color: #355d51;
+      opacity: .34;
+      user-select: none;
+      justify-self: end;
+      transform: translateX(8%);
+    }
+    @media (max-width: 42rem) {
+      .landing .donuts { grid-template-columns: 1fr; mask-image: none; }
+      .landing .donuts pre {
+        font-size: clamp(.75rem, 3.9vw, 1.5rem);
+        opacity: .12;
+      }
+    }
+    .landing .motion-control {
+      padding: .15rem 0;
+      border: 0;
+      background: var(--background);
+      color: var(--link);
+      font: inherit;
+      font-size: .875rem;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    .landing .motion-control:focus-visible {
+      outline: 2px solid var(--link);
+      outline-offset: 3px;
+    }
+    @media print {
+      .landing .donuts, .landing .motion-control { display: none; }
+    }
+  </style>
+</head>
+<body class="landing" id="top">
+  <a class="skip-link" href="#content">Skip to content</a>
+  <div class="donuts" aria-hidden="true">
+    <pre></pre>
+  </div>
+  <header class="project-header">
+    <a class="project-name" href="#top">Rusk</a>
+    <nav aria-label="Main navigation">
+      <a href="#products">Products</a>
+      <a href="#company">Company</a>
+    </nav>
+  </header>
+
+  <main id="content" tabindex="-1">
+    <h1>Developer tools that run locally.</h1>
+    <p>Rusk builds software for developers who want to work with models on their own hardware. We design around the tools developers already use and the machines they already have.</p>
+
+    <section id="products" aria-labelledby="products-heading">
+      <h2 id="products-heading">Products</h2>
+      <p><a href="index.html"><strong>Tessera</strong></a> is our first product. It brings local code completion and chat to VS Code, selecting a compact model for the language at your cursor. Every model package is under 1 GB.</p>
+      <p><a href="https://github.com/somalip/tessera/releases">Download Tessera</a> or <a href="docs/ARCHITECTURE.md">read the architecture</a>.</p>
+    </section>
+
+    <section id="company" aria-labelledby="company-heading">
+      <h2 id="company-heading">Company</h2>
+      <p>Rusk is the company behind Tessera. We build around local hardware limits, fit into the editor developers already use, and keep inference on the same machine.</p>
+    </section>
+  </main>
+
+  <footer>
+    <nav aria-label="Footer navigation">
+      <a href="#top">Rusk</a>
+      <a href="index.html">Tessera</a>
+      <a href="https://github.com/somalip/tessera">GitHub</a>
+    </nav>
+    <button class="motion-control" type="button" hidden>Pause animation</button>
+  </footer>
+
+  <script>
+    const donut = document.querySelector('.donuts pre');
+    const control = document.querySelector('.motion-control');
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const width = 34;
+    const height = 17;
+    const shades = '.,-~:;=!*#$@';
+
+    // Precompute points and surface normals on a torus.
+    const points = [];
+    for (let ring = 0; ring < 90; ring += 1) {
+      const around = ring * Math.PI / 45;
+      const cosAround = Math.cos(around);
+      const sinAround = Math.sin(around);
+      for (let tube = 0; tube < 36; tube += 1) {
+        const angle = tube * Math.PI / 18;
+        const cosTube = Math.cos(angle);
+        const sinTube = Math.sin(angle);
+        const radius = 1.6 + .65 * cosTube;
+        points.push({
+          x: radius * cosAround,
+          y: radius * sinAround,
+          z: .65 * sinTube,
+          nx: cosTube * cosAround,
+          ny: cosTube * sinAround,
+          nz: sinTube,
+        });
+      }
+    }
+
+    function render(panel, tilt, roll) {
+      const pixels = Array(width * height).fill(' ');
+      const depth = new Float32Array(pixels.length);
+      depth.fill(Infinity);
+      const cosTilt = Math.cos(tilt);
+      const sinTilt = Math.sin(tilt);
+      const cosRoll = Math.cos(roll);
+      const sinRoll = Math.sin(roll);
+
+      for (const point of points) {
+        const y = point.y * cosTilt - point.z * sinTilt;
+        const z = point.y * sinTilt + point.z * cosTilt + 7;
+        const column = Math.round(width / 2 + 43 * (point.x * cosRoll - y * sinRoll) / z);
+        const row = Math.round(height / 2 + 21 * (point.x * sinRoll + y * cosRoll) / z);
+        if (column < 0 || column >= width || row < 0 || row >= height) continue;
+
+        const index = row * width + column;
+        if (z >= depth[index]) continue;
+        depth[index] = z;
+        const normalY = point.ny * cosTilt - point.nz * sinTilt;
+        const normalZ = point.ny * sinTilt + point.nz * cosTilt;
+        const light = -.6 * (point.nx * sinRoll + normalY * cosRoll) - .8 * normalZ;
+        const shade = Math.round(Math.max(0, Math.min(1, light)) * (shades.length - 1));
+        pixels[index] = shades[shade];
+      }
+
+      const rows = [];
+      for (let row = 0; row < height; row += 1) {
+        rows.push(pixels.slice(row * width, (row + 1) * width).join(''));
+      }
+      panel.textContent = rows.join('\n');
+    }
+
+    let elapsed = 0;
+    let lastFrame;
+    let animation;
+
+    function draw() {
+      render(donut, .7 + elapsed * .00067, -.3 + elapsed * .00032);
+    }
+
+    function tick(now) {
+      if (lastFrame === undefined) lastFrame = now;
+      if (now - lastFrame >= 40) {
+        elapsed += Math.min(now - lastFrame, 80);
+        lastFrame = now;
+        draw();
+      }
+      animation = requestAnimationFrame(tick);
+    }
+
+    function setMotion(enabled) {
+      cancelAnimationFrame(animation);
+      animation = undefined;
+      lastFrame = undefined;
+      if (enabled) animation = requestAnimationFrame(tick);
+      control.textContent = enabled ? 'Pause animation' : 'Play animation';
+    }
+
+    draw();
+    control.hidden = false;
+    setMotion(!reducedMotion.matches);
+    control.addEventListener('click', () => setMotion(animation === undefined));
+    reducedMotion.addEventListener('change', () => setMotion(!reducedMotion.matches));
+  </script>
+</body>
+</html>

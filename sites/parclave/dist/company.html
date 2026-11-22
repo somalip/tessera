@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="About Rusk, the company behind Tessera.">
+  <title>Company · Rusk</title>
+  <link rel="stylesheet" href="site.css">
+  <style>
+    .landing nav [aria-current="page"] {
+      color: var(--text);
+      font-weight: 700;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body class="landing" id="top">
+  <a class="skip-link" href="#content">Skip to content</a>
+  <header class="project-header">
+    <a class="project-name" href="./">Rusk</a>
+    <nav aria-label="Main navigation">
+      <a href="./">Home</a>
+      <a href="products.html">Products</a>
+      <a href="company.html" aria-current="page">Company</a>
+    </nav>
+  </header>
+
+  <main id="content" tabindex="-1">
+    <h1>About Rusk</h1>
+    <p>Rusk makes tools for software development that run close to the work, on the developer’s own machine. We started with Tessera because code completion and chat already belong in the editor.</p>
+
+    <section aria-labelledby="approach-heading">
+      <h2 id="approach-heading">How we build</h2>
+      <ul>
+        <li><strong>Work within local hardware limits.</strong> We set a download budget and check it when packaging a model for release.</li>
+        <li><strong>Fit into the developer’s workflow.</strong> Tessera uses the language at the cursor and lets developers pin a model to a file or workspace.</li>
+        <li><strong>Keep local processing straightforward.</strong> Tessera sends editor context to an inference process on the same machine.</li>
+      </ul>
+      <p><a href="products.html">Explore our products</a></p>
+    </section>
+  </main>
+
+  <footer>
+    <span>Rusk</span>
+    <nav aria-label="Footer navigation">
+      <a href="products.html">Products</a>
+      <a href="company.html">About Rusk</a>
+      <a href="https://github.com/somalip/tessera">Tessera on GitHub</a>
+    </nav>
+  </footer>
+</body>
+</html>

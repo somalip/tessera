@@ -74,3 +74,42 @@ class OvernightCheckpointTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "provenance checks"):
                     reuse_checkpoint(root, output)
                 self.assertEqual((output / weights.name).read_bytes(), b"original")
+
+
+class ContinuousSearchTests(unittest.TestCase):
+    def test_promoted_weights_are_used_by_next_round_until_deadline(self) -> None:
+        from train.cpp_overnight import search
+
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)
+            round_one = output / "round-001"
+            best = round_one / "cpp-generation.Q4_0.gguf"
+            full = round_one / "cpp-generation.f16.gguf"
+
+            def promote(run: Path, *args: object, **kwargs: object) -> None:
+                best.touch()
+                full.touch()
+                (run / "cpp-generation.IQ4_NL.gguf").touch()
+                write_json(
+                    run / "summary.json",
+                    {"status": "finished", "best": {"model": str(best)}},
+                )
+
+            def time_out(run: Path, *args: object, **kwargs: object) -> None:
+                self.assertEqual(kwargs["start"], full)
+                self.assertEqual(kwargs["baseline_model"], best)
+                write_json(run / "summary.json", {"status": "timed_out", "best": None})
+                raise TimeoutError
+
+            with patch("train.cpp_overnight.sweep", side_effect=[None]) as sweep:
+                from collections.abc import Callable
+
+                rounds: list[Callable[..., None]] = [promote, time_out]
+                sweep.side_effect = lambda *args, **kwargs: rounds.pop(0)(
+                    *args, **kwargs
+                )
+                search(output, Path("server"), 6, None, 6, 99)
+                self.assertEqual(sweep.call_count, 2)
+            self.assertTrue(best.exists())
+            self.assertTrue(full.exists())
+            self.assertFalse((round_one / "cpp-generation.IQ4_NL.gguf").exists())

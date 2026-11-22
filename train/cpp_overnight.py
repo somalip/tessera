@@ -6,6 +6,7 @@ import importlib
 import json
 import math
 import os
+import platform
 import shutil
 import signal
 import subprocess
@@ -67,12 +68,31 @@ def preflight(server: Path) -> None:
         raise FileNotFoundError("Missing local inputs\n" + "\n".join(missing))
     if shutil.disk_usage(ARTIFACTS).free < 8_000_000_000:
         raise ValueError("Need at least 8 GB free for the fine-tune and candidates")
-    subprocess.run(
-        ["docker", "image", "inspect", COMPILERS["cpp"][0], PYTHON_IMAGE],
-        stdout=subprocess.DEVNULL,
-        timeout=30,
-        check=True,
-    )
+    check_verifier_images()
+
+
+def check_verifier_images() -> None:
+    pulls = []
+    for image in (COMPILERS["cpp"][0], PYTHON_IMAGE):
+        result = subprocess.run(
+            ["docker", "image", "inspect", image],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            text=True,
+            timeout=30,
+            check=False,
+        )
+        if result.returncode == 0:
+            continue
+        error = result.stderr.strip()
+        if "no such image" not in error.lower():
+            raise RuntimeError(f"Docker could not inspect the verifier image. {error}")
+        pulls.append(f"  docker pull '{image}'")
+    if pulls:
+        raise RuntimeError(
+            "Missing verifier images in the active Docker context. Run these once, "
+            "then retry:\n" + "\n".join(pulls)
+        )
 
 
 def run_stage(
@@ -231,10 +251,14 @@ def strict_results(
     }
 
 
-def improves(candidate: dict[str, Any], baseline: dict[str, Any]) -> bool:
+def improves(
+    candidate: dict[str, Any], baseline: dict[str, Any], *, recursive: bool = False
+) -> bool:
+    passed = set(candidate["passed"])
+    previous = set(baseline["passed"])
     return (
         0 < candidate["size_bytes"] < LIMIT
-        and set(baseline["passed"]) < set(candidate["passed"])
+        and (previous < passed or (recursive and bool(passed) and previous == passed))
         and candidate["stopped"] >= baseline["stopped"]
         and 0 < candidate["inference_ms"] <= baseline["inference_ms"] * 0.95
     )
@@ -282,20 +306,41 @@ def reuse_checkpoint(previous: Path, output: Path) -> None:
         shutil.copyfile(previous / name, output / name)
 
 
-def sweep(output: Path, server: Path, hours: float, previous: Path | None) -> None:
-    deadline = time.monotonic() + hours * 3600
+def sweep(
+    output: Path,
+    server: Path,
+    hours: float,
+    previous: Path | None,
+    threads: int,
+    calibration_gpu_layers: int,
+    *,
+    deadline: float | None = None,
+    start: Path = START,
+    baseline_model: Path = DEPLOYED,
+    learning_rate: float = 0.00004,
+    recursive: bool = False,
+) -> None:
+    if deadline is None:
+        deadline = time.monotonic() + hours * 3600
     run_id = uuid.uuid4().hex
     environment = {
         **os.environ,
         "PYTHONPATH": f"{ROOT}:{CPP / 'tooling/llama.cpp-b12244/gguf-py'}",
         "PYTHONUNBUFFERED": "1",
+        "TESSERA_TRAIN_THREADS": str(threads),
         "TESSERA_VERIFIER_RUN_ID": run_id,
         "HF_HUB_OFFLINE": "1",
         "TRANSFORMERS_OFFLINE": "1",
         "TINY_STRENGTH_REASONING_BUDGET": "0",
     }
     runner = [sys.executable, str(SUITE / "run.py")]
-    summary: dict[str, Any] = {"status": "running", "best": None, "candidates": {}}
+    summary: dict[str, Any] = {
+        "status": "running",
+        "best": None,
+        "candidates": {},
+        "cpu_threads": threads,
+        "calibration_gpu_layers": calibration_gpu_layers,
+    }
 
     def save() -> None:
         pending = output / ".summary.json"
@@ -337,11 +382,11 @@ def sweep(output: Path, server: Path, hours: float, previous: Path | None) -> No
                     str(output),
                     str(BASE),
                     "--base-gguf",
-                    str(START),
+                    str(start),
                     "--epochs",
                     "1",
                     "--learning-rate",
-                    "0.00004",
+                    str(learning_rate),
                 ],
             )
         else:
@@ -349,7 +394,7 @@ def sweep(output: Path, server: Path, hours: float, previous: Path | None) -> No
             summary["reused_training"] = str(previous)
         text = calibration(output)
         summary["calibration_sha256"] = digest(text)
-        baseline = evaluate("deployed", DEPLOYED)
+        baseline = evaluate("deployed", baseline_model)
         summary["baseline"] = baseline
         save()
         source = output / "cpp-generation.f16.gguf"
@@ -367,9 +412,9 @@ def sweep(output: Path, server: Path, hours: float, previous: Path | None) -> No
                 "-c",
                 "128",
                 "-ngl",
-                "0",
+                str(calibration_gpu_layers),
                 "-t",
-                "4",
+                str(threads),
                 "--no-ppl",
             ],
         )
@@ -391,7 +436,7 @@ def sweep(output: Path, server: Path, hours: float, previous: Path | None) -> No
                         str(source),
                         str(model),
                         quant,
-                        "4",
+                        str(threads),
                     ],
                 )
             except RuntimeError as error:
@@ -413,7 +458,7 @@ def sweep(output: Path, server: Path, hours: float, previous: Path | None) -> No
                 failures = True
                 save()
                 continue
-            result["eligible"] = improves(result, baseline)
+            result["eligible"] = improves(result, baseline, recursive=recursive)
             summary["candidates"][quant] = result
             eligible = [
                 entry
@@ -449,9 +494,101 @@ def sweep(output: Path, server: Path, hours: float, previous: Path | None) -> No
     print(f"Results in {output / 'summary.json'}", flush=True)
 
 
+def search(
+    output: Path,
+    server: Path,
+    hours: float,
+    previous: Path | None,
+    threads: int,
+    gpu_layers: int,
+) -> None:
+    deadline = time.monotonic() + hours * 3600
+    start, baseline = START, DEPLOYED
+    summary: dict[str, Any] = {"status": "running", "best": None, "rounds": []}
+
+    def save() -> None:
+        pending = output / ".summary.json"
+        write_json(pending, summary)
+        pending.replace(output / "summary.json")
+
+    save()
+    try:
+        iteration = 0
+        while time.monotonic() < deadline:
+            if shutil.disk_usage(output).free < 8_000_000_000:
+                raise ValueError(
+                    "Need at least 8 GB free to start another search round"
+                )
+            iteration += 1
+            run = output / f"round-{iteration:03}"
+            run.mkdir()
+            rate = 0.00004 / math.sqrt(iteration)
+            print(f"Search round {iteration}, learning rate {rate:.6g}", flush=True)
+            try:
+                sweep(
+                    run,
+                    server,
+                    hours,
+                    previous if iteration == 1 else None,
+                    threads,
+                    gpu_layers,
+                    deadline=deadline,
+                    start=start,
+                    baseline_model=baseline,
+                    learning_rate=rate,
+                    recursive=True,
+                )
+            finally:
+                report = read_report(run / "summary.json")
+                best = report["best"]
+                if best:
+                    start = run / "cpp-generation.f16.gguf"
+                    baseline = Path(best["model"])
+                    summary["best"] = best
+                    summary["training_checkpoint"] = str(start)
+                summary["rounds"].append(
+                    {
+                        "report": str(run / "summary.json"),
+                        "status": report["status"],
+                        "learning_rate": rate,
+                        "promoted": bool(best),
+                    }
+                )
+                save()
+                # Keep reports and both checkpoints from winning rounds.
+                for weights in run.glob("cpp-generation.*"):
+                    if weights not in (start, baseline):
+                        weights.unlink()
+                (run / "cpp.imatrix.gguf").unlink(missing_ok=True)
+        summary["status"] = "finished"
+    except TimeoutError:
+        summary["status"] = "finished"
+    except KeyboardInterrupt:
+        summary["status"] = "interrupted"
+        raise
+    except Exception as error:
+        summary.update(status="failed", error=str(error))
+        raise
+    finally:
+        save()
+    print(f"Search results in {output / 'summary.json'}", flush=True)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--hours", type=float, default=8)
+    parser.add_argument(
+        "--continuous",
+        action="store_true",
+        help="Repeat fine-tuning and search until the time budget expires",
+    )
+    parser.add_argument("--threads", type=int, default=os.cpu_count() or 1)
+    parser.add_argument(
+        "--calibration-gpu-layers",
+        type=int,
+        default=99 if sys.platform == "darwin" and platform.machine() == "arm64" else 0,
+        help="Layers offloaded during calibration. Use 0 for CPU calibration.",
+    )
     parser.add_argument("--output", type=Path)
     parser.add_argument("--server", default=SERVER, type=Path)
     parser.add_argument(
@@ -465,18 +602,33 @@ def main() -> None:
     args = parser.parse_args()
     if not math.isfinite(args.hours) or args.hours <= 0:
         parser.error("--hours must be positive and finite")
+    if args.threads < 1 or args.calibration_gpu_layers < 0:
+        parser.error(
+            "--threads must be positive and --calibration-gpu-layers nonnegative"
+        )
     if not args.check and args.output is None:
         parser.error("--output is required for a training run")
     server = args.server.resolve()
-    preflight(server)
+    try:
+        preflight(server)
+    except (OSError, RuntimeError, ValueError, subprocess.SubprocessError) as error:
+        parser.exit(1, f"{error}\n")
     if args.check:
         print("Local C++ training prerequisites found")
         return
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
     previous = args.reuse_training.resolve() if args.reuse_training else None
+    runner = search if args.continuous else sweep
     try:
-        sweep(output, server, args.hours, previous)
+        runner(
+            output,
+            server,
+            args.hours,
+            previous,
+            args.threads,
+            args.calibration_gpu_layers,
+        )
     except TimeoutError as error:
         parser.exit(1, f"{error}. Results in {output / 'summary.json'}\n")
 
