@@ -63,7 +63,7 @@
   <header class="project-header">
     <a class="project-name" href="#top">Tessera</a>
     <nav aria-label="Main navigation">
-      <a href="#downloads">Downloads</a>
+      <a href="https://github.com/somalip/tessera/releases">Downloads</a>
       <a href="#start">Setup</a>
       <a href="docs/research-paper.html">Research</a>
       <a href="#security">Security</a>
@@ -121,7 +121,15 @@
     |     |/
     '-----'</pre>
       <h2 id="downloads-heading">Downloads</h2>
-      <p>The VS Code installer and model packages are coming soon. Check <a href="https://github.com/somalip/tessera/releases">GitHub Releases</a> for updates.</p>
+      <p><a href="https://github.com/somalip/tessera/releases">Download from GitHub Releases</a> and expand a release’s Assets list to see available VS Code installers and model files.</p>
+
+      <h3 id="model-licenses">Model licenses</h3>
+      <ul>
+        <li><strong>Original coding model.</strong> The upstream <a href="https://huggingface.co/Qwen/Qwen2.5-Coder-0.5B">Qwen2.5-Coder-0.5B</a> weights are licensed under Apache License 2.0 (Apache-2.0).</li>
+        <li><strong>Python autocomplete and structured-data autocomplete.</strong> Both are based on Apache-2.0 Qwen2.5-Coder-0.5B weights. The Python model has a merged LoRA update. The structured-data model uses the stock weights in Q4_K_M format.</li>
+        <li><strong>Standalone Python models.</strong> The configured generator and experimental LoRA candidate are based on <a href="https://huggingface.co/Qwen/Qwen2.5-Coder-1.5B">Qwen2.5-Coder-1.5B</a>, whose upstream weights are licensed under Apache-2.0.</li>
+        <li><strong>Documentation, English editing, diagrams, and summaries.</strong> All four experimental variants use Apache-2.0 <a href="https://huggingface.co/Qwen/Qwen3.5-0.8B">Qwen3.5-0.8B</a> weights with task-specific chat templates. The TCM archives include the <a href="docs/research/general-models/LICENSE">Apache-2.0 license text</a>.</li>
+      </ul>
     </section>
 
     <section id="start" class="section-with-art" aria-labelledby="start-heading">
