@@ -6,6 +6,10 @@ Tessera starts and stops local llama.cpp servers as you switch models. It unload
 
 Each model package Tessera ships must be under 1 GB on disk. Runtime memory also depends on the model, context length, and server overhead.
 
+## License
+
+Tessera’s original code and documentation are licensed under [Apache License 2.0](LICENSE). Redistributed model weights retain their upstream licenses and applicable notices. The [homepage](index.html#model-licenses) lists the model licenses.
+
 ## Try it in VS Code
 
 See [GitHub Releases](https://github.com/somalip/tessera/releases) for downloads and the [release guide](releases/README.md) for the experimental model packages.
