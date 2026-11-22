@@ -420,3 +420,28 @@ html:has(.tessera-home) { background: #f8f8f3; }
   .tessera-home .home-hero { grid-template-columns: 1fr; }
   .tessera-home .doodle { display: none; }
 }
+
+@media screen and (prefers-reduced-motion: no-preference) {
+  .tessera-home .hero-doodle {
+    animation: hero-float 6s ease-in-out infinite;
+  }
+  .tessera-home .doodle-heading .doodle {
+    animation: doodle-sway 4s ease-in-out infinite;
+  }
+  .tessera-home .doodle-heading .doodle:nth-child(even) {
+    animation-delay: -2s;
+  }
+}
+
+@keyframes hero-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-8px) rotate(1deg); }
+  50% { transform: translateY(0) rotate(0deg); }
+  75% { transform: translateY(6px) rotate(-1deg); }
+}
+
+@keyframes doodle-sway {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(3deg); }
+  75% { transform: rotate(-3deg); }
+}
