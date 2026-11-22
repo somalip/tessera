@@ -287,10 +287,11 @@ html:has(.landing) { background: #fafaf8; }
   border-bottom: 1px solid var(--secondary);
   border-radius: 0 0 .3rem .3rem;
 }
+.result-panels h3 { font-size: 1rem; line-height: 1.3; letter-spacing: normal; }
 .result-bars { margin: .65rem 0 0; font-size: .9375rem; }
 .result-bars dd {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 4ch;
+  grid-template-columns: minmax(0, 1fr) max-content;
   align-items: center;
   gap: .75rem;
   margin: 0 0 .45rem;

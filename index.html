@@ -147,12 +147,32 @@
    \ '--' /
     '----'\
            \\</pre>
-      <h2 id="research-heading">Research and model notes</h2>
-      <p>The <a href="docs/research-paper.html">research paper</a> describes how Tessera routes requests and what the early Python evaluations measured.</p>
-      <details>
-        <summary>Experimental specialty models</summary>
-        <p>The documentation, English editing, Mermaid, and summary variants share the Qwen3.5-0.8B Q8_0 weights and tokenizer. Each adds specialty instructions through its GGUF chat template. Raw completion calls that bypass the template skip those instructions.</p>
-      </details>
+      <h2 id="research-heading">Fine-tuned models and results</h2>
+      <p>We used LoRA to fine-tune two Python models. The 354 MB Qwen2.5-Coder-0.5B autocomplete model trained on 96 original examples of comments and partial lines. The 935 MB standalone-program candidate trained for two epochs on 48 verified examples.</p>
+      <figure>
+        <div class="result-panels">
+          <div>
+            <h3>Autocomplete AST matches</h3>
+            <dl class="result-bars">
+              <div><dt>Fine-tuned 0.5B · IQ4_NL</dt><dd><meter min="0" max="12" value="9" aria-hidden="true"></meter><span>9 / 12</span></dd></div>
+              <div><dt>Stock 0.5B · Q4_K_M</dt><dd><meter min="0" max="12" value="7" aria-hidden="true"></meter><span>7 / 12</span></dd></div>
+              <div><dt>Earlier fine-tuned 1.5B · Q4_0</dt><dd><meter min="0" max="12" value="8" aria-hidden="true"></meter><span>8 / 12</span></dd></div>
+            </dl>
+          </div>
+          <div>
+            <h3>Standalone programs passed</h3>
+            <dl class="result-bars">
+              <div><dt>Fine-tuned candidate · Q4_0</dt><dd><meter min="0" max="8" value="1" aria-hidden="true"></meter><span>1 / 8</span></dd></div>
+              <div><dt>Configured CPU checkpoint</dt><dd><meter min="0" max="8" value="1" aria-hidden="true"></meter><span>1 / 8</span></dd></div>
+              <div><dt>7B reference · Q4_K_M</dt><dd><meter min="0" max="8" value="3" aria-hidden="true"></meter><span>3 / 8</span></dd></div>
+            </dl>
+          </div>
+        </div>
+        <figcaption>Bars show counts out of each suite’s total. The autocomplete comparison used different quantizations. The 7B program reference used different serving settings.</figcaption>
+      </figure>
+      <p>The fine-tuned autocomplete model reached its first token in a median of 75 ms on CPU, compared with 167 ms for the stock model. The standalone candidate tied the configured checkpoint on full programs and passed 1 of 16 short Python chat tests, compared with 4 of 16 for the configured checkpoint. The release kept the latter for Python generation.</p>
+      <p>The four experimental Qwen3.5-0.8B variants use shared weights and task-specific chat templates. The smoke checks passed 2 of 4 for documentation, 1 of 1 for English editing, 3 of 3 for diagrams, and 2 of 2 for summaries.</p>
+      <p><a href="docs/research-paper.html#evaluation">Read the research methods, charts, and source reports</a>.</p>
     </section>
     <section id="security" class="section-with-art" aria-labelledby="security-heading">
       <pre class="ascii-art section-art" aria-hidden="true">
