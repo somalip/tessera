@@ -40,6 +40,26 @@
       <p>Inline completion must respond during an edit and fit the surrounding code. A standalone program request must preserve requirements and produce enough text to implement them. Chat needs conversation history and may use a selection from the editor. Tessera treats these as separate request types and chooses models and prompt budgets accordingly. This paper examines the 0.1.8 VSIX, its runtime implementation, and the repository reports for Python autocomplete and standalone generation. [1–4]</p>
 
       <h2 id="cognition">2. Cognitive framework</h2>
+      <pre class="ascii-brain" aria-hidden="true">
+                 __..---..__
+           _..--'           `-.__
+       _.-'   __..--.  .--._     `--._
+     .'   _.-'      /  /    `-.       `-.
+   .'   .'    _..--'   `--.    `-._      \
+  /    /   .-'    _.._     \       `-.    \
+ /    /  .'    .-'    `-.   '--._     \    )
+(     \  \_   /   .--._  \       \     )   |
+ \     `-. `--' .'     `--'   _.-'    /   /
+  `._     `---._ `-.___..---''   _.-'   .'
+     `--..__     `---..______..--'    _.-'
+            `---..__       _..------''
+                    `--.  / .--------.
+                        \/ / =======. )
+                         \ `--------.-'
+                          \    _..-'
+                           |  /
+                           | /
+                           |_/</pre>
       <h3>2.1 System 1 and System 2 as modes of reasoning</h3>
       <p>Evans and Stanovich distinguish Type 1 processes, often called System 1, by their autonomy. An experienced programmer may expect <code>return</code> after reading a function signature and its body. Type 2 processing, often called System 2, relies on working memory to hold and manipulate hypothetical possibilities. A programmer might compare what a function should return for an empty input, a missing field, and a field whose value is zero. Each hypothetical case can be evaluated against the same contract. Speed is a common correlate. The defining distinction in this account is how the response is produced. <a href="#ref-dual-process">[9]</a></p>
       <p>A plausible default can begin a train of thought that later checks revise. In a default-interventionist account, Type 1 supplies a candidate response and Type 2 can intervene when a goal, rule, or detected conflict calls for further reasoning. The candidate may survive review, and deliberation can still go wrong if the reasoner overlooks a constraint. For coding, this suggests distinguishing local plausibility from evidence that a proposed implementation satisfies the specification. <a href="#ref-dual-process">[9]</a></p>

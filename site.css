@@ -177,6 +177,23 @@ html:has(.landing) { background: #fafaf8; }
 }
 .paper-page .paper-figure { margin-block: 1.5rem; }
 .paper-page .paper-figure figcaption { margin-top: .65rem; }
+.landing .ascii-brain {
+  width: max-content;
+  max-width: 100%;
+  margin: 1rem auto 1.5rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--link);
+  font: 700 clamp(.625rem, 2.4vw, .875rem)/1.12 ui-monospace, monospace;
+}
+@media screen and (prefers-reduced-motion: no-preference) {
+  .landing .ascii-brain { animation: brain-pulse 4s ease-in-out; }
+}
+@keyframes brain-pulse {
+  30% { color: #007568; }
+  65% { color: #8b451d; }
+}
 .result-panels {
   display: grid;
   gap: .85rem;
