@@ -321,3 +321,102 @@ html:has(.landing) { background: #fafaf8; }
   .paper-figure { break-inside: avoid; }
   .paper-contents { display: none; }
 }
+
+/* Tessera home */
+.tessera-home {
+  --background: #f8f8f3;
+  --text: #252c28;
+  --secondary: #4e5951;
+  --rule: #cdd6cb;
+  --link: #245b43;
+  --soft-green: #e9efe5;
+  width: min(58rem, calc(100% - 2.5rem));
+}
+html:has(.tessera-home) { background: #f8f8f3; }
+.tessera-home .project-name { font: 700 1.35rem Georgia, serif; }
+.tessera-home nav a { text-decoration: none; }
+.tessera-home nav a:hover { text-decoration: underline; }
+.tessera-home .home-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: clamp(1.25rem, 5vw, 4rem);
+  padding: clamp(1.5rem, 5vw, 3.5rem);
+  border: 1px solid var(--rule);
+  border-radius: 1rem;
+  background: var(--soft-green);
+}
+.tessera-home h1 { max-width: 13ch; font-size: clamp(2.65rem, 6vw, 4.65rem); }
+.tessera-home h2 { font-size: clamp(1.8rem, 4vw, 2.35rem); }
+.tessera-home .home-hero p { max-width: 43ch; margin-top: 1rem; }
+.tessera-home .actions { gap: .75rem 1.2rem; }
+.tessera-home .button {
+  color: white;
+  background: var(--link);
+  border-color: var(--link);
+  text-decoration: none;
+}
+.tessera-home .button:hover { background: #183e2d; }
+.tessera-home .doodle {
+  display: block;
+  fill: none;
+  stroke: #315844;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.tessera-home .doodle-wash { fill: #d8e5d2; stroke: none; }
+.tessera-home .doodle-accent { stroke: #a05236; }
+.tessera-home .hero-doodle { width: clamp(8rem, 26vw, 15rem); }
+.tessera-home .doodle-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+}
+.tessera-home .doodle-heading .doodle { flex: none; width: clamp(2.75rem, 10vw, 4.5rem); }
+.tessera-home section {
+  max-width: 43rem;
+  margin: 0 auto;
+  padding-block: clamp(1.75rem, 4vw, 2.75rem);
+  border-bottom: 1px solid var(--rule);
+}
+.tessera-home section:last-child { border-bottom: 0; }
+.tessera-home section h3:not(.result-panels h3) {
+  margin-top: 1.4rem;
+  font-size: 1.1rem;
+  letter-spacing: normal;
+}
+.tessera-home .code-example {
+  overflow: hidden;
+  border: 1px solid var(--rule);
+  border-radius: .65rem;
+  background: #fff;
+}
+.tessera-home .code-example figcaption {
+  margin: 0;
+  padding: .5rem 1rem;
+  background: var(--soft-green);
+}
+.tessera-home .code-example pre {
+  border: 0;
+  background: transparent;
+}
+.tessera-home .model-licenses {
+  margin-top: 1.15rem;
+  padding: .6rem .9rem;
+  border: 1px solid var(--rule);
+  border-radius: .55rem;
+}
+.tessera-home .model-licenses summary { font-weight: 650; }
+.tessera-home .model-licenses ul { padding-left: 1.25rem; }
+.tessera-home .result-panels { border-radius: .65rem; background: var(--soft-green); }
+.tessera-home footer { margin-top: 0; }
+@media (max-width: 39rem) {
+  .tessera-home .home-hero { grid-template-columns: 1fr; gap: .5rem; }
+  .tessera-home .hero-doodle { justify-self: center; width: 8rem; }
+}
+@media print, (forced-colors: active) {
+  .tessera-home .home-hero { grid-template-columns: 1fr; }
+  .tessera-home .doodle { display: none; }
+}

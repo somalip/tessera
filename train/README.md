@@ -107,3 +107,18 @@ unselected weights generated inside its round directories. Its root
 `summary.json` identifies the best model found on the six-case development
 benchmark. Repeated selection on this suite calls for a separate release
 evaluation.
+
+### 24-hour quality-first search
+
+Use `--continuous --quality-first --hours 24 --seed-run /path/to/search` to
+start from an audited winner and its matching full-precision checkpoint.
+This mode adds original C++ practice cases to the existing license, overlap,
+and sandbox checks. It varies learning rate and epoch count between rounds.
+More verified passes can win without a speed gain. Equal scores can win when
+the passing cases match and latency improves by at least five percent.
+The usual size ceiling applies. Keep the benchmark separate from training
+and use an independent evaluation before release.
+
+For normal Mac use during search, use `nice -n 15`, `--threads 2`,
+`--calibration-gpu-layers 0`, and the direct llama-server binary with
+`LLAMA_ARG_THREADS=2`.

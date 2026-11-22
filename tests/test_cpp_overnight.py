@@ -32,6 +32,20 @@ class OvernightSelectionTests(unittest.TestCase):
             with self.subTest(regression=regression):
                 self.assertFalse(improves({**candidate, **regression}, baseline))
 
+    def test_quality_first_accepts_more_passes_without_a_speed_gain(self) -> None:
+        baseline = {"passed": ["loop"], "stopped": 6, "inference_ms": 1000}
+        candidate = {
+            "passed": ["parse", "sort"],
+            "stopped": 5,
+            "inference_ms": 1300,
+            "size_bytes": LIMIT - 1,
+        }
+        self.assertTrue(improves(candidate, baseline, quality_first=True))
+        self.assertFalse(improves(candidate, baseline))
+        self.assertFalse(
+            improves({**candidate, "size_bytes": LIMIT}, baseline, quality_first=True)
+        )
+
     def test_child_is_stopped_when_budget_expires(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             log = Path(directory) / "stage.log"

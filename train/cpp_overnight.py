@@ -252,10 +252,27 @@ def strict_results(
 
 
 def improves(
-    candidate: dict[str, Any], baseline: dict[str, Any], *, recursive: bool = False
+    candidate: dict[str, Any],
+    baseline: dict[str, Any],
+    *,
+    recursive: bool = False,
+    quality_first: bool = False,
 ) -> bool:
     passed = set(candidate["passed"])
     previous = set(baseline["passed"])
+    if quality_first:
+        return (
+            0 < candidate["size_bytes"] < LIMIT
+            and bool(passed)
+            and (
+                len(passed) > len(previous)
+                or (
+                    passed == previous
+                    and candidate["stopped"] >= baseline["stopped"]
+                    and 0 < candidate["inference_ms"] <= baseline["inference_ms"] * 0.95
+                )
+            )
+        )
     return (
         0 < candidate["size_bytes"] < LIMIT
         and (previous < passed or (recursive and bool(passed) and previous == passed))
@@ -318,7 +335,9 @@ def sweep(
     start: Path = START,
     baseline_model: Path = DEPLOYED,
     learning_rate: float = 0.00004,
+    epochs: int = 1,
     recursive: bool = False,
+    quality_first: bool = False,
 ) -> None:
     if deadline is None:
         deadline = time.monotonic() + hours * 3600
@@ -328,6 +347,7 @@ def sweep(
         "PYTHONPATH": f"{ROOT}:{CPP / 'tooling/llama.cpp-b12244/gguf-py'}",
         "PYTHONUNBUFFERED": "1",
         "TESSERA_TRAIN_THREADS": str(threads),
+        "TESSERA_CPP_PRACTICE": "1" if quality_first else "0",
         "TESSERA_VERIFIER_RUN_ID": run_id,
         "HF_HUB_OFFLINE": "1",
         "TRANSFORMERS_OFFLINE": "1",
@@ -384,7 +404,7 @@ def sweep(
                     "--base-gguf",
                     str(start),
                     "--epochs",
-                    "1",
+                    str(epochs),
                     "--learning-rate",
                     str(learning_rate),
                 ],
@@ -458,7 +478,9 @@ def sweep(
                 failures = True
                 save()
                 continue
-            result["eligible"] = improves(result, baseline, recursive=recursive)
+            result["eligible"] = improves(
+                result, baseline, recursive=recursive, quality_first=quality_first
+            )
             summary["candidates"][quant] = result
             eligible = [
                 entry
@@ -501,10 +523,33 @@ def search(
     previous: Path | None,
     threads: int,
     gpu_layers: int,
+    *,
+    quality_first: bool = False,
+    seed_run: Path | None = None,
 ) -> None:
     deadline = time.monotonic() + hours * 3600
     start, baseline = START, DEPLOYED
     summary: dict[str, Any] = {"status": "running", "best": None, "rounds": []}
+    if seed_run is not None:
+        seed = read_report(seed_run / "summary.json")["best"]
+        if not seed:
+            raise ValueError("The seed run has no saved winner")
+        baseline = Path(seed["model"])
+        start = baseline.with_name("cpp-generation.f16.gguf")
+        details = read_report(start.with_name("training-report.json"))
+        seed_report = read_report(start.with_name("summary.json"))
+        original_audit = read_report(SUITE / "v4/training.json")["corpus_audit"]
+        if (
+            not 0 < baseline.stat().st_size < LIMIT
+            or digest(baseline) != seed["sha256"]
+            or digest(start) != details["trained_f16_sha256"]
+            or details["dataset"]["holdout_sha256"] != original_audit["holdout_sha256"]
+            or seed_report["best"] != seed
+        ):
+            raise ValueError("The seed checkpoint failed its audit")
+        summary.update(
+            best=seed, training_checkpoint=str(start), seed_run=str(seed_run)
+        )
 
     def save() -> None:
         pending = output / ".summary.json"
@@ -522,7 +567,13 @@ def search(
             iteration += 1
             run = output / f"round-{iteration:03}"
             run.mkdir()
-            rate = 0.00004 / math.sqrt(iteration)
+            if quality_first:
+                settings = ((4e-5, 1), (8e-5, 2), (2e-5, 3), (1.2e-4, 1), (3e-5, 2))
+                cycle, index = divmod(iteration - 1, len(settings))
+                rate, epochs = settings[index]
+                rate /= math.sqrt(cycle + 1)
+            else:
+                rate, epochs = 0.00004 / math.sqrt(iteration), 1
             print(f"Search round {iteration}, learning rate {rate:.6g}", flush=True)
             try:
                 sweep(
@@ -536,7 +587,9 @@ def search(
                     start=start,
                     baseline_model=baseline,
                     learning_rate=rate,
+                    epochs=epochs,
                     recursive=True,
+                    quality_first=quality_first,
                 )
             finally:
                 report = read_report(run / "summary.json")
@@ -551,6 +604,7 @@ def search(
                         "report": str(run / "summary.json"),
                         "status": report["status"],
                         "learning_rate": rate,
+                        "epochs": epochs,
                         "promoted": bool(best),
                     }
                 )
@@ -582,6 +636,12 @@ def main() -> None:
         action="store_true",
         help="Repeat fine-tuning and search until the time budget expires",
     )
+    parser.add_argument(
+        "--quality-first", action="store_true", help="Prioritize C++ test passes"
+    )
+    parser.add_argument(
+        "--seed-run", type=Path, help="Start from a previous run's verified winner"
+    )
     parser.add_argument("--threads", type=int, default=os.cpu_count() or 1)
     parser.add_argument(
         "--calibration-gpu-layers",
@@ -608,6 +668,10 @@ def main() -> None:
         )
     if not args.check and args.output is None:
         parser.error("--output is required for a training run")
+    if (args.quality_first or args.seed_run) and not args.continuous:
+        parser.error("--quality-first and --seed-run require --continuous")
+    if args.seed_run and args.reuse_training:
+        parser.error("--seed-run and --reuse-training are mutually exclusive")
     server = args.server.resolve()
     try:
         preflight(server)
@@ -620,6 +684,12 @@ def main() -> None:
     output.mkdir(parents=True, exist_ok=False)
     previous = args.reuse_training.resolve() if args.reuse_training else None
     runner = search if args.continuous else sweep
+    options = {}
+    if args.continuous:
+        options = {
+            "quality_first": args.quality_first,
+            "seed_run": args.seed_run.resolve() if args.seed_run else None,
+        }
     try:
         runner(
             output,
@@ -628,6 +698,7 @@ def main() -> None:
             previous,
             args.threads,
             args.calibration_gpu_layers,
+            **options,
         )
     except TimeoutError as error:
         parser.exit(1, f"{error}. Results in {output / 'summary.json'}\n")

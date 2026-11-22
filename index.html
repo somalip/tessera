@@ -6,64 +6,13 @@
   <meta name="description" content="Tessera brings local code completion and chat to VS Code with compact models selected for the language at your cursor.">
   <title>Tessera · Local coding models for VS Code</title>
   <link rel="stylesheet" href="site.css">
-  <style>
-    .hero-heading,
-    .section-with-art {
-      position: relative;
-      isolation: isolate;
-    }
-    .landing .hero-heading + p { margin-top: 1.15rem; }
-    .landing .ascii-art {
-      position: absolute;
-      z-index: -1;
-      inset-block-start: 0;
-      inset-inline-end: 0;
-      padding: 0;
-      overflow: hidden;
-      border: 0;
-      background: none;
-      color: #657e72;
-      opacity: .65;
-      font: 600 .58rem/1.15 ui-monospace, monospace;
-      pointer-events: none;
-      user-select: none;
-    }
-    .landing .section-art {
-      inset-block-start: 0;
-      inset-inline-end: 0;
-      color: #657e72;
-      opacity: .2;
-      font-size: .65rem;
-    }
-    @media (min-width: 62rem) {
-      .landing .section-art {
-        inset-inline-end: auto;
-        inset-inline-start: calc(100% + 1.5rem);
-        opacity: .55;
-      }
-      .landing .section-with-art:nth-of-type(even) .section-art {
-        inset-inline-start: auto;
-        inset-inline-end: calc(100% + 1.5rem);
-      }
-    }
-    @media (max-width: 42rem) {
-      .landing .ascii-art {
-        font-size: clamp(.45rem, 1.65vw, .58rem);
-        opacity: .28;
-      }
-      .landing .section-art { opacity: .16; }
-    }
-    @media print, (forced-colors: active) {
-      .landing .ascii-art { display: none; }
-    }
-  </style>
 </head>
-<body class="landing" id="top">
+<body class="landing tessera-home" id="top">
   <a class="skip-link" href="#content">Skip to content</a>
   <header class="project-header">
     <a class="project-name" href="#top">Tessera</a>
     <nav aria-label="Main navigation">
-      <a href="https://github.com/somalip/tessera/releases">Downloads</a>
+      <a href="#downloads">Downloads</a>
       <a href="#start">Setup</a>
       <a href="docs/research-paper.html">Research</a>
       <a href="#security">Security</a>
@@ -72,74 +21,73 @@
   </header>
 
   <main id="content" tabindex="-1">
-    <div class="hero-heading">
-      <h1>Local coding models, made efficient.</h1>
-      <pre class="ascii-art" aria-hidden="true">
-           __..---..__
-       _.-'   _       '-._
-    .-'  _.-'  '---.      '-.
-   /   .'    .--.   \  .-.   \
-  /   /   .-'    '--' /   \   \
- |   |   /    .---.   '._  |   |
- |   '._ |   /     '---. './   /
-  \     '---'  .--.     \    .'
-   '._    __.-'    '._   |_.'
-      '--'-.          '--'
-            '---._   /
-                  | |
-                  |_|</pre>
+    <div class="home-hero">
+      <div>
+        <h1>A little help with your code.</h1>
+        <p>Get inline suggestions as you type, or ask a question in chat. Tessera runs inside VS Code and uses small models on your own machine.</p>
+        <div class="actions">
+          <a class="button" href="#start">Set up in VS Code</a>
+          <a href="#downloads">Find a download</a>
+        </div>
+      </div>
+      <svg class="doodle hero-doodle" viewBox="0 0 250 210" aria-hidden="true" focusable="false">
+        <!-- A laptop and an idea sketched on a loose sheet of paper. -->
+        <path class="doodle-wash" d="M57 47Q121 28 180 46L185 139Q119 163 49 143Z"/>
+        <path d="M57 50Q109 38 173 45Q179 45 180 52L184 133Q124 143 52 137L54 59Q54 53 57 50Z"/>
+        <path d="M52 137L27 159Q23 164 33 166Q113 173 210 153L184 133M30 161Q107 166 202 152"/>
+        <path d="M98 148Q119 148 138 144L145 150L96 155Z"/>
+        <path d="M95 76L79 90L96 102M141 72L155 84L141 100M126 66L111 110"/>
+        <path class="doodle-accent" d="M202 26Q208 39 222 39Q208 44 204 58Q200 45 188 42Q200 38 202 26ZM224 71L232 67M219 61L223 53M37 92L27 87M38 105L23 108"/>
+        <path class="doodle-accent" d="M65 188Q131 197 190 176M89 195Q133 198 164 188"/>
+      </svg>
     </div>
-    <p>Tessera is a VS Code extension for inline completions and chat. It runs models on your machine with llama.cpp and picks one based on the language at your cursor.</p>
 
-    <section class="section-with-art" aria-labelledby="routing-heading">
-      <pre class="ascii-art section-art" aria-hidden="true">
-     +--[ PY ]
-    /
- o-+
-    \
-     +--[ SQL ]</pre>
-      <h2 id="routing-heading">How model selection works</h2>
-      <p>In a Python file like this, Tessera can use a SQL model while you edit the query and a Python model elsewhere in the file.</p>
-      <figure>
+    <section aria-labelledby="routing-heading">
+      <div class="doodle-heading">
+        <h2 id="routing-heading">Same file, different language</h2>
+        <svg class="doodle" viewBox="0 0 100 82" aria-hidden="true" focusable="false">
+          <path class="doodle-wash" d="M18 45Q34 19 67 16L84 41Q63 69 27 68Z"/>
+        <path d="M11 49Q30 47 40 45Q63 40 68 21M40 45Q59 44 76 61M59 25L69 19L75 27M66 63L78 62L75 51"/>
+        <path class="doodle-accent" d="M38 28L34 18M26 34L17 30"/>
+        </svg>
+      </div>
+      <p>Put your cursor inside this query and Tessera can pick a SQL model. Move back to the surrounding code and it can switch to Python.</p>
+      <figure class="code-example">
+        <figcaption><code>inventory.py</code></figcaption>
         <pre><code>query = """
     SELECT name, stock
     FROM inventory
     WHERE stock &lt; 10
 """</code></pre>
-        <figcaption>SQL inside <code>inventory.py</code></figcaption>
       </figure>
-      <p>You can pin a model to a file or workspace. Tessera’s model packages are under 1 GB each. Running a model also uses memory for its context and runtime buffers.</p>
+      <p>If you’d rather stick with one model, pin it to a file or workspace. Each Tessera model package is under 1 GB, and the model uses some extra memory while it runs.</p>
     </section>
 
-    <section id="downloads" class="section-with-art" aria-labelledby="downloads-heading">
-      <pre class="ascii-art section-art" aria-hidden="true">
-        |
-        |
-       \|/
-     .--v--.
-    /_____/|
-    |     |/
-    '-----'</pre>
+    <section id="downloads" aria-labelledby="downloads-heading">
       <h2 id="downloads-heading">Downloads</h2>
-      <p><a href="https://github.com/somalip/tessera/releases">Download from GitHub Releases</a> and expand a release’s Assets list to see available VS Code installers and model files.</p>
+      <p>Open a <a href="https://github.com/somalip/tessera/releases">GitHub release</a> and look under <strong>Assets</strong> for the VS Code installer (.vsix) and model files.</p>
 
-      <h3 id="model-licenses">Model licenses</h3>
-      <ul>
-        <li><strong>Original coding model.</strong> The upstream <a href="https://huggingface.co/Qwen/Qwen2.5-Coder-0.5B">Qwen2.5-Coder-0.5B</a> weights are licensed under Apache License 2.0 (Apache-2.0).</li>
-        <li><strong>Python autocomplete and structured-data autocomplete.</strong> Both are based on Apache-2.0 Qwen2.5-Coder-0.5B weights. The Python model has a merged LoRA update. The structured-data model uses the stock weights in Q4_K_M format.</li>
-        <li><strong>Standalone Python models.</strong> The configured generator and experimental LoRA candidate are based on <a href="https://huggingface.co/Qwen/Qwen2.5-Coder-1.5B">Qwen2.5-Coder-1.5B</a>, whose upstream weights are licensed under Apache-2.0.</li>
-        <li><strong>Documentation, English editing, diagrams, and summaries.</strong> All four experimental variants use Apache-2.0 <a href="https://huggingface.co/Qwen/Qwen3.5-0.8B">Qwen3.5-0.8B</a> weights with task-specific chat templates. The TCM archives include the <a href="docs/research/general-models/LICENSE">Apache-2.0 license text</a>.</li>
-      </ul>
+      <details class="model-licenses" id="model-licenses">
+        <summary>Model licenses</summary>
+        <ul>
+          <li><strong>Original coding model.</strong> The upstream <a href="https://huggingface.co/Qwen/Qwen2.5-Coder-0.5B">Qwen2.5-Coder-0.5B</a> weights are licensed under Apache License 2.0 (Apache-2.0).</li>
+          <li><strong>Python autocomplete and structured-data autocomplete.</strong> Both are based on Apache-2.0 Qwen2.5-Coder-0.5B weights. The Python model has a merged LoRA update. The structured-data model uses the stock weights in Q4_K_M format.</li>
+          <li><strong>Standalone Python models.</strong> The configured generator and experimental LoRA candidate are based on <a href="https://huggingface.co/Qwen/Qwen2.5-Coder-1.5B">Qwen2.5-Coder-1.5B</a>, whose upstream weights are licensed under Apache-2.0.</li>
+          <li><strong>Documentation, English editing, diagrams, and summaries.</strong> All four experimental variants use Apache-2.0 <a href="https://huggingface.co/Qwen/Qwen3.5-0.8B">Qwen3.5-0.8B</a> weights with task-specific chat templates. The TCM archives include the <a href="docs/research/general-models/LICENSE">Apache-2.0 license text</a>.</li>
+        </ul>
+      </details>
     </section>
 
-    <section id="start" class="section-with-art" aria-labelledby="start-heading">
-      <pre class="ascii-art section-art" aria-hidden="true">
- .---------------.
- | >_            |
- |               |
- '---------------'</pre>
-      <h2 id="start-heading">Set up in VS Code</h2>
-      <p>Once you have the VSIX installer and a compatible GGUF model:</p>
+    <section id="start" aria-labelledby="start-heading">
+      <div class="doodle-heading">
+        <h2 id="start-heading">Set up in VS Code</h2>
+        <svg class="doodle" viewBox="0 0 100 82" aria-hidden="true" focusable="false">
+          <path class="doodle-wash" d="M19 26L70 18L84 55L29 70Z"/>
+        <path d="M18 27Q44 22 71 19L81 55Q56 62 28 69Z M21 37L73 28M36 44L46 48L39 55M49 55L61 52"/>
+        <path class="doodle-accent" d="M83 20L88 12M89 28L98 24M36 77Q57 74 75 66"/>
+        </svg>
+      </div>
+      <p>Have the VSIX installer and a compatible GGUF model handy.</p>
       <ol>
         <li>Run <strong>Extensions: Install from VSIX…</strong> from the Command Palette and select the installer.</li>
         <li>Run <strong>Tessera: Open Dashboard</strong>.</li>
@@ -147,15 +95,8 @@
       </ol>
     </section>
 
-    <section class="section-with-art" aria-labelledby="research-heading">
-      <pre class="ascii-art section-art" aria-hidden="true">
-    .----.
-   / .--. \
-  | (    ) |
-   \ '--' /
-    '----'\
-           \\</pre>
-      <h2 id="research-heading">Fine-tuned models and results</h2>
+    <section aria-labelledby="research-heading">
+      <h2 id="research-heading">What we learned from fine-tuning</h2>
       <p>We used LoRA to fine-tune two Python models. The 354 MB Qwen2.5-Coder-0.5B autocomplete model trained on 96 original examples of comments and partial lines. The 935 MB standalone-program candidate trained for two epochs on 48 verified examples.</p>
       <figure>
         <div class="result-panels">
@@ -182,15 +123,7 @@
       <p>The four experimental Qwen3.5-0.8B variants use shared weights and task-specific chat templates. The smoke checks passed 2 of 4 for documentation, 1 of 1 for English editing, 3 of 3 for diagrams, and 2 of 2 for summaries.</p>
       <p><a href="docs/research-paper.html#evaluation">Read the research methods, charts, and source reports</a>.</p>
     </section>
-    <section id="security" class="section-with-art" aria-labelledby="security-heading">
-      <pre class="ascii-art section-art" aria-hidden="true">
-      .---.
-     /     \
-     |     |
-   .-+-----+-.
-   |    o    |
-   |    |    |
-   '---------'</pre>
+    <section id="security" aria-labelledby="security-heading">
       <h2 id="security-heading">Security policy</h2>
       <p>This policy covers the Tessera VS Code extension, its local model runtime, and model packages and downloads distributed by Tessera.</p>
 
@@ -198,7 +131,7 @@
       <p>Open <a href="https://github.com/somalip/tessera/security/advisories">Tessera’s GitHub Security Advisories</a> and select <strong>Report a vulnerability</strong> if the option is available. If the private form is unavailable, contact the maintainers through an established private channel and keep the details out of public issues and pull requests.</p>
       <p>Include the affected version, operating system, model or download source if relevant, steps to reproduce the issue, and the potential impact. Before sharing logs or examples, remove credentials, personal paths, and private code. Please coordinate public disclosure with the maintainers so users have time to update.</p>
 
-      <h3>Local inference and download integrity</h3>
+      <h3>Where your code goes</h3>
       <p>The extension sends prompts and editor context to its local inference server on the same machine. Extension usage metrics stay local. Registry lookups and model downloads connect to their configured sources. Tessera verifies signatures on remote registry indexes and checks downloaded model files against their expected SHA-256 hashes.</p>
     </section>
   </main>
