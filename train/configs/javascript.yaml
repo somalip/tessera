@@ -1,0 +1,19 @@
+extends: base.yaml
+language: javascript
+web_training:
+  - ["Write an exported clamp function taking n, lo, and hi.", "export function clamp(n, lo, hi) { return Math.min(hi, Math.max(lo, n)); }"]
+  - ["Build a set of distinct strings from an iterable named values.", "const distinct = new Set(values);"]
+  - ["Use optional chaining to read account.profile.nickname with a Guest fallback.", "const nickname = account?.profile?.nickname ?? 'Guest';"]
+  - ["Append a text node containing message to the DOM element named banner.", "banner.append(document.createTextNode(message));"]
+  - ["Convert the values from an iterator named items to an array.", "const result = Array.from(items);"]
+  - ["Write an arrow function subtract with parameters a and b.", "const subtract = (a, b) => a - b;"]
+web_holdout:
+  - prompt: "Return raw JavaScript declaring a function isEven that takes n and tests whether its remainder modulo two equals zero."
+    expected: "function isEven(n) { return n % 2 === 0; }"
+    checks: ['\bfunction\s+isEven\s*\(n\)', '\breturn\s+n\s*%\s*2\s*===\s*0\b']
+  - prompt: "Return raw JavaScript assigning to root the DOM element whose id is toolbar. Use getElementById."
+    expected: 'const root = document.getElementById("toolbar");'
+    checks: ['\b(?:const|let)\s+root\s*=', 'document\.getElementById\(["'']toolbar["'']\)']
+  - prompt: "Return raw JavaScript registering a click listener on button that invokes toggleMenu. Pass the function directly."
+    expected: 'button.addEventListener("click", toggleMenu);'
+    checks: ['\bbutton\.addEventListener\(["'']click["'']\s*,\s*toggleMenu\s*\)']

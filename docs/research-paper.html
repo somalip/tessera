@@ -19,22 +19,38 @@
   </header>
   <main class="paper" id="content" tabindex="-1">
     <article>
-      <header>
+      <header class="paper-intro">
         <h1>Fast Completion and Deliberate Generation in Tessera</h1>
-        <p class="paper-deck">A dual-process perspective on routing local coding models</p>
-        <p><strong>AI authorship disclosure.</strong> This paper was assisted by OpenAI Codex, an AI system.</p>
+        <p class="paper-deck">How much work should a local model do when you need one line of code? What changes when you ask for a whole program?</p>
+        <p class="paper-disclosure">Paper assisted by OpenAI Codex, an AI system.</p>
       </header>
 
-      <h2>Abstract</h2>
-      <p>Tessera is a VS Code extension that uses local editor context to select compact language models and shape inference requests. It distinguishes short fill-in-the-middle completions, comment-driven generation, and chat, and manages the llama.cpp processes that serve those models. Its design lets users configure a small model for routine editing while reserving a separate checkpoint for larger Python requests. A repository smoke test recorded nine AST matches in twelve fast-completion prompts. In a separate eight-program evaluation, the configured Python model passed one task and a 7B reference passed three under different serving configurations. Dual-process theory offers a framework for asking when a quick default is useful and when a task warrants explicit constraints and checks. Tessera approximates this division through request routing. The recorded results characterize two workloads and leave the benefit of routing itself open to controlled testing.</p>
+      <div class="paper-examples" aria-label="Two kinds of coding requests">
+        <div class="paper-example">
+          <p><strong>Finish the line</strong></p>
+          <pre><code>return price * <mark>quantity</mark></code></pre>
+          <p>Tessera can show a short suggestion from the code around your cursor.</p>
+        </div>
+        <div class="paper-example">
+          <p><strong>Write the program</strong></p>
+          <pre><code># Read a CSV and total each column</code></pre>
+          <p>A separate model gets more room to generate the program. Tessera can retry if the output is incomplete or has invalid Python syntax.</p>
+        </div>
+      </div>
+
+      <p class="paper-takeaway">The Python autocomplete model matched the expected syntax tree in <strong>9 of 12</strong> prompts. The configured program generator passed <strong>1 of 8</strong> tasks in a separate suite. <a href="#evaluation">See how both were scored</a>.</p>
 
       <nav class="paper-contents" aria-label="Paper contents">
+        <a href="#abstract">Abstract</a>
         <a href="#cognition">Cognitive framework</a>
         <a href="#routing">Request routing</a>
         <a href="#runtime">Runtime</a>
         <a href="#evaluation">Methods and results</a>
         <a href="#limitations">Follow-up study</a>
       </nav>
+
+      <h2 id="abstract">Abstract</h2>
+      <p>Tessera is a VS Code extension that uses local editor context to select compact language models and shape inference requests. It distinguishes short fill-in-the-middle completions, comment-driven generation, and chat, and manages the llama.cpp processes that serve those models. Its design lets users configure a small model for routine editing while reserving a separate checkpoint for larger Python requests. A repository smoke test recorded nine AST matches in twelve fast-completion prompts. In a separate eight-program evaluation, the configured Python model passed one task and a 7B reference passed three under different serving configurations. Dual-process theory offers a framework for asking when a quick default is useful and when a task warrants explicit constraints and checks. Tessera approximates this division through request routing. The recorded results characterize two workloads and leave the benefit of routing itself open to controlled testing.</p>
 
       <h2>1. Problem and scope</h2>
       <p>Inline completion must respond during an edit and fit the surrounding code. A standalone program request must preserve requirements and produce enough text to implement them. Chat needs conversation history and may use a selection from the editor. Tessera treats these as separate request types and chooses models and prompt budgets accordingly. This paper examines the 0.1.8 VSIX, its runtime implementation, and the repository reports for Python autocomplete and standalone generation. [1–4]</p>

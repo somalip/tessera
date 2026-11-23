@@ -1,4 +1,4 @@
-"""Build and smoke-test local text specialists with unchanged Qwen tensor data."""
+"""Build and smoke-test local specialists with unchanged Qwen tensor data."""
 
 import argparse
 import hashlib
@@ -51,6 +51,34 @@ SPECIALTIES = {
             r"(?im)^[-*] .*(venue.*(select|decid|open)|(?:select|decid|open).*venue)",
         ],
     ),
+    "javascript": (
+        "Write modern JavaScript. Use browser or Node.js APIs as requested. Prefer plain JavaScript and preserve existing interfaces when editing.",
+        ["javascript", "javascriptreact"],
+        ["**/*.js", "**/*.mjs", "**/*.cjs", "**/*.jsx"],
+        "Return only a JavaScript function named doubleAll that takes an array of numbers and returns a new array with every number doubled. Use Array.map.",
+        [r"\bfunction doubleAll\s*\(", r"\.map\s*\(", r"(?:\*\s*2\b|\b2\s*\*)"],
+    ),
+    "html": (
+        "Write semantic HTML with accessible names, explicit form labels, and appropriate native elements. Return markup for the requested scope.",
+        ["html"],
+        ["**/*.html", "**/*.htm"],
+        'Return only an HTML fragment with a label reading Email and an email input. Use id="email" and associate the label with it using for.',
+        [
+            r'<label\b[^>]*\bfor=["\']email["\'][^>]*>\s*Email\s*</label>',
+            r'<input\b(?=[^>]*\bid=["\']email["\'])(?=[^>]*\btype=["\']email["\'])[^>]*>',
+        ],
+    ),
+    "css": (
+        "Write plain CSS that preserves existing selectors when editing. Use responsive layout, logical properties, and accessible interaction states when appropriate.",
+        ["css"],
+        ["**/*.css"],
+        "Return only CSS for a .cards selector with display grid, a 1rem gap, and two equally sized columns. Use repeat(2, 1fr).",
+        [
+            r"\.cards\s*\{[^}]*\bdisplay\s*:\s*grid\s*;",
+            r"\.cards\s*\{[^}]*\bgap\s*:\s*1rem\b",
+            r"\.cards\s*\{[^}]*\bgrid-template-columns\s*:\s*repeat\(2,\s*1fr\)",
+        ],
+    ),
 }
 
 
@@ -74,6 +102,12 @@ def main() -> None:
         help="llama.cpp gguf_new_metadata.py",
     )
     parser.add_argument("--server", required=True)
+    parser.add_argument(
+        "--specialty",
+        action="append",
+        choices=SPECIALTIES,
+        help="Build only this specialty (repeatable)",
+    )
     parser.add_argument("--output", type=Path, default=Path("artifacts/general-models"))
     args = parser.parse_args()
     source = json.loads(args.source.read_text())
@@ -84,6 +118,8 @@ def main() -> None:
     original = source["gguf"]["chat_template"]
     completions = {}
     for name, (instruction, languages, globs, prompt, checks) in SPECIALTIES.items():
+        if args.specialty and name not in args.specialty:
+            continue
         model_id = f"{name}-tiny"
         directory = args.output / name
         directory.mkdir(parents=True, exist_ok=True)

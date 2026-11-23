@@ -86,13 +86,24 @@ handles ordinary code suggestions.
 The status bar and dashboard show the GGUF from the current editor's last
 inline request. Hover over the status bar item for the request type, model ID,
 and full path. For Python comments, the tooltip and dashboard also show the
-parsing model. **Show Output** records route changes.
+parsing model. **Tessera: Inspect Model Routing** shows the models selected for
+autocomplete, chat, and edits at the cursor, with the reason for each choice
+and the last inline route when available. Open it from the sidebar or Command
+Palette. Inspecting a route does not start inference.
 
 Run **Tessera: Ask** to enter a prompt and open the response beside your editor.
 For a conversation, open Tessera Chat from the dashboard or use
 `@tessera` in VS Code Chat.
 Select code to explain, refactor, or generate tests from the dashboard.
-Refactors and generated tests open in a diff preview for review.
+Use **Tessera: Rewrite with Instructions** to describe a specific change to
+the selection or current line. Use **Tessera: Fix Diagnostics** from VS Code's
+Quick Fix menu on a reported diagnostic, or select several affected lines and
+run the command from the Command Palette. Tessera uses the editor's diagnostics
+and source to propose a local fix.
+
+Review generated changes in the diff and choose **Apply** to accept them.
+Source edits are discarded if the document changes during the request or review.
+Generated tests open in a new unsaved editor after confirmation.
 
 The Tessera sidebar shows session usage, including the latest reported generation
 speed, the most-used model by completed request count, reported output tokens,

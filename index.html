@@ -23,41 +23,62 @@
   <main id="content" tabindex="-1">
     <div class="home-hero">
       <div>
-        <h1>A little help with your code.</h1>
-        <p>Get inline suggestions as you type, or ask a question in chat. Tessera runs inside VS Code and uses small models on your own machine.</p>
+        <h1>A little help with your <span class="hero-underline">code.</span></h1>
+        <p>Halfway through a line? Tessera can suggest what comes next. Stuck on a function? Ask in chat. Both run in VS Code with small models on your machine.</p>
         <div class="actions">
           <a class="button" href="#start">Set up in VS Code</a>
           <a href="#downloads">Find a download</a>
         </div>
       </div>
       <svg class="doodle hero-doodle" viewBox="0 0 250 210" aria-hidden="true" focusable="false">
-        <!-- A laptop and an idea sketched on a loose sheet of paper. -->
+        <!-- A laptop, a spark, and a cup of coffee. -->
         <path class="doodle-wash" d="M57 47Q121 28 180 46L185 139Q119 163 49 143Z"/>
         <path d="M57 50Q109 38 173 45Q179 45 180 52L184 133Q124 143 52 137L54 59Q54 53 57 50Z"/>
-        <path d="M52 137L27 159Q23 164 33 166Q113 173 210 153L184 133M30 161Q107 166 202 152"/>
+        <path d="M52 137L27 159Q23 164 33 166Q113 173 210 153L184 133"/>
+        <path d="M30 161Q107 166 202 152"/>
         <path d="M98 148Q119 148 138 144L145 150L96 155Z"/>
-        <path d="M95 76L79 90L96 102M141 72L155 84L141 100M126 66L111 110"/>
-        <path class="doodle-accent" d="M202 26Q208 39 222 39Q208 44 204 58Q200 45 188 42Q200 38 202 26ZM224 71L232 67M219 61L223 53M37 92L27 87M38 105L23 108"/>
-        <path class="doodle-accent" d="M65 188Q131 197 190 176M89 195Q133 198 164 188"/>
+        <path d="M95 76L79 90L96 102"/>
+        <path d="M141 72L155 84L141 100"/>
+        <path d="M126 66L111 110"/>
+        <path class="doodle-accent" d="M202 26Q208 39 222 39Q208 44 204 58Q200 45 188 42Q200 38 202 26Z"/>
+        <path class="doodle-accent" d="M224 71L232 67"/>
+        <path class="doodle-accent" d="M219 61L223 53"/>
+        <path class="doodle-accent" d="M37 92L27 87"/>
+        <path class="doodle-accent" d="M38 105L23 108"/>
+        <path class="doodle-wash" d="M175 159L213 157L207 188L184 191Z"/>
+        <path d="M177 160Q194 155 213 158L208 183Q197 191 183 185Z"/>
+        <path d="M212 163Q228 159 226 171Q223 178 210 176"/>
+        <path d="M173 190Q194 196 219 186"/>
+        <path class="doodle-accent" d="M188 152Q183 148 189 142"/>
+        <path class="doodle-accent" d="M199 150Q194 145 201 138"/>
+        <path class="doodle-accent" d="M47 195Q109 202 165 183"/>
+        <path class="doodle-accent" d="M69 202Q110 204 142 194"/>
       </svg>
     </div>
 
     <section aria-labelledby="routing-heading">
       <div class="doodle-heading">
-        <h2 id="routing-heading">Same file, different language</h2>
+        <h2 id="routing-heading">One file, two languages</h2>
         <svg class="doodle" viewBox="0 0 100 82" aria-hidden="true" focusable="false">
           <path class="doodle-wash" d="M18 45Q34 19 67 16L84 41Q63 69 27 68Z"/>
-        <path d="M11 49Q30 47 40 45Q63 40 68 21M40 45Q59 44 76 61M59 25L69 19L75 27M66 63L78 62L75 51"/>
-        <path class="doodle-accent" d="M38 28L34 18M26 34L17 30"/>
+          <path d="M11 49Q30 47 40 45Q63 40 68 21"/>
+          <path d="M40 45Q59 44 76 61"/>
+          <path d="M59 25L69 19L75 27"/>
+          <path d="M66 63L78 62L75 51"/>
+          <path class="doodle-accent" d="M38 28L34 18"/>
+          <path class="doodle-accent" d="M26 34L17 30"/>
         </svg>
       </div>
-      <p>Put your cursor inside this query and Tessera can pick a SQL model. Move back to the surrounding code and it can switch to Python.</p>
+      <p>A Python file can have a little SQL tucked inside it. Put your cursor in the query and Tessera can switch to a SQL model. Move back to the surrounding code and it can switch back to Python.</p>
       <figure class="code-example">
-        <figcaption><code>inventory.py</code></figcaption>
+        <figcaption>
+          <code>inventory.py</code>
+          <span class="code-note">Python with a little SQL</span>
+        </figcaption>
         <pre><code>query = """
-    SELECT name, stock
+    <mark class="query-highlight">SELECT name, stock
     FROM inventory
-    WHERE stock &lt; 10
+    WHERE stock &lt; 10</mark>
 """</code></pre>
       </figure>
       <p>If you’d rather stick with one model, pin it to a file or workspace. Each Tessera model package is under 1 GB, and the model uses some extra memory while it runs.</p>
@@ -83,13 +104,18 @@
         <h2 id="start-heading">Set up in VS Code</h2>
         <svg class="doodle" viewBox="0 0 100 82" aria-hidden="true" focusable="false">
           <path class="doodle-wash" d="M19 26L70 18L84 55L29 70Z"/>
-        <path d="M18 27Q44 22 71 19L81 55Q56 62 28 69Z M21 37L73 28M36 44L46 48L39 55M49 55L61 52"/>
-        <path class="doodle-accent" d="M83 20L88 12M89 28L98 24M36 77Q57 74 75 66"/>
+          <path d="M18 27Q44 22 71 19L81 55Q56 62 28 69Z"/>
+          <path d="M21 37L73 28"/>
+          <path d="M36 44L46 48L39 55"/>
+          <path d="M49 55L61 52"/>
+          <path class="doodle-accent" d="M83 20L88 12"/>
+          <path class="doodle-accent" d="M89 28L98 24"/>
+          <path class="doodle-accent" d="M36 77Q57 74 75 66"/>
         </svg>
       </div>
-      <p>Have the VSIX installer and a compatible GGUF model handy.</p>
+      <p>Grab the VSIX installer and a compatible GGUF model, then open the Command Palette.</p>
       <ol>
-        <li>Run <strong>Extensions: Install from VSIX…</strong> from the Command Palette and select the installer.</li>
+        <li>Run <strong>Extensions: Install from VSIX…</strong> and select the installer.</li>
         <li>Run <strong>Tessera: Open Dashboard</strong>.</li>
         <li>Choose <strong>Add Local GGUF</strong>, select a model role, and open the GGUF file.</li>
       </ol>
@@ -127,12 +153,38 @@
       <h2 id="security-heading">Security policy</h2>
       <p>This policy covers the Tessera VS Code extension, its local model runtime, and model packages and downloads distributed by Tessera.</p>
 
-      <h3>Report a vulnerability privately</h3>
-      <p>Open <a href="https://github.com/somalip/tessera/security/advisories">Tessera’s GitHub Security Advisories</a> and select <strong>Report a vulnerability</strong> if the option is available. If the private form is unavailable, contact the maintainers through an established private channel and keep the details out of public issues and pull requests.</p>
-      <p>Include the affected version, operating system, model or download source if relevant, steps to reproduce the issue, and the potential impact. Before sharing logs or examples, remove credentials, personal paths, and private code. Please coordinate public disclosure with the maintainers so users have time to update.</p>
-
       <h3>Where your code goes</h3>
-      <p>The extension sends prompts and editor context to its local inference server on the same machine. Extension usage metrics stay local. Registry lookups and model downloads connect to their configured sources. Tessera verifies signatures on remote registry indexes and checks downloaded model files against their expected SHA-256 hashes.</p>
+      <figure class="security-flow">
+        <figcaption id="local-flow">On your machine</figcaption>
+        <ol aria-labelledby="local-flow">
+          <li><strong>VS Code</strong><span>Prompt and editor context</span></li>
+          <li><strong>Local inference server</strong><span>Processes the request over loopback</span></li>
+          <li><strong>VS Code</strong><span>Shows the completion or chat reply</span></li>
+        </ol>
+      </figure>
+      <p>Prompts and editor context stay on the machine during inference. Tessera records usage metrics locally.</p>
+
+      <h3>How Tessera checks model downloads</h3>
+      <p>Registry lookups and model downloads connect to their configured sources. When you install from a remote Tessera registry, the extension checks the index and the downloaded package.</p>
+      <figure class="security-flow security-flow-download">
+        <figcaption id="download-flow">From registry to local install</figcaption>
+        <ol aria-labelledby="download-flow">
+          <li><strong>Verify the index</strong><span>Check its signature</span></li>
+          <li><strong>Check the package</strong><span>Match its size and SHA-256 to the index</span></li>
+          <li><strong>Check the weights</strong><span>Match the GGUF hash to its manifest</span></li>
+        </ol>
+      </figure>
+
+      <div class="security-report">
+        <h3>Report a vulnerability privately</h3>
+        <p>Use <a href="https://github.com/somalip/tessera/security/advisories">Tessera’s GitHub Security Advisories</a> and choose <strong>Report a vulnerability</strong>. If the private form is unavailable, contact the maintainers through an established private channel. Keep vulnerability details out of public issues and pull requests.</p>
+        <ul>
+          <li>Include the affected Tessera version, operating system, and model or download source if relevant.</li>
+          <li>Describe how to reproduce the issue and what impact it could have.</li>
+          <li>Remove credentials, personal paths, and private code from logs and examples.</li>
+        </ul>
+        <p>Please coordinate public disclosure with the maintainers so users have time to update.</p>
+      </div>
     </section>
   </main>
 
@@ -143,5 +195,37 @@
       <a href="https://github.com/somalip/tessera/blob/main/eval/README.md">Evaluation</a>
     </nav>
   </footer>
+  <script>
+    if ('IntersectionObserver' in window &&
+        matchMedia('screen and (prefers-reduced-motion: no-preference)').matches) {
+      const doodleObserver = new IntersectionObserver((entries, observer) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          entry.target.classList.replace('doodle-pending', 'doodle-drawing');
+          observer.unobserve(entry.target);
+        }
+      }, { threshold: 0.25 });
+
+      for (const doodle of document.querySelectorAll('.tessera-home .doodle')) {
+        const strokes = [...doodle.querySelectorAll('path:not(.doodle-wash)')];
+        const lengths = strokes.map(stroke => stroke.getTotalLength());
+        const totalLength = lengths.reduce((total, length) => total + length, 0);
+        const drawTime = doodle.classList.contains('hero-doodle') ? 1500 : 800;
+        let delay = 0;
+
+        strokes.forEach((stroke, index) => {
+          const duration = drawTime * lengths[index] / totalLength;
+          stroke.style.setProperty('--stroke-dash', lengths[index] + 3);
+          stroke.style.setProperty('--stroke-duration', duration + 'ms');
+          stroke.style.setProperty('--stroke-delay', delay + 'ms');
+          delay += duration;
+        });
+
+        doodle.style.setProperty('--wash-delay', drawTime + 'ms');
+        doodle.classList.add('doodle-pending');
+        doodleObserver.observe(doodle);
+      }
+    }
+  </script>
 </body>
 </html>

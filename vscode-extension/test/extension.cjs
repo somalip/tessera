@@ -27,6 +27,24 @@ exports.run = async function() {
   assert.ok(commands.includes(dashboardId + ".focus"));
   assert.ok(commands.includes("tessera.ask"));
   assert.ok(commands.includes("tessera.triggerCompletion"));
+  for (const command of ["inspectRoute", "rewrite", "fixDiagnostics"]) {
+    assert.ok(commands.includes(`tessera.${command}`));
+  }
+  const collection = vscode.languages.createDiagnosticCollection("tessera-test");
+  try {
+    const range = new vscode.Range(0, 0, 0, 3);
+    collection.set(document.uri, [new vscode.Diagnostic(range, "Example diagnostic")]);
+    const fixesAt = position => vscode.commands.executeCommand(
+      "vscode.executeCodeActionProvider", document.uri, new vscode.Range(position, position),
+      vscode.CodeActionKind.QuickFix.value,
+    );
+    const fixes = await fixesAt(new vscode.Position(0, 1));
+    assert.ok(fixes.some(fix => fix.command?.command === "tessera.fixDiagnostics"));
+    const unrelated = await fixesAt(new vscode.Position(1, 0));
+    assert.ok(!unrelated.some(fix => fix.command?.command === "tessera.fixDiagnostics"));
+  } finally {
+    collection.dispose();
+  }
   await vscode.commands.executeCommand("tessera.openDashboard");
 
   const installed = {
@@ -80,6 +98,9 @@ exports.run = async function() {
     assert.match(advancedMarkup, /data-action="advanced" aria-pressed="true"/);
     assert.match(advancedMarkup, /Inline first token \(p95\)<\/dt><dd>50 ms/);
     assert.match(webview.html, /data-action="refactor"/);
+    assert.match(webview.html, /data-action="rewrite"/);
+    assert.match(webview.html, /data-action="fix-diagnostics"/);
+    assert.match(webview.html, /data-action="inspect-route"/);
     assert.match(webview.html, /data-action="ask" class="primary"/);
     assert.match(webview.html, /<ul aria-labelledby="models-heading">/);
     assert.deepEqual(webview.options.localResourceRoots, []);

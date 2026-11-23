@@ -1,0 +1,19 @@
+extends: base.yaml
+language: css
+web_training:
+  - ["Give .toolbar a flex layout and 0.5rem gap.", ".toolbar { display: flex; gap: 0.5rem; }"]
+  - ["Make images inside .article fit within their container without distortion.", ".article img { max-inline-size: 100%; block-size: auto; }"]
+  - ["Use logical padding of 2rem on the inline edges of .panel.", ".panel { padding-inline: 2rem; }"]
+  - ["Make .banner sticky against the top of the viewport.", ".banner { position: sticky; inset-block-start: 0; }"]
+  - ["Keep .avatar square and crop the image to fill.", ".avatar { aspect-ratio: 1; object-fit: cover; }"]
+  - ["Make a regular list named .tags wrap its items with flexbox.", ".tags { display: flex; flex-wrap: wrap; }"]
+web_holdout:
+  - prompt: "Return raw CSS that vertically centers flex children of .actions in a row with align-items and display."
+    expected: ".actions { display: flex; align-items: center; }"
+    checks: ['\.actions\s*\{[^}]*display\s*:\s*flex\s*;', '\.actions\s*\{[^}]*align-items\s*:\s*center\b']
+  - prompt: "Return raw CSS giving .dialog a 40rem max-width and a 1rem border-radius."
+    expected: ".dialog { max-width: 40rem; border-radius: 1rem; }"
+    checks: ['\.dialog\s*\{[^}]*max-width\s*:\s*40rem\b', '\.dialog\s*\{[^}]*border-radius\s*:\s*1rem\b']
+  - prompt: "Return raw CSS setting opacity to 0.5 for disabled input elements using the disabled pseudo-class."
+    expected: "input:disabled { opacity: 0.5; }"
+    checks: ['input:disabled\s*\{[^}]*opacity\s*:\s*0?\.5\b']

@@ -27,6 +27,8 @@ const editorActions = [
   { id: "complete", label: "Trigger Completion", command: "tessera.triggerCompletion" },
   { id: "explain", label: "Explain Code", command: "tessera.explain" },
   { id: "refactor", label: "Refactor Code", command: "tessera.refactor" },
+  { id: "rewrite", label: "Rewrite with Instructions…", command: "tessera.rewrite" },
+  { id: "fix-diagnostics", label: "Fix Diagnostics", command: "tessera.fixDiagnostics" },
   { id: "test", label: "Write Tests", command: "tessera.writeTests" },
 ];
 
@@ -35,7 +37,10 @@ function actions({ trusted, language, advanced, sections }: DashboardState) {
   return {
     routing: !visible.includes("routing") ? [] : !trusted
       ? [{ id: "trust", label: "Manage Workspace Trust…", command: "workbench.trust.manage" }]
-      : language ? [{ id: "route", label: "Choose Model…", command: "tessera.pickModel" }] : [],
+      : language ? [
+        { id: "route", label: "Choose Model…", command: "tessera.pickModel" },
+        { id: "inspect-route", label: "Inspect Model Routing…", command: "tessera.inspectRoute" },
+      ] : [],
     editor: trusted && visible.includes("editor") ? (advanced && language ? editorActions : editorActions.slice(0, 2)) : [],
     models: trusted && visible.includes("models") ? [
       { id: "workflow", label: "Models & Workflow", command: "tessera.openWorkflow" },

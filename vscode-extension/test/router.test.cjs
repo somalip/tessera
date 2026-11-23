@@ -1,7 +1,7 @@
 const assert = require("node:assert/strict");
 const { test } = require("node:test");
 const { embeddedLanguage, projectLanguage } = require("../dist/router/detector");
-const { selectModel } = require("../dist/router/policy");
+const { resolveRoute, selectModel } = require("../dist/router/policy");
 const { Lifecycle } = require("../dist/router/lifecycle");
 const ids = ["python", "typescript", "javascript", "c", "cpp", "kotlin", "sql", "rust",
   "css", "go", "general"];
@@ -44,6 +44,25 @@ for (const [index, [language, filename, extra, expected]] of cases.entries()) {
       ?.manifest.id, expected);
   });
 }
+
+test("route explanations follow the same precedence as model selection", () => {
+  const route = { language: "python", filename: "src/a.py", capability: "fim",
+    embedded: "sql", project: "cpp", override: "rust", generalist: "general" };
+  for (const [options, id, reason] of [
+    [{}, "rust", "Model pin"],
+    [{ override: "missing" }, "sql", "Embedded language · sql"],
+    [{ override: "", embedded: "" }, "cpp", "Project language · cpp"],
+    [{ override: "", embedded: "", project: undefined }, "python", "Editor language · python"],
+    [{ override: "", embedded: "", project: undefined, language: "plaintext" }, "python", "Filename pattern"],
+    [{ override: "", embedded: "", project: undefined, language: "java", filename: "" }, "kotlin", "Related language · java"],
+    [{ override: "", embedded: "", project: undefined, language: "plaintext", filename: "" }, "general", "Configured generalist"],
+  ]) {
+    const result = resolveRoute(models, { ...route, ...options });
+    assert.equal(result.model.manifest.id, id);
+    assert.equal(result.reason, reason);
+  }
+  assert.equal(resolveRoute(models, { ...route, capability: "edit" }), undefined);
+});
 
 test("embedded regions and project hints distinguish mixed-language files", () => {
   const embedded = (language, source) => embeddedLanguage(language, source, source.length);

@@ -5,7 +5,9 @@ import sys
 from pathlib import Path
 
 
-def export(checkpoint: Path, converter: Path, output: Path) -> None:
+def export(
+    checkpoint: Path, converter: Path, output: Path, *, exclude_mtp: bool = False
+) -> None:
     subprocess.run(
         [
             sys.executable,
@@ -15,6 +17,7 @@ def export(checkpoint: Path, converter: Path, output: Path) -> None:
             str(output),
             "--outtype",
             "f16",
+            *(["--no-mtp"] if exclude_mtp else []),
         ],
         check=True,
     )

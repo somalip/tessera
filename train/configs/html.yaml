@@ -1,0 +1,19 @@
+extends: base.yaml
+language: html
+web_training:
+  - ["Write a description list with the term Region and the description North.", "<dl><dt>Region</dt><dd>North</dd></dl>"]
+  - ["Create an accessible standalone search input named query with an aria-label of Search catalog.", '<input type="search" name="query" aria-label="Search catalog">']
+  - ["Mark up a standalone quotation containing Stay curious as a block quote.", "<blockquote>Stay curious</blockquote>"]
+  - ["Write a figure containing photo.jpg with Pond as the alternative text and caption.", '<figure><img src="photo.jpg" alt="Pond"><figcaption>Pond</figcaption></figure>']
+  - ["Create a progress indicator at 30 of 100.", '<progress value="30" max="100">30%</progress>']
+  - ["Create a collapsible details panel with summary Shipping and paragraph Allow two days.", "<details><summary>Shipping</summary><p>Allow two days.</p></details>"]
+web_holdout:
+  - prompt: "Return raw HTML for a button that reads Preview and does not submit its form."
+    expected: '<button type="button">Preview</button>'
+    checks: ['<button\b[^>]*\btype=["'']button["''][^>]*>\s*Preview\s*</button>']
+  - prompt: "Return raw HTML for an anchor to #contents reading Skip to contents."
+    expected: '<a href="#contents">Skip to contents</a>'
+    checks: ['<a\b[^>]*\bhref=["'']#contents["''][^>]*>\s*Skip to contents\s*</a>']
+  - prompt: "Return raw HTML with an ordered list containing Mix followed by Bake."
+    expected: "<ol><li>Mix</li><li>Bake</li></ol>"
+    checks: ['(?s)<ol\b[^>]*>\s*<li>\s*Mix\s*</li>\s*<li>\s*Bake\s*</li>\s*</ol>']

@@ -122,3 +122,18 @@ and use an independent evaluation before release.
 For normal Mac use during search, use `nice -n 15`, `--threads 2`,
 `--calibration-gpu-layers 0`, and the direct llama-server binary with
 `LLAMA_ARG_THREADS=2`.
+
+### 24-hour Python search alongside C++
+
+Run `python -m train.python_overnight --hours 24 --threads 1 --output PATH`
+from the repository root with Docker Desktop and the pinned Python verifier
+image. Use the repository virtual environment. The search uses the local
+`artifacts/python-brief` trainer and evaluator with the existing audited
+Python corpus. It benchmarks the starting model and tests fine-tunes with
+different learning rates and epoch counts. It ranks candidates by verified
+passes, with an inference latency improvement of at least 5% breaking ties.
+Every quantized candidate must stay under 1 GB.
+
+Use `caffeinate -is nice -n 15` on a plugged-in Mac to keep the run awake at
+low priority. The default is one CPU thread and CPU-only inference. The
+output directory's `summary.json` tracks the incumbent and completed rounds.

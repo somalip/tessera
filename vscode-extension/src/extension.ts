@@ -18,7 +18,7 @@ import { repositoryFiles, repositoryFromInput, searchRepositories } from "./regi
 import { fetchIndex, modelSizeLimit, ModelStore, type InstalledModel } from "./registry/download";
 import { embeddedLanguage, projectLanguage } from "./router/detector";
 import { Lifecycle } from "./router/lifecycle";
-import { selectModel } from "./router/policy";
+import { resolveRoute } from "./router/policy";
 import { PythonRegions } from "./router/pythonRegions";
 import { byCapability, validateWorkflow, workflowLanguage, workflowForLanguage, workflowKey, type Workflows } from "./router/workflow";
 import { LocalMetrics } from "./telemetry";
@@ -131,13 +131,20 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
     return stopped;
   };
 
-  const candidate = (
+  const routeAt = (
     document: vscode.TextDocument, position: vscode.Position,
     capability: Manifest["capabilities"][number] = "fim",
   ) => {
     if (!vscode.workspace.isTrusted) return;
     const workflow = workflowFor(document);
-    if (workflow) return byCapability(models(), capability === "fim" ? workflow.autocomplete : workflow.generator, capability);
+    if (workflow) {
+      const autocomplete = capability === "fim";
+      const id = autocomplete ? workflow.autocomplete : workflow.generator;
+      return {
+        model: byCapability(models(), id, capability),
+        reason: `Workflow ${autocomplete ? "autocomplete" : "generator"} · ${id || "Unassigned"}`,
+      };
+    }
     const folder = vscode.workspace.getWorkspaceFolder(document.uri)?.uri.toString();
     const docsKey = document.uri.toString();
     const language = document.languageId;
@@ -149,7 +156,7 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
         ? python.at(docsKey, document.version, source, offset)
         : embeddedLanguage(language, source, offset);
     }
-    return selectModel(models(), {
+    return resolveRoute(models(), {
       language, embedded,
       filename: document.uri.fsPath,
       project: projectLanguage(document.uri.fsPath, folder === projectFolder ? projectFiles : new Set()),
@@ -158,6 +165,9 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
       generalist: config().get("generalist"), capability,
     });
   };
+  const candidate = (document: vscode.TextDocument, position: vscode.Position,
+    capability: Manifest["capabilities"][number] = "fim") => routeAt(document, position, capability)?.model;
+
   const endpoint = (model: InstalledModel) => {
     const active = lifecycle;
     return {
@@ -209,21 +219,25 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
       if (vscode.window.activeTextEditor?.document === document) updateStatus();
     }, (code, newFile) => python.projectProblem(code, newFile), workflowFor);
 
-  const chatModel = (editor: vscode.TextEditor, capability: "chat" | "edit") => {
-    const model = candidate(editor.document, editor.selection.active, capability);
+  const chatModel = (editor: vscode.TextEditor, capability: "chat" | "edit", position = editor.selection.active) => {
+    const model = candidate(editor.document, position, capability);
     return model && endpoint(model);
   };
-  const selectChat = () => {
+  const chatRoute = (editor: vscode.TextEditor | undefined) => {
     if (!vscode.workspace.isTrusted) return;
-    const editor = vscode.window.activeTextEditor;
-    const routed = editor && chatModel(editor, "chat");
-    if (routed || (editor && workflowFor(editor.document))) return routed;
+    const routed = editor && routeAt(editor.document, editor.selection.active, "chat");
+    if (routed?.model || (editor && workflowFor(editor.document))) return routed;
     const available = models().filter(model => model.manifest.capabilities.includes("chat"));
-    const fallback = available.find(model => model.manifest.id === config().get("generalist")) ??
-      (available.length === 1 ? available[0] : undefined);
-    return fallback && endpoint(fallback);
+    const generalist = available.find(model => model.manifest.id === config().get("generalist"));
+    if (generalist) return { model: generalist, reason: "Configured generalist" };
+    if (available.length === 1) return { model: available[0], reason: "Only available chat model" };
   };
-  registerCodeActions(context, (editor, action) => chatModel(editor, action === "explain" ? "chat" : "edit"), log);
+  const selectChat = () => {
+    const model = chatRoute(vscode.window.activeTextEditor)?.model;
+    return model && endpoint(model);
+  };
+  registerCodeActions(context, (editor, action, position) =>
+    chatModel(editor, action === "explain" ? "chat" : "edit", position), log);
 
   const showError = (error: unknown) => {
     log.appendLine(String(error));
@@ -457,6 +471,30 @@ export function activate(context: vscode.ExtensionContext): InlineCompletion {
       if (picked === undefined) return;
       await context.globalState.update(key, picked.map(section => section.id));
       dashboard.refresh();
+    }),
+    vscode.commands.registerCommand("tessera.inspectRoute", async () => {
+      const editor = vscode.window.activeTextEditor;
+      if (!editor || !vscode.workspace.isTrusted) return;
+      const { document, selection } = editor;
+      const roles = [["Autocomplete", "fim"], ["Editor chat", "chat"], ["Editor edits", "edit"]] as const;
+      const items: vscode.QuickPickItem[] = roles.map(([label, capability]) => {
+        const route = capability === "chat" ? chatRoute(editor) : routeAt(document, selection.active, capability);
+        return {
+          label,
+          description: route?.model?.manifest.id ?? "No matching model",
+          detail: route?.reason ?? `No eligible match for ${document.languageId}`,
+        };
+      });
+      const last = inlineRoutes.get(document.uri.toString());
+      if (last) items.push({
+        label: "Last inline request", description: inlineRouteName(last),
+        detail: [last.model?.manifest.id, last.parser && `Parser · ${last.parser.manifest.id}`]
+          .filter(Boolean).join(" · "),
+      });
+      await vscode.window.showQuickPick(items, {
+        title: `Tessera model routing · ${document.languageId}`,
+        placeHolder: "Model selection at the cursor",
+      });
     }),
     vscode.commands.registerCommand("tessera.openDashboard",
       () => vscode.commands.executeCommand(`${dashboardId}.focus`)),

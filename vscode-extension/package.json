@@ -189,6 +189,21 @@
         "title": "Tessera: Write Tests"
       },
       {
+        "command": "tessera.rewrite",
+        "title": "Tessera: Rewrite with Instructions",
+        "enablement": "isWorkspaceTrusted && editorLangId"
+      },
+      {
+        "command": "tessera.fixDiagnostics",
+        "title": "Tessera: Fix Diagnostics",
+        "enablement": "isWorkspaceTrusted && editorLangId"
+      },
+      {
+        "command": "tessera.inspectRoute",
+        "title": "Tessera: Inspect Model Routing",
+        "enablement": "isWorkspaceTrusted && editorLangId"
+      },
+      {
         "command": "tessera.exportMetrics",
         "title": "Tessera: Export Local Metrics"
       },

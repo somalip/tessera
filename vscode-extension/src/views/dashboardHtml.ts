@@ -63,10 +63,10 @@ export function renderDashboard({ trusted, advanced, language, active, lastInlin
     <button type="button" data-action="advanced" aria-pressed="${advanced}">Advanced</button>
     <button type="button" data-action="customize-sidebar" title="Choose visible sidebar sections">Customize…</button>
   </div>
-  ${visible.includes("routing") ? `<section aria-labelledby="routing-heading">
+  ${visible.includes("routing") ? `<section class="routing-card" aria-labelledby="routing-heading">
     <h2 id="routing-heading">Current editor</h2>
     <div class="section-content">
-      <div class="routing-heading">
+      <div class="routing-heading"${trusted && routed ? ' data-routed="true"' : ""}>
         <strong>${escapeHtml(routing)}</strong>
         ${trusted && language ? `<span class="language">${escapeHtml(language)}</span>` : ""}
       </div>
@@ -76,7 +76,7 @@ export function renderDashboard({ trusted, advanced, language, active, lastInlin
       ${buttons(groups.routing)}
     </div>
   </section>` : ""}
-  ${groups.editor.length ? `<section aria-labelledby="editor-heading">
+  ${groups.editor.length ? `<section class="editor-actions" aria-labelledby="editor-heading">
     <h2 id="editor-heading">Code actions</h2>
     <div class="section-content">${buttons(groups.editor, "ask")}</div>
   </section>` : ""}
@@ -152,84 +152,85 @@ export function dashboardHtml(markup: string, nonce: string): string {
       overflow-wrap: anywhere;
     }
     main {
-      --section-divider: var(--vscode-sideBarSectionHeader-border, var(--vscode-widget-border, transparent));
-      padding-block: 4px 12px;
+      --divider: var(--vscode-contrastBorder, var(--vscode-widget-border, #80808044));
+      --surface: var(--vscode-editorWidget-background, var(--vscode-sideBar-background));
+      --muted: var(--vscode-descriptionForeground, inherit);
+      padding: 10px clamp(8px, 4vw, 16px) 20px;
     }
+    #dashboard-content { display: grid; gap: 16px; }
     .mode-picker {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
-      margin: 6px 12px 12px;
-      gap: 2px;
-      background: var(--vscode-editorWidget-background);
-      border: 1px solid var(--vscode-widget-border, transparent);
-      border-radius: 4px;
-      padding: 2px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 3px;
+      background: var(--surface);
+      border: 1px solid var(--divider);
+      border-radius: 6px;
+      padding: 3px;
     }
-    .mode-picker button { text-align: center; }
+    .mode-picker button { flex: 1 1 auto; text-align: center; font-size: .92em; }
     .mode-picker button[aria-pressed="true"] {
       background: var(--vscode-button-secondaryBackground);
       color: var(--vscode-button-secondaryForeground);
     }
     main:not(:has([data-resources="true"])) #resources { display: none; }
-    h2 {
-      margin: 0;
-      padding: 5px 16px;
-      border-block-start: 1px solid var(--section-divider);
-      background: var(--vscode-sideBarSectionHeader-background);
-      color: var(--vscode-sideBarSectionHeader-foreground, inherit);
-      font-size: .85em;
-      font-weight: 600;
-      letter-spacing: .025em;
-      text-transform: uppercase;
+    section { min-width: 0; border-block-start: 1px solid var(--divider); padding-block-start: 10px; }
+    #resources { margin-block-start: 16px; }
+    h2 { margin: 0 0 8px; font-size: .94em; font-weight: 600; }
+    .routing-card {
+      border: 1px solid var(--divider);
+      border-radius: 8px;
+      padding: 11px;
+      background: var(--surface);
     }
-    section:first-child h2 { border-block-start: 0; }
-    .section-content { padding: 8px 12px 12px; }
+    .routing-card h2 { color: var(--muted); }
     .routing-heading, .model-heading {
       display: flex;
+      justify-content: space-between;
       align-items: baseline;
       flex-wrap: wrap;
-      gap: 2px 10px;
+      gap: 3px 8px;
     }
-    .routing-heading { justify-content: space-between; padding-inline: 4px; }
-    .routing-heading strong { font-weight: 600; }
-    .routing-heading + p, .section-content > p { margin: 3px 4px 6px; }
-    .language, .muted, .model-status {
-      color: var(--vscode-descriptionForeground, var(--vscode-foreground));
-      font-size: .92em;
-    }
-    .language { font-family: var(--vscode-editor-font-family, monospace); }
-    .model-status { white-space: nowrap; }
-    .model-status::before {
+    .routing-heading strong { font-size: 1.12em; font-weight: 650; }
+    .routing-heading[data-routed="true"] strong::before, .model-status::before {
       content: "";
       display: inline-block;
       width: 6px;
       height: 6px;
-      margin-inline-end: 5px;
+      margin-inline-end: 6px;
       border-radius: 50%;
       background: var(--vscode-testing-iconPassed, currentColor);
-      vertical-align: .12em;
+      vertical-align: .15em;
+    }
+    .section-content > p { margin: 4px 0 0; }
+    .language, .muted, .model-status { color: var(--muted); font-size: .92em; }
+    .language {
+      border: 1px solid var(--divider);
+      border-radius: 4px;
+      padding-inline: 5px;
+      font-family: var(--vscode-editor-font-family, monospace);
     }
     ul { list-style: none; padding: 0; margin: 0; }
-    li { padding: 5px 4px; }
-    li + li { border-block-start: 1px solid var(--section-divider); }
-    .model-heading { justify-content: space-between; }
+    li { padding-block: 7px; }
+    li + li, .usage-row + .usage-row { border-block-start: 1px solid var(--divider); }
     .model-heading strong { font-weight: 600; }
-    .model-actions { margin-block-start: 5px; }
-    .usage { margin: 0 4px; }
-    .usage-row { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0 8px; padding-block: 3px; }
+    .model-actions, .routing-card .actions { margin-block-start: 10px; }
+    .usage { margin: 0; }
+    .usage-row { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0 8px; padding-block: 4px; }
+    .usage-row dt { color: var(--muted); }
     .usage-row dd { margin: 0; font-variant-numeric: tabular-nums; }
-    .resource { margin: 4px 4px 8px; }
+    .resource { margin-block: 4px 10px; }
     .resource-label { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0 8px; }
-    meter { display: block; width: 100%; height: 8px; margin-top: 3px; }
+    meter { display: block; width: 100%; height: 8px; margin-top: 4px; }
     meter::-webkit-meter-bar { border: 0; background: var(--vscode-scrollbarSlider-background); }
     meter::-webkit-meter-optimum-value { background: var(--vscode-progressBar-background); }
-    .actions { display: grid; gap: 2px; }
+    .actions { display: grid; grid-template-columns: minmax(0, 1fr); gap: 5px; }
     button {
       min-width: 0;
-      min-height: 26px;
-      padding: 3px 7px;
+      min-height: 28px;
+      padding: 4px 8px;
       border: 1px solid var(--vscode-contrastBorder, transparent);
-      border-radius: 2px;
+      border-radius: 4px;
       background: transparent;
       color: inherit;
       font: inherit;
@@ -237,23 +238,23 @@ export function dashboardHtml(markup: string, nonce: string): string {
       overflow-wrap: anywhere;
       cursor: pointer;
     }
+    .routing-card button, .editor-actions button { border-color: var(--divider); }
     button:hover {
       background: var(--vscode-list-hoverBackground);
       color: var(--vscode-list-hoverForeground, inherit);
     }
     button.primary {
-      margin-block: 2px 4px;
       border-color: var(--vscode-button-border, var(--vscode-contrastBorder, transparent));
       background: var(--vscode-button-background);
       color: var(--vscode-button-foreground);
       text-align: center;
+      font-weight: 600;
+      min-height: 32px;
     }
     button.primary:hover { background: var(--vscode-button-hoverBackground); }
     button:focus-visible { outline: 1px solid var(--vscode-focusBorder); outline-offset: -1px; }
-    @media (min-width: 350px) {
-      #editor-heading + .section-content .actions {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
+    @media (min-width: 290px) {
+      .editor-actions .actions, .model-actions .actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .actions .primary { grid-column: 1 / -1; }
     }
   </style>

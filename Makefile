@@ -44,3 +44,11 @@ package:
 vsix:
 	mkdir -p artifacts
 	npm --prefix vscode-extension run package
+
+WEB_PYTHON ?= artifacts/web-training-venv/bin/python
+WEB_BASE ?= artifacts/qwen35-08b-training
+WEB_OUTPUT ?= artifacts/web-overnight/$(shell date +%Y%m%d-%H%M%S)
+WEB_ARGS ?=
+.PHONY: web-overnight
+web-overnight:
+	"$(WEB_PYTHON)" -m train.web_overnight --base "$(WEB_BASE)" --output "$(WEB_OUTPUT)" $(WEB_ARGS)

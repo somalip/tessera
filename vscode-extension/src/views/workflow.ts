@@ -199,34 +199,35 @@ function html(nonce: string): string {
   [hidden] { display: none !important; }
   body { margin: 0; padding: 0; color: var(--vscode-editor-foreground); background: var(--vscode-editor-background);
     font: var(--vscode-font-size, 13px)/1.45 var(--vscode-font-family, sans-serif); }
-  body { --divider: var(--vscode-panel-border, var(--vscode-widget-border, #80808044));
+  body { --divider: var(--vscode-contrastBorder, var(--vscode-panel-border, #80808044));
     --surface: var(--vscode-editorWidget-background, var(--vscode-editor-background));
     --muted: var(--vscode-descriptionForeground, var(--vscode-editor-foreground)); }
   main { min-height: 100vh; display: grid; grid-template-columns: clamp(150px, 19vw, 208px) minmax(0, 1fr); }
-  .rail { align-self: start; position: sticky; inset-block-start: 0; padding: 21px 12px 14px;
+  .rail { align-self: start; position: sticky; inset-block-start: 0; padding: 24px 12px 14px;
     min-height: 100vh; background: var(--vscode-sideBar-background, var(--surface));
     color: var(--vscode-sideBar-foreground, inherit); border-inline-end: 1px solid var(--divider); }
   .product { font-size: 16px; font-weight: 650; letter-spacing: -.02em; padding-inline: 9px; margin-bottom: 20px; }
   nav, .rail-tools { display: grid; gap: 3px; }
   .rail-tools { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--divider); }
-  .rail button { text-align: start; min-height: 32px; padding-inline: 9px; }
+  .rail button { text-align: start; min-height: 34px; padding-inline: 10px; }
   .rail button[aria-selected="true"] { font-weight: 600; background: var(--vscode-list-inactiveSelectionBackground, var(--surface));
-    color: var(--vscode-list-inactiveSelectionForeground, inherit); border-inline-start-color: var(--vscode-focusBorder); }
-  .editor { min-width: 0; width: 100%; max-width: 1200px; padding: 0 clamp(16px, 4vw, 42px) 32px; }
-  header { position: sticky; top: 0; z-index: 2; padding-top: 20px; background: var(--vscode-editor-background); }
-  h1 { font-size: 22px; letter-spacing: -.025em; line-height: 1.25; margin: 0 0 5px; font-weight: 650; }
-  .page-heading { padding: 20px 0 12px; border-bottom: 1px solid var(--divider); }
+    color: var(--vscode-list-inactiveSelectionForeground, inherit); border-inline-start-color: var(--vscode-textLink-foreground); }
+  .editor { container-type: inline-size; min-width: 0; width: 100%; max-width: 1200px; padding: 0 clamp(16px, 4vw, 42px) 32px; }
+  header { padding-top: 26px; }
+  h1 { font-size: 25px; letter-spacing: -.025em; line-height: 1.25; margin: 0 0 5px; font-weight: 650; }
+  .page-heading { padding: 26px 0 14px; border-bottom: 1px solid var(--divider); }
   .actions, .controls { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
   .toolbar { min-height: 43px; display: flex; justify-content: space-between; align-items: center;
-    flex-wrap: wrap; gap: 6px 14px; padding: 11px 0; border-bottom: 1px solid var(--vscode-panel-border); }
+    flex-wrap: wrap; gap: 8px 14px; margin-top: 14px; padding: 9px; border: 1px solid var(--divider);
+    border-radius: 6px; background: var(--surface); }
   .toolbar input { width: 104px; }
-  .status, p { color: var(--vscode-descriptionForeground); margin: 0; }
+  .status, p { color: var(--muted); margin: 0; overflow-wrap: anywhere; }
   .error { color: var(--vscode-errorForeground); margin: 6px 0; }
   .error:empty { display: none; }
-  input, button { font: inherit; min-height: 28px; border-radius: 4px; }
+  input, button { font: inherit; min-height: 30px; border-radius: 4px; }
   input { color: var(--vscode-input-foreground); background: var(--vscode-input-background);
     border: 1px solid var(--vscode-input-border, var(--vscode-panel-border)); padding: 2px 6px; }
-  button { border: 1px solid transparent; padding: 2px 7px; cursor: pointer; color: inherit; background: transparent; }
+  button { border: 1px solid var(--vscode-contrastBorder, transparent); padding: 3px 9px; cursor: pointer; color: inherit; background: transparent; }
   button:hover { background: var(--vscode-toolbar-hoverBackground, var(--vscode-list-hoverBackground)); }
   button.primary { color: var(--vscode-button-foreground); background: var(--vscode-button-background);
     border-color: var(--vscode-button-border, transparent); }
@@ -238,9 +239,11 @@ function html(nonce: string): string {
   .browse, .section-heading { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 18px 0 8px; }
   .section-heading { justify-content: space-between; }
   .browse input { flex: 1; min-width: min(220px, 100%); }
-  .rows { border-block-start: 1px solid var(--vscode-panel-border); }
-  .row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(135px, .7fr) auto; align-items: center;
-    padding: 8px 10px; min-height: 44px; gap: 12px; border-bottom: 1px solid var(--vscode-panel-border); }
+  .rows { border: 1px solid var(--divider); border-radius: 6px; }
+  .rows > .empty { padding: 12px; }
+  .row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .85fr) auto; align-items: center;
+    padding: 10px 12px; min-height: 48px; gap: 12px; }
+  .row + .row { border-block-start: 1px solid var(--divider); }
   .row:hover { background: var(--vscode-list-hoverBackground); }
   .row strong { font-weight: 500; overflow-wrap: anywhere; }
   .row p { font-size: .92em; }
@@ -276,11 +279,11 @@ function html(nonce: string): string {
   #to-auto { grid-column: 2; grid-row: 1; margin-left: 38%; }
   #to-parser { grid-column: 2; grid-row: 2; margin-left: 38%; }
   #to-generator { grid-column: 4; grid-row: 2; }
-  .palette { display: flex; flex-wrap: wrap; gap: 4px; margin-block: 6px; }
-  .palette span { padding: 2px 6px; border: 1px solid var(--vscode-panel-border); border-radius: 2px;
+  .palette { display: flex; flex-wrap: wrap; gap: 6px; margin-block: 8px; }
+  .palette span { padding: 2px 6px; border: 1px solid var(--vscode-panel-border); border-radius: 4px;
     cursor: grab; overflow-wrap: anywhere; }
   .palette span:hover { background: var(--vscode-list-hoverBackground); }
-  details { margin: 10px 0; }
+  details { margin: 10px 0; padding: 9px 11px; border: 1px solid var(--divider); border-radius: 6px; }
   summary { cursor: pointer; color: var(--vscode-descriptionForeground); }
   details p { margin: 5px 0; }
   @media (max-width: 690px) {
@@ -291,13 +294,43 @@ function html(nonce: string): string {
     nav, .rail-tools { display: flex; flex-wrap: wrap; }
     .rail-tools { border: 0; padding: 0; margin: 0; }
   }
-  @media (max-width: 480px) {
-    .graph { grid-template-columns: minmax(0, .85fr) 16px minmax(0, 1fr) 16px minmax(0, 1fr);
-      padding: 6px; row-gap: 8px; }
-    .node { padding: 3px; overflow-wrap: anywhere; }
-    .row { grid-template-columns: minmax(0, 1fr) auto; }
+  @container (max-width: 475px) {
+    .graph {
+      grid-template-columns: 16px minmax(0, 1fr);
+      grid-template-rows: auto minmax(80px, auto) minmax(80px, auto) 14px auto;
+      row-gap: 0;
+    }
+    .router { grid-area: 1 / 1 / 2 / 3; }
+    .auto, .parser, .generator, #to-generator { grid-column: 2; }
+    .auto { grid-row: 2; }
+    .parser { grid-row: 3; }
+    .auto, .parser { margin-block-start: 8px; }
+    .generator { grid-row: 5; }
+    #branch { grid-area: 2 / 1 / 3 / 2; }
+    #branch::before { display: none; }
+    #branch::after { top: 0; bottom: 0; left: 0; }
+    #to-auto, #to-parser { grid-column: 1; margin-left: 0; }
+    #to-auto { grid-row: 2; }
+    #to-parser { grid-row: 3; align-self: stretch; border-top: 0; }
+    #to-parser::before {
+      content: ""; position: absolute; inset: 0 0 calc(50% - 4px) 0;
+      border-inline-start: 1px solid currentColor; border-block-end: 1px dashed currentColor;
+    }
+    #to-parser[data-connected="true"]::before { border-block-end-style: solid; }
+    #to-parser::after { top: calc(50% + 1px); }
+    #to-generator {
+      grid-row: 4; align-self: stretch; justify-self: center;
+      border-top: 0; border-inline-start: 1px dashed currentColor;
+    }
+    #to-generator[data-connected="true"] { border-inline-start-style: solid; }
+    #to-generator::after { inset: auto auto 1px -3px; transform: rotate(135deg); }
+    .row { grid-template-columns: minmax(0, 1fr) auto; gap: 4px 8px; }
     .row p { grid-row: 2; }
     .row button { grid-area: 1 / 2 / 3 / 3; }
+  }
+  @container (max-width: 270px) {
+    .row { grid-template-columns: minmax(0, 1fr); }
+    .row button { grid-area: auto; justify-self: start; }
   }
 </style>
 </head>
@@ -435,7 +468,12 @@ function html(nonce: string): string {
       button.addEventListener('click', () => vscode.postMessage({ action: 'test', value: model.id }));
       return modelRow(model, button);
     }));
-    if (!matching.length) get('models').textContent = query ? 'No matching installed models.' : 'Add or download a model to start.';
+    if (!matching.length) {
+      const emptyState = document.createElement('p');
+      emptyState.className = 'empty';
+      emptyState.textContent = query ? 'No matching installed models.' : 'Add or download a model to start.';
+      get('models').append(emptyState);
+    }
   }
   function renderLibrary() {
     renderInstalled();
